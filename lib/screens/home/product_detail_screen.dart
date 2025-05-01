@@ -1,0 +1,339 @@
+import 'package:flutter/material.dart';
+import 'package:awesome_dialog/awesome_dialog.dart';
+import 'package:souqe/constants/app_routes.dart';
+import 'package:souqe/constants/colors.dart';
+import 'package:souqe/models/product.dart';
+import 'package:souqe/mock/dummy_products.dart'; // for suggested product lookup
+
+class ProductDetailScreen extends StatefulWidget {
+  final Product product;
+  const ProductDetailScreen({super.key, required this.product});
+
+  @override
+  State<ProductDetailScreen> createState() => _ProductDetailScreenState();
+}
+
+class _ProductDetailScreenState extends State<ProductDetailScreen> {
+  int quantity = 1;
+  bool hasSeenWarning = false;
+  bool showSuggestion = false;
+
+  void _showAllergenWarning() {
+    AwesomeDialog(
+      context: context,
+      dialogType: DialogType.warning,
+      animType: AnimType.rightSlide,
+      title: 'Allergen Warning',
+      desc: 'This product contains the following allergens:\n\n'
+          '${widget.product.allergens.map((e) => '• $e').join('\n')}',
+      btnOkOnPress: () {
+        setState(() {
+          hasSeenWarning = true;
+          if (widget.product.suggestedProductId != null) {
+            showSuggestion = true;
+          }
+        });
+      },
+    ).show();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final product = widget.product;
+
+    return Scaffold(
+      backgroundColor: AppColors.background,
+      appBar: AppBar(
+        backgroundColor: AppColors.background,
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Colors.black),
+          onPressed: () => Navigator.pop(context),
+        ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.favorite_border, color: Colors.black),
+            tooltip: 'Add to Favorites',
+            onPressed: () {},
+          ),
+        ],
+      ),
+      body: Stack(
+        children: [
+          Column(
+            children: [
+              Container(
+                height: 140,
+                width: double.infinity,
+                margin: const EdgeInsets.symmetric(horizontal: 16),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(16),
+                  image: DecorationImage(
+                    image: AssetImage(product.imageUrl),
+                    fit: BoxFit.contain,
+                  ),
+                ),
+              ),
+              if (product.allergens.isNotEmpty)
+                Container(
+                  margin: const EdgeInsets.symmetric(vertical: 12),
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  decoration: BoxDecoration(
+                    color: Colors.red.shade100,
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: const Text(
+                    'Contains allergens',
+                    style: TextStyle(
+                      fontSize: 12,
+                      fontFamily: 'Inter',
+                      color: Colors.red,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+              const SizedBox(height: 16),
+              Expanded(
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                  child: SingleChildScrollView(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Center(
+                          child: Column(
+                            children: [
+                              Text(
+                                product.name,
+                                style: const TextStyle(
+                                  fontSize: 25,
+                                  fontWeight: FontWeight.bold,
+                                  fontFamily: 'Montserrat',
+                                  color: AppColors.primary,
+                                ),
+                              ),
+                              const SizedBox(height: 4),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          product.description,
+                          style: const TextStyle(
+                            fontSize: 14,
+                            fontFamily: 'Inter',
+                            color: AppColors.textMedium,
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Container(
+                              decoration: BoxDecoration(
+                                border: Border.all(color: AppColors.textLight),
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              child: Row(
+                                children: [
+                                  IconButton(
+                                    icon: const Icon(Icons.remove),
+                                    onPressed: () {
+                                      if (quantity > 1) {
+                                        setState(() => quantity--);
+                                      }
+                                    },
+                                  ),
+                                  Text(
+                                    '$quantity',
+                                    style: const TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w600,
+                                      fontFamily: 'Inter',
+                                    ),
+                                  ),
+                                  IconButton(
+                                    icon: const Icon(Icons.add),
+                                    onPressed: () {
+                                      setState(() => quantity++);
+                                    },
+                                  ),
+                                ],
+                              ),
+                            ),
+                            Text(
+                              '\$${(product.price * quantity).toStringAsFixed(2)}',
+                              style: const TextStyle(
+                                fontSize: 22,
+                                fontWeight: FontWeight.bold,
+                                color: AppColors.primaryLight,
+                                fontFamily: 'Montserrat',
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 24),
+                        const Text(
+                          'Product Detail',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            fontFamily: 'Inter',
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        const Text(
+                          'Apples are nutritious. Apples may be good for weight loss. Apples may be good for your heart. As part of a healthful and varied diet.',
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: AppColors.textMedium,
+                            fontFamily: 'Inter',
+                          ),
+                        ),
+                        const SizedBox(height: 24),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            const Text(
+                              'Nutritions',
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w500,
+                                fontFamily: 'Inter',
+                              ),
+                            ),
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                              decoration: BoxDecoration(
+                                color: AppColors.surface,
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: const Text(
+                                '100gr',
+                                style: TextStyle(fontSize: 14, fontFamily: 'Inter'),
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 24),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: const [
+                            Text(
+                              'Review',
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w500,
+                                fontFamily: 'Inter',
+                              ),
+                            ),
+                            Row(
+                              children: [
+                                Icon(Icons.star, color: Colors.orange, size: 20),
+                                Icon(Icons.star, color: Colors.orange, size: 20),
+                                Icon(Icons.star, color: Colors.orange, size: 20),
+                                Icon(Icons.star, color: Colors.orange, size: 20),
+                                Icon(Icons.star, color: Colors.orange, size: 20),
+                              ],
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 32),
+                        SizedBox(
+                          width: double.infinity,
+                          child: ElevatedButton(
+                            onPressed: () {
+                              if (product.allergens.isNotEmpty && !hasSeenWarning) {
+                                _showAllergenWarning();
+                              } else {
+                                Navigator.pushNamed(context, AppRoutes.cart);
+                              }
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: AppColors.primary,
+                              padding: const EdgeInsets.symmetric(vertical: 16),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                            ),
+                            child: Text(
+                              hasSeenWarning ? 'Go to Cart' : 'Add To Basket',
+                              style: const TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                                fontFamily: 'Inter',
+                                color: Colors.white,
+                              ),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+
+          // ✅ Suggested product note
+          if (showSuggestion && product.suggestedProductId != null)
+            Positioned(
+              bottom: 20,
+              right: 20,
+              child: Material(
+                elevation: 4,
+                color: AppColors.surface,
+                borderRadius: BorderRadius.circular(12),
+                child: InkWell(
+                  onTap: () {
+                    final suggested = dummyProducts.firstWhere(
+                      (p) => p.id == product.suggestedProductId,
+                      orElse: () => product,
+                    );
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => ProductDetailScreen(product: suggested),
+                      ),
+                    );
+                  },
+                  child: Container(
+                    padding: const EdgeInsets.all(12),
+                    width: 220,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Row(
+                      children: [
+                        const Icon(Icons.info_outline, color: AppColors.primary),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Text(
+                            'You may also like: Spices',
+                            style: const TextStyle(
+                              fontSize: 13,
+                              fontFamily: 'Inter',
+                            ),
+                          ),
+                        ),
+                        GestureDetector(
+                          onTap: () {
+                            setState(() => showSuggestion = false);
+                          },
+                          child: const Padding(
+                            padding: EdgeInsets.only(left: 6),
+                            child: Icon(Icons.close, size: 16),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+}

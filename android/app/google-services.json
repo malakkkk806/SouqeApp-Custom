@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "497705829988",
+    "project_id": "souqe-app-35c82",
+    "storage_bucket": "souqe-app-35c82.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:497705829988:android:3705f8359f69bf66a20171",
+        "android_client_info": {
+          "package_name": "com.example.mobapp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCTEuiNLLkvNzCo8eOja2qgsnK1VzqEGhQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

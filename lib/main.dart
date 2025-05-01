@@ -1,0 +1,101 @@
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:firebase_core/firebase_core.dart';
+//import 'firebase_options.dart';
+
+// Constants
+import 'constants/app_routes.dart';
+import 'constants/colors.dart';
+
+// Screens
+import 'screens/onboarding/intro_screen.dart';
+import 'screens/onboarding/onboarding_screen.dart';
+import 'screens/auth/signin_screen.dart';
+import 'screens/auth/login_screen.dart';
+import 'screens/auth/signup_screen.dart';
+import 'screens/auth/forgot_password_screen.dart';
+import 'screens/auth/otp_screen.dart';
+import 'screens/auth/reset_password_screen.dart';
+import 'screens/home/home_screen.dart';
+import 'screens/cart/cart_screen.dart';
+import 'screens/cart/order_status_screen.dart';
+import 'screens/cart/track_order_screen.dart';
+import 'screens/medical/medical_history_screen.dart';
+import 'screens/explore/explore_screen.dart';
+import 'screens/profile/account_screen.dart';
+
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  // Initialize Firebase
+  await Firebase.initializeApp(
+    //options: DefaultFirebaseOptions.currentPlatform,
+  );
+
+  // System UI styling
+  SystemChrome.setSystemUIOverlayStyle(
+    const SystemUiOverlayStyle(
+      statusBarColor: AppColors.primary,
+      statusBarIconBrightness: Brightness.light,
+    ),
+  );
+
+  // Debug line to confirm app launch
+  debugPrint('Flutter app is launching...');
+
+  runApp(const MyApp());
+}
+
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'SOUQÉ',
+      debugShowCheckedModeBanner: false,
+      theme: ThemeData(
+        colorScheme: const ColorScheme.light(
+          primary: AppColors.primary,
+          secondary: AppColors.secondary,
+          surface: AppColors.surface,
+          error: AppColors.error,
+        ),
+        scaffoldBackgroundColor: AppColors.background,
+        appBarTheme: const AppBarTheme(
+          elevation: 0,
+          centerTitle: true,
+          backgroundColor: Colors.transparent,
+          foregroundColor: AppColors.textDark,
+        ),
+        fontFamily: 'Roboto',
+        useMaterial3: true,
+      ),
+
+      // Change this line to test different screens:
+      initialRoute: AppRoutes.splash,
+
+      routes: {
+        AppRoutes.splash: (context) => const IntroScreen(),
+        AppRoutes.onboarding: (context) => const OnboardingScreen(),
+        AppRoutes.signin: (context) => const SignInScreen(),
+        AppRoutes.signup: (context) => const SignUpScreen(),
+        AppRoutes.login: (context) => const LogInScreen(),
+        AppRoutes.home: (context) => const HomeScreen(),
+        AppRoutes.forgotPassword: (context) => const ForgotPasswordScreen(),
+        AppRoutes.medicalHistory: (context) => const MedicalHistoryScreen(),
+        AppRoutes.cart: (context) => const CartScreen(),
+        AppRoutes.otp: (context) => const OTPScreen(),
+        AppRoutes.resetPassword: (context) => const ResetPasswordScreen(),
+        AppRoutes.explore: (context) => const ExploreScreen(),
+        AppRoutes.trackOrder: (context) => const TrackOrderScreen(),
+        AppRoutes.account: (context) => const AccountScreen(),
+        AppRoutes.orderStatus: (context) {
+          final args = ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>?;
+          final isSuccess = args?['success'] ?? false;
+          return OrderStatusScreen(isSuccess: isSuccess);
+        },
+      },
+    );
+  }
+}
