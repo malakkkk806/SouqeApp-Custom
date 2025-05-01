@@ -18,7 +18,6 @@ class SignInScreenState extends State<SignInScreen> {
   String searchQuery = '';
   final TextEditingController _phoneController = TextEditingController();
   final FocusNode _phoneFocusNode = FocusNode();
-
   final FirebaseAuth _auth = FirebaseAuth.instance;
   bool _isLoading = false;
 
@@ -52,29 +51,34 @@ class SignInScreenState extends State<SignInScreen> {
 
     setState(() => _isLoading = true);
 
-    await _auth.verifyPhoneNumber(
-      phoneNumber: fullPhone,
-      verificationCompleted: (PhoneAuthCredential credential) async {
-        // Optional: auto-sign-in
-        await _auth.signInWithCredential(credential);
-      },
-      verificationFailed: (FirebaseAuthException e) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Verification failed: ${e.message}")),
-        );
-      },
-      codeSent: (String verificationId, int? resendToken) {
-        Navigator.pushNamed(
-          context,
-          AppRoutes.otp,
-          arguments: {
-            'verificationId': verificationId,
-            'phone': fullPhone,
-          },
-        );
-      },
-      codeAutoRetrievalTimeout: (String verificationId) {},
-    );
+    try {
+      await _auth.verifyPhoneNumber(
+        phoneNumber: fullPhone,
+        verificationCompleted: (PhoneAuthCredential credential) async {
+          await _auth.signInWithCredential(credential);
+        },
+        verificationFailed: (FirebaseAuthException e) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text("Verification failed: ${e.message}")),
+          );
+        },
+        codeSent: (String verificationId, int? resendToken) {
+          Navigator.pushNamed(
+            context,
+            AppRoutes.otp,
+            arguments: {
+              'verificationId': verificationId,
+              'phone': fullPhone,
+            },
+          );
+        },
+        codeAutoRetrievalTimeout: (String verificationId) {},
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Error: $e")),
+      );
+    }
 
     setState(() => _isLoading = false);
   }
@@ -91,13 +95,11 @@ class SignInScreenState extends State<SignInScreen> {
     return Scaffold(
       body: Stack(
         children: [
-          Container(
-            decoration: BoxDecoration(
-              image: DecorationImage(
-                image: AssetImage(AppImages.bagPhoto),
-                fit: BoxFit.cover,
-              ),
-            ),
+          Image.asset(
+            AppImages.bagPhoto,
+            fit: BoxFit.cover,
+            width: double.infinity,
+            height: double.infinity,
           ),
           Container(color: AppColors.black40),
           Center(
@@ -141,14 +143,13 @@ class SignInScreenState extends State<SignInScreen> {
                                     Text(
                                       countryCode,
                                       style: TextStyle(
-                                        fontSize: 16,
+                                        fontSize: 18,
                                         color: AppColors.grey[800],
                                         fontFamily: 'Inter',
                                         fontWeight: FontWeight.w500,
                                       ),
                                     ),
-                                    const SizedBox(width: 4),
-                                    Icon(Icons.arrow_drop_down, color: AppColors.grey[600], size: 20),
+                                    const Icon(Icons.arrow_drop_down),
                                   ],
                                 ),
                               ),
@@ -159,13 +160,15 @@ class SignInScreenState extends State<SignInScreen> {
                                 controller: _phoneController,
                                 focusNode: _phoneFocusNode,
                                 keyboardType: TextInputType.phone,
+                                style: const TextStyle(fontSize: 18),
                                 decoration: InputDecoration(
                                   hintText: 'Enter your phone number',
+                                  hintStyle: const TextStyle(fontSize: 18),
                                   border: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(8),
                                     borderSide: BorderSide(color: AppColors.grey.shade300),
                                   ),
-                                  contentPadding: const EdgeInsets.symmetric(horizontal: 16),
+                                  contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
                                 ),
                               ),
                             ),
@@ -173,24 +176,27 @@ class SignInScreenState extends State<SignInScreen> {
                         ),
                         const SizedBox(height: 24),
                         SizedBox(
+                          height: 56,
                           width: double.infinity,
                           child: ElevatedButton(
                             onPressed: _isLoading ? null : _startPhoneVerification,
                             style: ElevatedButton.styleFrom(
                               backgroundColor: AppColors.primary,
-                              padding: const EdgeInsets.symmetric(vertical: 16),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(12),
-                              ),
-                              textStyle: const TextStyle(
-                                fontFamily: 'Inter',
-                                fontWeight: FontWeight.w600,
-                                fontSize: 18,
                               ),
                             ),
                             child: _isLoading
                                 ? const CircularProgressIndicator(color: Colors.white)
-                                : const Text('Continue'),
+                                : const Text(
+                                    'Send OTP',
+                                    style: TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold,
+                                      fontFamily: 'Inter',
+                                      color: Colors.white,
+                                    ),
+                                  ),
                           ),
                         ),
                         const SizedBox(height: 16),
@@ -203,41 +209,49 @@ class SignInScreenState extends State<SignInScreen> {
                           ),
                         ),
                         const SizedBox(height: 24),
-                        ElevatedButton(
-                          onPressed: () {},
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(0xFF1877F2),
-                            foregroundColor: AppColors.white,
-                            padding: const EdgeInsets.symmetric(vertical: 20),
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                          ),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: const [
-                              Icon(Icons.facebook),
-                              SizedBox(width: 14),
-                              Text('Sign in with Facebook'),
-                            ],
+                        SizedBox(
+                          height: 56,
+                          width: double.infinity,
+                          child: ElevatedButton.icon(
+                            onPressed: () {},
+                            icon: const Icon(Icons.facebook, size: 24),
+                            label: const Text(
+                              'Sign in with Facebook',
+                              style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.w600,
+                                fontFamily: 'Inter',
+                              ),
+                            ),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: const Color(0xFF1877F2),
+                              foregroundColor: Colors.white,
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                            ),
                           ),
                         ),
                         const SizedBox(height: 20),
-                        ElevatedButton(
-                          onPressed: () {
-                            Navigator.pushNamed(context, AppRoutes.signup);
-                          },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.green,
-                            foregroundColor: AppColors.white,
-                            padding: const EdgeInsets.symmetric(vertical: 20),
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                          ),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: const [
-                              Icon(Icons.g_mobiledata),
-                              SizedBox(width: 14),
-                              Text('Sign in with Google'),
-                            ],
+                        SizedBox(
+                          height: 56,
+                          width: double.infinity,
+                          child: ElevatedButton.icon(
+                            onPressed: () {
+                              Navigator.pushNamed(context, AppRoutes.signup);
+                            },
+                            icon: const Icon(Icons.g_mobiledata, size: 28),
+                            label: const Text(
+                              'Sign in with Google',
+                              style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.w600,
+                                fontFamily: 'Inter',
+                              ),
+                            ),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.green,
+                              foregroundColor: Colors.white,
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                            ),
                           ),
                         ),
                         const SizedBox(height: 16),
