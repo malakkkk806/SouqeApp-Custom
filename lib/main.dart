@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:firebase_core/firebase_core.dart';
-//import 'firebase_options.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 // Constants
 import 'constants/app_routes.dart';
@@ -24,15 +25,20 @@ import 'screens/medical/medical_history_screen.dart';
 import 'screens/explore/explore_screen.dart';
 import 'screens/profile/account_screen.dart';
 
+// Local notification instance
+final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+    FlutterLocalNotificationsPlugin();
+
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   // Initialize Firebase
-  await Firebase.initializeApp(
-    //options: DefaultFirebaseOptions.currentPlatform,
-  );
+  await Firebase.initializeApp();
 
-  // System UI styling
+  // Request permission and setup notifications
+  await _setupNotifications();
+
+  // Optional: set status bar UI style
   SystemChrome.setSystemUIOverlayStyle(
     const SystemUiOverlayStyle(
       statusBarColor: AppColors.primary,
@@ -40,10 +46,51 @@ Future<void> main() async {
     ),
   );
 
-  // Debug line to confirm app launch
-  debugPrint('Flutter app is launching...');
-
   runApp(const MyApp());
+}
+
+Future<void> _setupNotifications() async {
+  final FirebaseMessaging messaging = FirebaseMessaging.instance;
+
+  // Request permission (Android 13+)
+  NotificationSettings settings = await messaging.requestPermission(
+    alert: true,
+    badge: true,
+    sound: true,
+  );
+
+  print('Notification permission: ${settings.authorizationStatus}');
+
+  // Fetch FCM token
+  String? token = await messaging.getToken();
+  print('FCM Token: $token');
+
+  // Local notifications setup
+  const androidSettings = AndroidInitializationSettings('@mipmap/ic_launcher');
+  const initSettings = InitializationSettings(android: androidSettings);
+  await flutterLocalNotificationsPlugin.initialize(initSettings);
+
+  // Foreground message handler
+  FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+    final notification = message.notification;
+    final android = message.notification?.android;
+
+    if (notification != null && android != null) {
+      flutterLocalNotificationsPlugin.show(
+        notification.hashCode,
+        notification.title,
+        notification.body,
+        const NotificationDetails(
+          android: AndroidNotificationDetails(
+            'default_channel',
+            'Default',
+            importance: Importance.max,
+            priority: Priority.high,
+          ),
+        ),
+      );
+    }
+  });
 }
 
 class MyApp extends StatelessWidget {
@@ -71,10 +118,7 @@ class MyApp extends StatelessWidget {
         fontFamily: 'Roboto',
         useMaterial3: true,
       ),
-
-      // Change this line to test different screens:
       initialRoute: AppRoutes.splash,
-
       routes: {
         AppRoutes.splash: (context) => const IntroScreen(),
         AppRoutes.onboarding: (context) => const OnboardingScreen(),

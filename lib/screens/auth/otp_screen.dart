@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:souqe/constants/colors.dart';
 import 'package:souqe/constants/app_routes.dart';
 import 'package:souqe/constants/app_images.dart';
@@ -12,11 +13,15 @@ class OTPScreen extends StatefulWidget {
 }
 
 class _OTPScreenState extends State<OTPScreen> {
+  late String verificationId;
+  late String phone;
+  final TextEditingController _otpController = TextEditingController();
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+
   late Timer _timer;
   int _start = 30;
   bool _isResendEnabled = false;
-
-  final TextEditingController _otpController = TextEditingController();
+  bool _isLoading = false;
 
   @override
   void initState() {
@@ -48,26 +53,50 @@ class _OTPScreenState extends State<OTPScreen> {
     super.dispose();
   }
 
-  void _verifyOTP() {
-    // Skip backend verification
-    if (_otpController.text.length == 6) {
-      Navigator.pushReplacementNamed(context, AppRoutes.medicalHistory);
-    } else {
+  void _verifyOTP() async {
+    final code = _otpController.text.trim();
+
+    if (code.length != 6) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Please enter a valid 6-digit code'),
           backgroundColor: AppColors.primary,
         ),
       );
+      return;
+    }
+
+    setState(() => _isLoading = true);
+
+    try {
+      final credential = PhoneAuthProvider.credential(
+        verificationId: verificationId,
+        smsCode: code,
+      );
+
+      final result = await _auth.signInWithCredential(credential);
+
+      if (result.user != null) {
+        Navigator.pushReplacementNamed(context, AppRoutes.medicalHistory);
+      }
+    } on FirebaseAuthException catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error: ${e.message}')),
+      );
+    } finally {
+      setState(() => _isLoading = false);
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final args = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
+    verificationId = args?['verificationId'] ?? '';
+    phone = args?['phone'] ?? '';
+
     return Scaffold(
       body: Stack(
         children: [
-          // Background
           Container(
             decoration: BoxDecoration(
               image: DecorationImage(
@@ -76,10 +105,7 @@ class _OTPScreenState extends State<OTPScreen> {
               ),
             ),
           ),
-          // Overlay
           Container(color: AppColors.black40),
-
-          // Content
           SingleChildScrollView(
             child: SafeArea(
               child: Padding(
@@ -87,14 +113,11 @@ class _OTPScreenState extends State<OTPScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Back button
                     IconButton(
                       icon: const Icon(Icons.arrow_back, color: Colors.white),
                       onPressed: () => Navigator.pop(context),
                     ),
                     const SizedBox(height: 20),
-
-                    // Logo
                     Center(
                       child: Text(
                         'SOUQÉ',
@@ -108,8 +131,6 @@ class _OTPScreenState extends State<OTPScreen> {
                       ),
                     ),
                     const SizedBox(height: 40),
-
-                    // OTP container
                     Container(
                       padding: const EdgeInsets.all(24),
                       decoration: BoxDecoration(
@@ -119,7 +140,6 @@ class _OTPScreenState extends State<OTPScreen> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          // Title
                           Text(
                             'Enter OTP',
                             style: TextStyle(
@@ -130,10 +150,8 @@ class _OTPScreenState extends State<OTPScreen> {
                             ),
                           ),
                           const SizedBox(height: 8),
-
-                          // Subtitle
                           Text(
-                            'We’ve sent a 6-digit verification code to your phone.',
+                            'We’ve sent a 6-digit verification code to $phone.',
                             style: TextStyle(
                               fontSize: 16,
                               fontFamily: 'Inter',
@@ -141,8 +159,6 @@ class _OTPScreenState extends State<OTPScreen> {
                             ),
                           ),
                           const SizedBox(height: 32),
-
-                          // OTP input
                           TextFormField(
                             controller: _otpController,
                             keyboardType: TextInputType.number,
@@ -161,14 +177,12 @@ class _OTPScreenState extends State<OTPScreen> {
                             textAlign: TextAlign.center,
                           ),
                           const SizedBox(height: 16),
-
-                          // Resend Code
                           Center(
                             child: _isResendEnabled
                                 ? TextButton(
                                     onPressed: () {
                                       startTimer();
-                                      // Skip resend logic for now
+                                      // TODO: Implement resend logic
                                     },
                                     child: const Text(
                                       'Resend Code',
@@ -188,13 +202,11 @@ class _OTPScreenState extends State<OTPScreen> {
                                   ),
                           ),
                           const SizedBox(height: 24),
-
-                          // Verify button
                           SizedBox(
                             width: double.infinity,
                             height: 50,
                             child: ElevatedButton(
-                              onPressed: _verifyOTP,
+                              onPressed: _isLoading ? null : _verifyOTP,
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: AppColors.primary,
                                 foregroundColor: AppColors.white,
@@ -203,7 +215,9 @@ class _OTPScreenState extends State<OTPScreen> {
                                   fontWeight: FontWeight.bold,
                                 ),
                               ),
-                              child: const Text('Verify'),
+                              child: _isLoading
+                                  ? const CircularProgressIndicator(color: Colors.white)
+                                  : const Text('Verify'),
                             ),
                           ),
                         ],

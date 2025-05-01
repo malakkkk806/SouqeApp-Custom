@@ -3,6 +3,7 @@ import 'package:souqe/constants/app_images.dart';
 import 'package:souqe/constants/colors.dart';
 import 'package:souqe/constants/country_codes.dart';
 import 'package:souqe/constants/app_routes.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class SignInScreen extends StatefulWidget {
   const SignInScreen({super.key});
@@ -17,6 +18,9 @@ class SignInScreenState extends State<SignInScreen> {
   String searchQuery = '';
   final TextEditingController _phoneController = TextEditingController();
   final FocusNode _phoneFocusNode = FocusNode();
+
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+  bool _isLoading = false;
 
   void _selectCountry(String code) {
     setState(() {
@@ -36,6 +40,45 @@ class SignInScreenState extends State<SignInScreen> {
     }).toList();
   }
 
+  void _startPhoneVerification() async {
+    final fullPhone = '$countryCode${_phoneController.text.trim()}';
+
+    if (_phoneController.text.trim().isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Enter your phone number")),
+      );
+      return;
+    }
+
+    setState(() => _isLoading = true);
+
+    await _auth.verifyPhoneNumber(
+      phoneNumber: fullPhone,
+      verificationCompleted: (PhoneAuthCredential credential) async {
+        // Optional: auto-sign-in
+        await _auth.signInWithCredential(credential);
+      },
+      verificationFailed: (FirebaseAuthException e) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("Verification failed: ${e.message}")),
+        );
+      },
+      codeSent: (String verificationId, int? resendToken) {
+        Navigator.pushNamed(
+          context,
+          AppRoutes.otp,
+          arguments: {
+            'verificationId': verificationId,
+            'phone': fullPhone,
+          },
+        );
+      },
+      codeAutoRetrievalTimeout: (String verificationId) {},
+    );
+
+    setState(() => _isLoading = false);
+  }
+
   @override
   void dispose() {
     _phoneController.dispose();
@@ -48,7 +91,6 @@ class SignInScreenState extends State<SignInScreen> {
     return Scaffold(
       body: Stack(
         children: [
-          // Background image
           Container(
             decoration: BoxDecoration(
               image: DecorationImage(
@@ -57,13 +99,7 @@ class SignInScreenState extends State<SignInScreen> {
               ),
             ),
           ),
-
-          // Overlay color
-          Container(
-            color: AppColors.black40,
-          ),
-
-          // Main content
+          Container(color: AppColors.black40),
           Center(
             child: SingleChildScrollView(
               padding: const EdgeInsets.all(24),
@@ -81,7 +117,6 @@ class SignInScreenState extends State<SignInScreen> {
                     textAlign: TextAlign.center,
                   ),
                   const SizedBox(height: 40),
-
                   Container(
                     width: double.infinity,
                     padding: const EdgeInsets.all(24),
@@ -94,15 +129,12 @@ class SignInScreenState extends State<SignInScreen> {
                         Row(
                           children: [
                             GestureDetector(
-                              onTap: () =>
-                                  setState(() => showCountryPicker = true),
+                              onTap: () => setState(() => showCountryPicker = true),
                               child: Container(
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 12, vertical: 16),
+                                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
                                 decoration: BoxDecoration(
                                   borderRadius: BorderRadius.circular(8),
-                                  border: Border.all(
-                                      color: AppColors.grey.shade300),
+                                  border: Border.all(color: AppColors.grey.shade300),
                                 ),
                                 child: Row(
                                   children: [
@@ -116,11 +148,7 @@ class SignInScreenState extends State<SignInScreen> {
                                       ),
                                     ),
                                     const SizedBox(width: 4),
-                                    Icon(
-                                      Icons.arrow_drop_down,
-                                      color: AppColors.grey[600],
-                                      size: 20,
-                                    ),
+                                    Icon(Icons.arrow_drop_down, color: AppColors.grey[600], size: 20),
                                   ],
                                 ),
                               ),
@@ -135,19 +163,37 @@ class SignInScreenState extends State<SignInScreen> {
                                   hintText: 'Enter your phone number',
                                   border: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(8),
-                                    borderSide: BorderSide(
-                                        color: AppColors.grey.shade300),
+                                    borderSide: BorderSide(color: AppColors.grey.shade300),
                                   ),
-                                  contentPadding: const EdgeInsets.symmetric(
-                                      horizontal: 16),
+                                  contentPadding: const EdgeInsets.symmetric(horizontal: 16),
                                 ),
                               ),
                             ),
                           ],
                         ),
-
                         const SizedBox(height: 24),
-
+                        SizedBox(
+                          width: double.infinity,
+                          child: ElevatedButton(
+                            onPressed: _isLoading ? null : _startPhoneVerification,
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: AppColors.primary,
+                              padding: const EdgeInsets.symmetric(vertical: 16),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              textStyle: const TextStyle(
+                                fontFamily: 'Inter',
+                                fontWeight: FontWeight.w600,
+                                fontSize: 18,
+                              ),
+                            ),
+                            child: _isLoading
+                                ? const CircularProgressIndicator(color: Colors.white)
+                                : const Text('Continue'),
+                          ),
+                        ),
+                        const SizedBox(height: 16),
                         const Text(
                           'Or Join with social media',
                           style: TextStyle(
@@ -157,91 +203,55 @@ class SignInScreenState extends State<SignInScreen> {
                           ),
                         ),
                         const SizedBox(height: 24),
-
-                        // Facebook Button
-                        SizedBox(
-                          width: double.infinity,
-                          child: ElevatedButton(
-                            onPressed: () {},
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: const Color(0xFF1877F2),
-                              foregroundColor: AppColors.white,
-                              padding:
-                                  const EdgeInsets.symmetric(vertical: 20),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                              textStyle: const TextStyle(
-                                fontFamily: 'Inter',
-                                fontWeight: FontWeight.w600,
-                                fontSize: 18,
-                              ),
-                            ),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: const [
-                                Icon(Icons.facebook, size: 28),
-                                SizedBox(width: 14),
-                                Text('Sign in with Facebook'),
-                              ],
-                            ),
+                        ElevatedButton(
+                          onPressed: () {},
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: const Color(0xFF1877F2),
+                            foregroundColor: AppColors.white,
+                            padding: const EdgeInsets.symmetric(vertical: 20),
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: const [
+                              Icon(Icons.facebook),
+                              SizedBox(width: 14),
+                              Text('Sign in with Facebook'),
+                            ],
                           ),
                         ),
-
                         const SizedBox(height: 20),
-
-                        // Google Button
-                        SizedBox(
-                          width: double.infinity,
-                          child: ElevatedButton(
-                            onPressed: () {
-                              Navigator.pushNamed(context, AppRoutes.signup);
-                            },
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.green,
-                              foregroundColor: AppColors.white,
-                              padding:
-                                  const EdgeInsets.symmetric(vertical: 20),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                              textStyle: const TextStyle(
-                                fontFamily: 'Inter',
-                                fontWeight: FontWeight.w600,
-                                fontSize: 18,
-                              ),
-                            ),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: const [
-                                Icon(Icons.g_mobiledata, size: 28),
-                                SizedBox(width: 14),
-                                Text('Sign in with Google'),
-                              ],
-                            ),
+                        ElevatedButton(
+                          onPressed: () {
+                            Navigator.pushNamed(context, AppRoutes.signup);
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.green,
+                            foregroundColor: AppColors.white,
+                            padding: const EdgeInsets.symmetric(vertical: 20),
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: const [
+                              Icon(Icons.g_mobiledata),
+                              SizedBox(width: 14),
+                              Text('Sign in with Google'),
+                            ],
                           ),
                         ),
-
                         const SizedBox(height: 16),
-
-                        // Sign up prompt
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            const Text(
-                              "Don't have an account?",
-                              style: TextStyle(fontFamily: 'Inter'),
-                            ),
+                            const Text("Don't have an account?", style: TextStyle(fontFamily: 'Inter')),
                             TextButton(
                               onPressed: () {
-                                Navigator.pushNamed(context, AppRoutes.explore);
+                                Navigator.pushNamed(context, AppRoutes.signup);
                               },
                               child: const Text(
                                 'Sign Up',
-                                style: TextStyle(
-                                  fontFamily: 'Inter',
-                                  fontWeight: FontWeight.bold,
-                                ),
+                                style: TextStyle(fontWeight: FontWeight.bold, fontFamily: 'Inter'),
                               ),
                             ),
                           ],
@@ -253,8 +263,6 @@ class SignInScreenState extends State<SignInScreen> {
               ),
             ),
           ),
-
-          // Country Picker Modal
           if (showCountryPicker)
             GestureDetector(
               onTap: () => setState(() {
@@ -266,9 +274,7 @@ class SignInScreenState extends State<SignInScreen> {
                 child: Center(
                   child: SingleChildScrollView(
                     child: AlertDialog(
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(16),
-                      ),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                       title: const Text('Select Country'),
                       content: SizedBox(
                         width: double.maxFinite,
@@ -279,12 +285,9 @@ class SignInScreenState extends State<SignInScreen> {
                               decoration: InputDecoration(
                                 hintText: 'Search country...',
                                 prefixIcon: const Icon(Icons.search),
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(8),
-                                ),
+                                border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
                               ),
-                              onChanged: (value) =>
-                                  setState(() => searchQuery = value),
+                              onChanged: (value) => setState(() => searchQuery = value),
                             ),
                             const SizedBox(height: 16),
                             Expanded(
@@ -293,16 +296,9 @@ class SignInScreenState extends State<SignInScreen> {
                                 itemBuilder: (context, index) {
                                   final country = filteredCountries[index];
                                   return ListTile(
-                                    leading: Text(
-                                      country['code']!,
-                                      style: const TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 16,
-                                      ),
-                                    ),
+                                    leading: Text(country['code']!, style: const TextStyle(fontWeight: FontWeight.bold)),
                                     title: Text(country['name']!),
-                                    onTap: () =>
-                                        _selectCountry(country['code']!),
+                                    onTap: () => _selectCountry(country['code']!),
                                   );
                                 },
                               ),

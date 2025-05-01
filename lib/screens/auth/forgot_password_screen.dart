@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:souqe/constants/app_images.dart';
 import 'package:souqe/constants/colors.dart';
 
@@ -12,6 +13,9 @@ class ForgotPasswordScreen extends StatefulWidget {
 class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+
+  bool _loading = false;
 
   @override
   void dispose() {
@@ -19,14 +23,25 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
     super.dispose();
   }
 
-  void _resetPassword() {
-    if (_formKey.currentState!.validate()) {
+  Future<void> _resetPassword() async {
+    if (!_formKey.currentState!.validate()) return;
+
+    setState(() => _loading = true);
+    try {
+      await _auth.sendPasswordResetEmail(email: _emailController.text.trim());
+
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('Password reset link sent!'),
+          content: Text('Password reset link sent! Check your email.'),
           backgroundColor: AppColors.primary,
         ),
       );
+    } on FirebaseAuthException catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(e.message ?? 'Reset failed')),
+      );
+    } finally {
+      setState(() => _loading = false);
     }
   }
 
@@ -35,7 +50,6 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
     return Scaffold(
       body: Stack(
         children: [
-          // Background
           Container(
             decoration: BoxDecoration(
               image: DecorationImage(
@@ -44,11 +58,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
               ),
             ),
           ),
-
-          // Overlay
           Container(color: AppColors.black40),
-
-          // Content
           SingleChildScrollView(
             child: SafeArea(
               child: Padding(
@@ -56,14 +66,11 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Back button
                     IconButton(
                       icon: const Icon(Icons.arrow_back, color: Colors.white),
                       onPressed: () => Navigator.pop(context),
                     ),
                     const SizedBox(height: 20),
-
-                    // Logo
                     Center(
                       child: Text(
                         'SOUQÉ',
@@ -77,8 +84,6 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                       ),
                     ),
                     const SizedBox(height: 40),
-
-                    // Form container
                     Container(
                       padding: const EdgeInsets.all(24),
                       decoration: BoxDecoration(
@@ -109,14 +114,12 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                               ),
                             ),
                             const SizedBox(height: 32),
-
                             TextFormField(
                               controller: _emailController,
                               keyboardType: TextInputType.emailAddress,
                               style: const TextStyle(fontFamily: 'Inter'),
                               decoration: const InputDecoration(
                                 labelText: 'Email',
-                                labelStyle: TextStyle(fontFamily: 'Inter'),
                                 prefixIcon: Icon(Icons.email),
                                 border: OutlineInputBorder(),
                               ),
@@ -131,13 +134,11 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                               },
                             ),
                             const SizedBox(height: 24),
-
-                            // Custom Submit Button
                             SizedBox(
                               width: double.infinity,
                               height: 50,
                               child: ElevatedButton(
-                                onPressed: _resetPassword,
+                                onPressed: _loading ? null : _resetPassword,
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor: AppColors.primary,
                                   foregroundColor: AppColors.white,
@@ -146,7 +147,9 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                                     fontWeight: FontWeight.bold,
                                   ),
                                 ),
-                                child: const Text('Reset Password'),
+                                child: _loading
+                                    ? const CircularProgressIndicator(color: Colors.white)
+                                    : const Text('Reset Password'),
                               ),
                             ),
                           ],

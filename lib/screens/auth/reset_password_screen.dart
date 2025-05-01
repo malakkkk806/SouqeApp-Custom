@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:souqe/constants/colors.dart';
 import 'package:souqe/constants/app_images.dart';
+import 'package:souqe/constants/app_routes.dart';
 
 class ResetPasswordScreen extends StatefulWidget {
   const ResetPasswordScreen({super.key});
@@ -26,13 +27,20 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
 
   void _resetPassword() {
     if (_formKey.currentState!.validate()) {
+      // You could also update the password in Firebase if the user is logged in:
+      // FirebaseAuth.instance.currentUser?.updatePassword(_passwordController.text.trim());
+
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Password successfully reset!'),
           backgroundColor: AppColors.primary,
         ),
       );
-      // TODO: Navigate to login or home screen
+
+      // Navigate to login
+      Future.delayed(const Duration(seconds: 1), () {
+        Navigator.pushReplacementNamed(context, AppRoutes.login);
+      });
     }
   }
 
@@ -41,7 +49,6 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
     return Scaffold(
       body: Stack(
         children: [
-          // Background image
           Container(
             decoration: BoxDecoration(
               image: DecorationImage(
@@ -50,11 +57,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
               ),
             ),
           ),
-
-          // Dark overlay
           Container(color: AppColors.black40),
-
-          // Main content
           SingleChildScrollView(
             child: SafeArea(
               child: Padding(
@@ -62,14 +65,11 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Back button
                     IconButton(
                       icon: const Icon(Icons.arrow_back, color: Colors.white),
                       onPressed: () => Navigator.pop(context),
                     ),
                     const SizedBox(height: 20),
-
-                    // App Title
                     Center(
                       child: Text(
                         'SOUQÉ',
@@ -83,8 +83,6 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                       ),
                     ),
                     const SizedBox(height: 40),
-
-                    // Form Card
                     Container(
                       padding: const EdgeInsets.all(24),
                       decoration: BoxDecoration(
@@ -115,8 +113,6 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                               ),
                             ),
                             const SizedBox(height: 32),
-
-                            // New Password
                             TextFormField(
                               controller: _passwordController,
                               obscureText: _obscurePassword,
@@ -138,15 +134,16 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                               ),
                               style: const TextStyle(fontFamily: 'Inter'),
                               validator: (value) {
-                                if (value == null || value.length < 6) {
+                                if (value == null || value.isEmpty) {
+                                  return 'Enter your new password';
+                                }
+                                if (value.length < 6) {
                                   return 'Password must be at least 6 characters';
                                 }
                                 return null;
                               },
                             ),
                             const SizedBox(height: 16),
-
-                            // Confirm Password
                             TextFormField(
                               controller: _confirmPasswordController,
                               obscureText: _obscureConfirmPassword,
@@ -161,14 +158,16 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                                   ),
                                   onPressed: () {
                                     setState(() {
-                                      _obscureConfirmPassword =
-                                          !_obscureConfirmPassword;
+                                      _obscureConfirmPassword = !_obscureConfirmPassword;
                                     });
                                   },
                                 ),
                               ),
                               style: const TextStyle(fontFamily: 'Inter'),
                               validator: (value) {
+                                if (value == null || value.isEmpty) {
+                                  return 'Please confirm your password';
+                                }
                                 if (value != _passwordController.text) {
                                   return 'Passwords do not match';
                                 }
@@ -176,8 +175,6 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                               },
                             ),
                             const SizedBox(height: 24),
-
-                            // Reset Button
                             SizedBox(
                               width: double.infinity,
                               height: 50,
