@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:firebase_core/firebase_core.dart';
-//import 'firebase_options.dart';
+import 'package:provider/provider.dart';  // This imports both Provider and ChangeNotifierProvider
 
 // Constants
 import 'constants/app_routes.dart';
@@ -24,13 +24,14 @@ import 'screens/medical/medical_history_screen.dart';
 import 'screens/explore/explore_screen.dart';
 import 'screens/profile/account_screen.dart';
 
+// Providers
+import 'providers/cart_provider.dart';  // Ensure this path is correct
+
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   // Initialize Firebase
-  await Firebase.initializeApp(
-    //options: DefaultFirebaseOptions.currentPlatform,
-  );
+  await Firebase.initializeApp();
 
   // System UI styling
   SystemChrome.setSystemUIOverlayStyle(
@@ -40,10 +41,12 @@ Future<void> main() async {
     ),
   );
 
-  // Debug line to confirm app launch
-  debugPrint('Flutter app is launching...');
-
-  runApp(const MyApp());
+  runApp(
+    ChangeNotifierProvider(
+      create: (_) => CartProvider(),
+      child: const MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -71,10 +74,7 @@ class MyApp extends StatelessWidget {
         fontFamily: 'Roboto',
         useMaterial3: true,
       ),
-
-      // Change this line to test different screens:
       initialRoute: AppRoutes.splash,
-
       routes: {
         AppRoutes.splash: (context) => const IntroScreen(),
         AppRoutes.onboarding: (context) => const OnboardingScreen(),

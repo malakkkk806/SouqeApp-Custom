@@ -5,6 +5,7 @@ class CartItem {
   final String imageUrl;
   int quantity;
   final List<String> allergens;
+  final bool isSelected; // Add this field
 
   CartItem({
     required this.productId,
@@ -13,6 +14,7 @@ class CartItem {
     required this.imageUrl,
     this.quantity = 1,
     required this.allergens,
+    this.isSelected = false, // Initialize with default value
   });
 
   double get totalPrice => price * quantity;
@@ -24,6 +26,7 @@ class CartItem {
         'imageUrl': imageUrl,
         'quantity': quantity,
         'allergens': allergens,
+        'isSelected': isSelected, // Add to JSON
       };
 
   factory CartItem.fromJson(Map<String, dynamic> json) => CartItem(
@@ -33,6 +36,7 @@ class CartItem {
         imageUrl: json['imageUrl'] as String,
         quantity: (json['quantity'] as num).toInt(),
         allergens: (json['allergens'] as List<dynamic>).cast<String>(),
+        isSelected: json['isSelected'] as bool? ?? false, // Handle null case
       );
 
   CartItem copyWith({
@@ -42,6 +46,7 @@ class CartItem {
     String? imageUrl,
     int? quantity,
     List<String>? allergens,
+    bool? isSelected, // Add to copyWith
   }) {
     return CartItem(
       productId: productId ?? this.productId,
@@ -50,6 +55,7 @@ class CartItem {
       imageUrl: imageUrl ?? this.imageUrl,
       quantity: quantity ?? this.quantity,
       allergens: allergens ?? List.from(this.allergens),
+      isSelected: isSelected ?? this.isSelected, // Include in copy
     );
   }
 

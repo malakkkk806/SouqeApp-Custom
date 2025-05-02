@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:awesome_dialog/awesome_dialog.dart';
+import 'package:provider/provider.dart';
 import 'package:souqe/constants/app_routes.dart';
 import 'package:souqe/constants/colors.dart';
 import 'package:souqe/models/product.dart';
-import 'package:souqe/mock/dummy_products.dart'; // for suggested product lookup
+import 'package:souqe/mock/dummy_products.dart';
+import 'package:souqe/providers/cart_provider.dart';
+import 'package:souqe/models/cart_item.dart';
 
 class ProductDetailScreen extends StatefulWidget {
   final Product product;
@@ -17,6 +20,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
   int quantity = 1;
   bool hasSeenWarning = false;
   bool showSuggestion = false;
+  bool isAddedToCart = false;
 
   void _showAllergenWarning() {
     AwesomeDialog(
@@ -36,6 +40,106 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
       },
     ).show();
   }
+
+ Future<void> _addToCart() async {
+  try {
+    final cart = Provider.of<CartProvider>(context, listen: false);
+    final product = widget.product;
+
+    // Validate product data
+    if (product.id.isEmpty) throw Exception('Product ID is empty');
+    if (quantity <= 0) throw Exception('Quantity must be at least 1');
+    if (product.price <= 0) throw Exception('Invalid product price');
+
+    final cartItem = CartItem(
+      productId: product.id,
+      name: product.name,
+      price: product.price,
+      imageUrl: product.imageUrl,
+      quantity: quantity,
+      allergens: product.allergens,
+    );
+
+    // Debug print before adding
+    debugPrint('Attempting to add: ${cartItem.toString()}');
+
+    // Add to cart
+    cart.addItem(cartItem);
+
+    // Verify addition
+    if (!cart.items.containsKey(product.id)) {
+      throw Exception('Item not found in cart after addition');
+    }
+
+    // Update UI state
+    setState(() => isAddedToCart = true);
+
+    // Show success feedback
+    await ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Row(
+          children: [
+            const Icon(Icons.check_circle, color: Colors.white),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Text(
+                'Added $quantity ${quantity > 1 ? 'items' : 'item'} of ${product.name}',
+                style: const TextStyle(fontSize: 16),
+              ),
+            ),
+          ],
+        ),
+        duration: const Duration(seconds: 2),
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(10),
+        ),
+        backgroundColor: Colors.green,
+        action: SnackBarAction(
+          label: 'VIEW CART',
+          textColor: Colors.white,
+          onPressed: () => Navigator.pushNamed(context, AppRoutes.cart),
+        ),
+      ),
+    );
+
+    // Debug print after successful addition
+    debugPrint('Successfully added to cart. Total items: ${cart.itemCount}');
+
+  } catch (e, stackTrace) {
+    debugPrint('Add to cart error: $e');
+    debugPrint('Stack trace: $stackTrace');
+
+    // Show error feedback
+    await ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Row(
+          children: [
+            const Icon(Icons.error_outline, color: Colors.white),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Text(
+                'Failed to add: ${e.toString().replaceFirst('Exception: ', '')}',
+                style: const TextStyle(fontSize: 16),
+              ),
+            ),
+          ],
+        ),
+        duration: const Duration(seconds: 3),
+        behavior: SnackBarBehavior.floating,
+        backgroundColor: Colors.red,
+        action: SnackBarAction(
+          label: 'RETRY',
+          textColor: Colors.white,
+          onPressed: _addToCart,
+        ),
+      ),
+    );
+    
+    // Reset UI state on failure
+    setState(() => isAddedToCart = false);
+  }
+}
 
   @override
   Widget build(BuildContext context) {
@@ -62,6 +166,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
         children: [
           Column(
             children: [
+              // Product Image
               Container(
                 height: 140,
                 width: double.infinity,
@@ -74,6 +179,8 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                   ),
                 ),
               ),
+
+              // Allergen Warning
               if (product.allergens.isNotEmpty)
                 Container(
                   margin: const EdgeInsets.symmetric(vertical: 12),
@@ -92,7 +199,10 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                     ),
                   ),
                 ),
+
               const SizedBox(height: 16),
+
+              // Product Details
               Expanded(
                 child: Container(
                   padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
@@ -100,6 +210,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
+                        // Product Name
                         Center(
                           child: Column(
                             children: [
@@ -116,7 +227,10 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                             ],
                           ),
                         ),
+
                         const SizedBox(height: 8),
+
+                        // Product Description
                         Text(
                           product.description,
                           style: const TextStyle(
@@ -125,10 +239,14 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                             color: AppColors.textMedium,
                           ),
                         ),
+
                         const SizedBox(height: 16),
+
+                        // Quantity Selector and Price
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
+                            // Quantity Selector
                             Container(
                               decoration: BoxDecoration(
                                 border: Border.all(color: AppColors.textLight),
@@ -161,6 +279,8 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                                 ],
                               ),
                             ),
+                            
+                            // Total Price
                             Text(
                               '\$${(product.price * quantity).toStringAsFixed(2)}',
                               style: const TextStyle(
@@ -172,7 +292,10 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                             ),
                           ],
                         ),
+
                         const SizedBox(height: 24),
+
+                        // Product Details Section
                         const Text(
                           'Product Detail',
                           style: TextStyle(
@@ -190,7 +313,10 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                             fontFamily: 'Inter',
                           ),
                         ),
+
                         const SizedBox(height: 24),
+
+                        // Nutrition Info
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
@@ -215,7 +341,10 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                             ),
                           ],
                         ),
+
                         const SizedBox(height: 24),
+
+                        // Reviews
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: const [
@@ -238,7 +367,10 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                             ),
                           ],
                         ),
+
                         const SizedBox(height: 32),
+
+                        // Add to Cart Button
                         SizedBox(
                           width: double.infinity,
                           child: ElevatedButton(
@@ -246,18 +378,18 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                               if (product.allergens.isNotEmpty && !hasSeenWarning) {
                                 _showAllergenWarning();
                               } else {
-                                Navigator.pushNamed(context, AppRoutes.cart);
+                                _addToCart();
                               }
                             },
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: AppColors.primary,
+                              backgroundColor: isAddedToCart ? Colors.green : AppColors.primary,
                               padding: const EdgeInsets.symmetric(vertical: 16),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(12),
                               ),
                             ),
                             child: Text(
-                              hasSeenWarning ? 'Go to Cart' : 'Add To Basket',
+                              isAddedToCart ? '✓ Added to Cart' : 'Add To Basket',
                               style: const TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.bold,
@@ -276,7 +408,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
             ],
           ),
 
-          // ✅ Suggested product note
+          // Suggested Product Banner
           if (showSuggestion && product.suggestedProductId != null)
             Positioned(
               bottom: 20,
@@ -294,7 +426,10 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (_) => ProductDetailScreen(product: suggested),
+                        builder: (_) => ChangeNotifierProvider.value(
+                          value: Provider.of<CartProvider>(context, listen: false),
+                          child: ProductDetailScreen(product: suggested),
+                        ),
                       ),
                     );
                   },
@@ -310,7 +445,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                         const SizedBox(width: 8),
                         Expanded(
                           child: Text(
-                            'You may also like: Spices',
+                            'You may also like: ${dummyProducts.firstWhere((p) => p.id == product.suggestedProductId, orElse: () => product).name}',
                             style: const TextStyle(
                               fontSize: 13,
                               fontFamily: 'Inter',

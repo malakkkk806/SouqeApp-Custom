@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:souqe/constants/app_images.dart';
 import 'package:souqe/constants/colors.dart';
 import 'package:souqe/widgets/common/bottom_nav_bar.dart';
-import 'package:souqe/widgets/home/product_card.dart';
 import 'package:souqe/screens/home/product_detail_screen.dart';
 import 'package:souqe/models/product.dart';
+import 'package:souqe/providers/cart_provider.dart';
+import 'package:souqe/models/cart_item.dart';
+import 'package:souqe/screens/cart/cart_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -80,7 +83,7 @@ class _HomeScreenState extends State<HomeScreen> {
       case 1:
         return const Center(child: Text("Explore Screen"));
       case 2:
-        return const Center(child: Text("Cart Screen"));
+        return const CartScreen(); // Now using actual CartScreen
       case 3:
         return const Center(child: Text("Favourite Screen"));
       case 4:
@@ -88,6 +91,117 @@ class _HomeScreenState extends State<HomeScreen> {
       default:
         return _buildShopContent();
     }
+  }
+
+  Widget _buildProductCard(Product product) {
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) => ProductDetailScreen(product: product),
+          ),
+        );
+      },
+      child: Card(
+        elevation: 2,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Expanded(
+              child: ClipRRect(
+                borderRadius: const BorderRadius.vertical(
+                  top: Radius.circular(12)),
+                child: Image.asset(
+                  product.imageUrl,
+                  width: double.infinity,
+                  fit: BoxFit.cover,
+                  errorBuilder: (_, __, ___) => Container(
+                    color: Colors.grey[200],
+                    child: const Icon(Icons.broken_image),
+                  ),
+                ),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(12),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    product.name,
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    product.description,
+                    style: TextStyle(
+                      color: Colors.grey[600],
+                      fontSize: 14,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  const SizedBox(height: 8),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        '\$${product.price.toStringAsFixed(2)}',
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                          color: AppColors.primary,
+                        ),
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.add_circle_outline,
+                            color: AppColors.primary),
+                        onPressed: () {
+                          final cart = Provider.of<CartProvider>(context, listen: false);
+                          cart.addItem(CartItem(
+                            productId: product.id,
+                            name: product.name,
+                            price: product.price,
+                            imageUrl: product.imageUrl,
+                            allergens: product.allergens,
+                            quantity: 1,
+                          ));
+                          
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text('Added ${product.name} to cart'),
+                              action: SnackBarAction(
+                                label: 'VIEW CART',
+                                onPressed: () {
+                                  setState(() => _currentIndex = 2);
+                                },
+                              ),
+                              behavior: SnackBarBehavior.floating,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 
   Widget _buildSection(String title, List<Product> productList, {bool isGrocery = false}) {
@@ -122,19 +236,9 @@ class _HomeScreenState extends State<HomeScreen> {
             separatorBuilder: (_, __) => const SizedBox(width: 16),
             itemBuilder: (context, index) {
               final product = productList[index];
-              return ProductCard(
-                name: product.name,
-                price: '\$${product.price}',
-                description: product.description,
-                image: product.imageUrl,
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => ProductDetailScreen(product: product),
-                    ),
-                  );
-                },
+              return SizedBox(
+                width: 160,
+                child: _buildProductCard(product),
               );
             },
           ),
