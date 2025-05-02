@@ -18,6 +18,7 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   int _currentIndex = 0;
+  final Set<String> _favoriteProductIds = {};
 
   final List<Product> products = [
     Product(
@@ -83,7 +84,7 @@ class _HomeScreenState extends State<HomeScreen> {
       case 1:
         return const Center(child: Text("Explore Screen"));
       case 2:
-        return const CartScreen(); // Now using actual CartScreen
+        return const CartScreen();
       case 3:
         return const Center(child: Text("Favourite Screen"));
       case 4:
@@ -94,6 +95,8 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _buildProductCard(Product product) {
+    final isFavorite = _favoriteProductIds.contains(product.id);
+
     return GestureDetector(
       onTap: () {
         Navigator.push(
@@ -104,30 +107,73 @@ class _HomeScreenState extends State<HomeScreen> {
         );
       },
       child: Card(
-        elevation: 2,
+        elevation: 1,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(12),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Expanded(
-              child: ClipRRect(
-                borderRadius: const BorderRadius.vertical(
-                  top: Radius.circular(12)),
-                child: Image.asset(
-                  product.imageUrl,
-                  width: double.infinity,
-                  fit: BoxFit.cover,
-                  errorBuilder: (_, __, ___) => Container(
-                    color: Colors.grey[200],
-                    child: const Icon(Icons.broken_image),
+            // Product image with favorite icon overlay
+            Stack(
+              children: [
+                AspectRatio(
+                  aspectRatio: 1,
+                  child: ClipRRect(
+                    borderRadius: const BorderRadius.vertical(
+                        top: Radius.circular(12)),
+                    child: Image.asset(
+                      product.imageUrl,
+                      fit: BoxFit.contain,
+                    ),
                   ),
                 ),
-              ),
+                Positioned(
+                  top: 8,
+                  right: 8,
+                  child: IconButton(
+                    icon: Icon(
+                      isFavorite ? Icons.favorite : Icons.favorite_border,
+                      color: AppColors.primary,
+                    ),
+                    onPressed: () {
+                      setState(() {
+                        if (isFavorite) {
+                          _favoriteProductIds.remove(product.id);
+                        } else {
+                          _favoriteProductIds.add(product.id);
+                        }
+                      });
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(
+                            isFavorite
+                                ? 'Removed ${product.name} from favorites'
+                                : 'Added ${product.name} to favorites',
+                            style: const TextStyle(fontSize: 13),
+                          ),
+                          behavior: SnackBarBehavior.floating,
+                          backgroundColor: AppColors.primary.withOpacity(0.9),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          duration: const Duration(seconds: 2),
+                          action: SnackBarAction(
+                            label: 'VIEW FAVORITES',
+                            textColor: Colors.white,
+                            onPressed: () {
+                              setState(() => _currentIndex = 3);
+                            },
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              ],
             ),
             Padding(
-              padding: const EdgeInsets.all(12),
+              padding: const EdgeInsets.all(8),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -135,36 +181,36 @@ class _HomeScreenState extends State<HomeScreen> {
                     product.name,
                     style: const TextStyle(
                       fontWeight: FontWeight.bold,
-                      fontSize: 16,
-                    ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    product.description,
-                    style: TextStyle(
-                      color: Colors.grey[600],
                       fontSize: 14,
                     ),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
-                  const SizedBox(height: 8),
+                  const SizedBox(height: 2),
+                  Text(
+                    product.description,
+                    style: const TextStyle(fontSize: 12, color: Colors.grey),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  const SizedBox(height: 2), // Reduced spacing between description and price
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
                         '\$${product.price.toStringAsFixed(2)}',
                         style: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 16,
                           color: AppColors.primary,
+                          fontWeight: FontWeight.bold,
                         ),
                       ),
                       IconButton(
-                        icon: const Icon(Icons.add_circle_outline,
-                            color: AppColors.primary),
+                        icon: const Icon(
+                          Icons.add_circle_outline,
+                          color: AppColors.primary,
+                        ),
+                        padding: EdgeInsets.zero,
+                        constraints: const BoxConstraints(),
                         onPressed: () {
                           final cart = Provider.of<CartProvider>(context, listen: false);
                           cart.addItem(CartItem(
@@ -175,20 +221,25 @@ class _HomeScreenState extends State<HomeScreen> {
                             allergens: product.allergens,
                             quantity: 1,
                           ));
-                          
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
-                              content: Text('Added ${product.name} to cart'),
+                              content: Text(
+                                'Added ${product.name} to cart',
+                                style: const TextStyle(fontSize: 13),
+                              ),
+                              behavior: SnackBarBehavior.floating,
+                              backgroundColor: AppColors.primary.withOpacity(0.9),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10),
+                              ),
                               action: SnackBarAction(
                                 label: 'VIEW CART',
+                                textColor: Colors.white,
                                 onPressed: () {
                                   setState(() => _currentIndex = 2);
                                 },
                               ),
-                              behavior: SnackBarBehavior.floating,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(10),
-                              ),
+                              duration: const Duration(seconds: 2),
                             ),
                           );
                         },
@@ -204,7 +255,7 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _buildSection(String title, List<Product> productList, {bool isGrocery = false}) {
+  Widget _buildSection(String title, List<Product> productList) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -214,31 +265,31 @@ class _HomeScreenState extends State<HomeScreen> {
             Text(
               title,
               style: const TextStyle(
-                fontSize: 20,
-                fontFamily: 'Montserrat',
+                fontSize: 18,
                 fontWeight: FontWeight.bold,
+                fontFamily: 'Montserrat',
               ),
             ),
             TextButton(
               onPressed: () {},
-              child: const Text("See all", style: TextStyle(color: AppColors.primary)),
+              child: const Text(
+                "See all",
+                style: TextStyle(color: AppColors.primary),
+              ),
             ),
           ],
         ),
-        const SizedBox(height: 12),
-        if (isGrocery) _buildCategoryChips(),
-        const SizedBox(height: 16),
+        const SizedBox(height: 10),
         SizedBox(
-          height: 230,
+          height: 265,
           child: ListView.separated(
             scrollDirection: Axis.horizontal,
             itemCount: productList.length,
-            separatorBuilder: (_, __) => const SizedBox(width: 16),
+            separatorBuilder: (_, __) => const SizedBox(width: 12),
             itemBuilder: (context, index) {
-              final product = productList[index];
               return SizedBox(
                 width: 160,
-                child: _buildProductCard(product),
+                child: _buildProductCard(productList[index]),
               );
             },
           ),
@@ -247,122 +298,62 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _buildCategoryChips() {
-    final categories = [
-      {
-        'title': 'Pulses',
-        'color': AppColors.surface,
-        'icon': AppImages.pulses,
-      },
-      {
-        'title': 'Rice',
-        'color': AppColors.secondary.withOpacity(0.15),
-        'icon': AppImages.rice,
-      },
-      {
-        'title': 'Oils',
-        'color': AppColors.primaryLight.withOpacity(0.1),
-        'icon': AppImages.oil,
-      },
-    ];
-
-    return SizedBox(
-      height: 100,
-      child: ListView.separated(
-        scrollDirection: Axis.horizontal,
-        itemCount: categories.length,
-        separatorBuilder: (_, __) => const SizedBox(width: 34),
-        itemBuilder: (context, index) {
-          final category = categories[index];
-          return Container(
-            width: 160,
-            padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              color: category['color'] as Color,
-              borderRadius: BorderRadius.circular(20),
-            ),
-            child: Row(
+  Widget _buildShopContent() {
+    return SafeArea(
+      child: SingleChildScrollView(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Column(
               children: [
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(12),
-                  child: Image.asset(
-                    category['icon'] as String,
-                    width: 50,
-                    height: 50,
-                    fit: BoxFit.cover,
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Text(
-                    category['title'] as String,
-                    style: const TextStyle(
-                      fontFamily: 'Inter',
-                      fontSize: 18,
-                      fontWeight: FontWeight.w600,
+                Image.asset(AppImages.logo2, height: 50),
+                const SizedBox(height: 6),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: const [
+                    Icon(Icons.location_on, color: AppColors.primary, size: 18),
+                    SizedBox(width: 4),
+                    Text(
+                      'Shoubra, Faculty Of Enginnering',
+                      style: TextStyle(
+                        fontWeight: FontWeight.w600,
+                        fontFamily: 'Inter',
+                      ),
                     ),
-                  ),
+                  ],
                 ),
+                const SizedBox(height: 12),
               ],
             ),
-          );
-        },
-      ),
-    );
-  }
-
-  Widget _buildShopContent() {
-    return SingleChildScrollView(
-      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Column(
-            children: [
-              Image.asset(AppImages.logo2, height: 60),
-              const SizedBox(height: 6),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: const [
-                  Icon(Icons.location_on, color: AppColors.primary, size: 18),
-                  SizedBox(width: 4),
-                  Text(
-                    'Shoubra, Faculty Of Enginnering',
-                    style: TextStyle(
-                      fontWeight: FontWeight.w600,
-                      fontFamily: 'Inter',
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 16),
-            ],
-          ),
-          TextField(
-            decoration: InputDecoration(
-              hintText: 'Search Store',
-              prefixIcon: const Icon(Icons.search),
-              filled: true,
-              fillColor: AppColors.surface,
-              contentPadding: const EdgeInsets.symmetric(horizontal: 16),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-                borderSide: BorderSide.none,
+            TextField(
+              decoration: InputDecoration(
+                hintText: 'Search Store',
+                prefixIcon: const Icon(Icons.search),
+                filled: true,
+                fillColor: AppColors.surface,
+                contentPadding: const EdgeInsets.symmetric(horizontal: 16),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide.none,
+                ),
               ),
             ),
-          ),
-          const SizedBox(height: 16),
-          ClipRRect(
-            borderRadius: BorderRadius.circular(12),
-            child: Image.asset(AppImages.banner1, height: 150, fit: BoxFit.cover),
-          ),
-          const SizedBox(height: 24),
-          _buildSection("Exclusive Offer", products.sublist(0, 2)),
-          const SizedBox(height: 24),
-          _buildSection("Best Selling", products.sublist(0, 2)),
-          const SizedBox(height: 24),
-          _buildSection("Groceries", products.sublist(2), isGrocery: true),
-        ],
+            const SizedBox(height: 16),
+            ClipRRect(
+              borderRadius: BorderRadius.circular(12),
+              child: Image.asset(
+                AppImages.banner1,
+                height: 140,
+                fit: BoxFit.cover,
+              ),
+            ),
+            const SizedBox(height: 20),
+            _buildSection("Exclusive Offer", products.sublist(0, 3)),
+            const SizedBox(height: 20),
+            _buildSection("Best Selling", products.sublist(3)),
+          ],
+        ),
       ),
     );
   }

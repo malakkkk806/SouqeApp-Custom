@@ -47,7 +47,7 @@ class _LogInScreenState extends State<LogInScreen> {
           _passwordController.text.trim(),
         );
         if (user != null) {
-          Navigator.pushReplacementNamed(context, AppRoutes.medicalHistory);
+          Navigator.pushReplacementNamed(context, AppRoutes.home);
         }
       } catch (e) {
         _showSnackBar("Login failed: ${e.toString()}");
@@ -59,10 +59,10 @@ class _LogInScreenState extends State<LogInScreen> {
     try {
       final user = await _authService.signInWithGoogle();
       if (user != null) {
-        Navigator.pushReplacementNamed(context, AppRoutes.medicalHistory);
+        Navigator.pushReplacementNamed(context, AppRoutes.home);
       }
     } catch (e) {
-      _showSnackBar("Google sign-in failed: $e");
+      _showSnackBar("Google Login failed: $e");
     }
   }
 
