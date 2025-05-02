@@ -11,6 +11,8 @@ import 'package:souqe/models/product.dart';
 import 'package:souqe/providers/cart_provider.dart';
 import 'package:souqe/models/cart_item.dart';
 import 'package:souqe/screens/cart/cart_screen.dart';
+import 'package:souqe/screens/profile/account_screen.dart';
+
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -395,9 +397,9 @@ class _HomeScreenState extends State<HomeScreen> {
       case 2:
         return const CartScreen();
       case 3:
-        return const FavouriteScreen();
+        //return const FavouriteScreen();
       case 4:
-        return const AccountScreen;
+        return AccountScreen(userAddress: _currentAddress);
       default:
         return _buildShopContent();
     }

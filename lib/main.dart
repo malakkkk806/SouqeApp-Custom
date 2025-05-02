@@ -91,7 +91,7 @@ class MyApp extends StatelessWidget {
         AppRoutes.resetPassword: (context) => const ResetPasswordScreen(),
         AppRoutes.explore: (context) => const ExploreScreen(),
         AppRoutes.trackOrder: (context) => const TrackOrderScreen(),
-        AppRoutes.account: (context) => const AccountScreen(),
+        AppRoutes.account: (context) => const AccountScreen(userAddress: '',),
         AppRoutes.orderStatus: (context) {
           final args = ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>?;
           final isSuccess = args?['success'] ?? false;
