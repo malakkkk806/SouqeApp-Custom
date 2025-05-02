@@ -1,92 +1,77 @@
 import 'package:flutter/material.dart';
-import 'package:souqe/constants/app_images.dart';
-import 'package:souqe/constants/colors.dart';
-import 'package:souqe/constants/country_codes.dart';
 import 'package:souqe/constants/app_routes.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:souqe/constants/colors.dart';
+import 'package:souqe/constants/app_images.dart';
+import 'package:souqe/constants/country_codes.dart';
+import 'package:souqe/services/phone_auth.dart';
+import 'package:flutter/services.dart';
 
 class SignInScreen extends StatefulWidget {
   const SignInScreen({super.key});
 
   @override
-  State<SignInScreen> createState() => SignInScreenState();
+  State<SignInScreen> createState() => _SignInScreenState();
 }
 
-class SignInScreenState extends State<SignInScreen> {
-  String countryCode = '+20';
-  bool showCountryPicker = false;
-  String searchQuery = '';
+class _SignInScreenState extends State<SignInScreen> {
   final TextEditingController _phoneController = TextEditingController();
-  final FocusNode _phoneFocusNode = FocusNode();
-  final FirebaseAuth _auth = FirebaseAuth.instance;
+  final PhoneAuthService _authService = PhoneAuthService();
+
+  String countryCode = '+20';
   bool _isLoading = false;
 
-  void _selectCountry(String code) {
-    setState(() {
-      countryCode = code;
-      showCountryPicker = false;
-      searchQuery = '';
-    });
-    FocusScope.of(context).requestFocus(_phoneFocusNode);
-  }
-
-  List<Map<String, String>> get filteredCountries {
-    return CountryCodes.codes.where((country) {
-      final name = country['name']?.toLowerCase() ?? '';
-      final code = country['code']?.toLowerCase() ?? '';
-      final query = searchQuery.toLowerCase();
-      return name.contains(query) || code.contains(query);
-    }).toList();
+  String getFlagEmoji(String isoCountryCode) {
+    if (isoCountryCode.length != 2) return '';
+    return isoCountryCode.toUpperCase().codeUnits
+        .map((c) => String.fromCharCode(c + 127397))
+        .join();
   }
 
   void _startPhoneVerification() async {
-    final fullPhone = '$countryCode${_phoneController.text.trim()}';
+    final rawInput = _phoneController.text.trim();
+    final sanitized = rawInput.startsWith('0') ? rawInput.substring(1) : rawInput;
+    final fullPhone = '$countryCode$sanitized';
 
-    if (_phoneController.text.trim().isEmpty) {
+    if (sanitized.isEmpty || sanitized.length < 8) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Enter your phone number")),
+        const SnackBar(
+          content: Text("Enter a valid phone number"),
+          backgroundColor: AppColors.primary,
+        ),
       );
       return;
     }
 
     setState(() => _isLoading = true);
 
-    try {
-      await _auth.verifyPhoneNumber(
-        phoneNumber: fullPhone,
-        verificationCompleted: (PhoneAuthCredential credential) async {
-          await _auth.signInWithCredential(credential);
-        },
-        verificationFailed: (FirebaseAuthException e) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text("Verification failed: ${e.message}")),
-          );
-        },
-        codeSent: (String verificationId, int? resendToken) {
-          Navigator.pushNamed(
-            context,
-            AppRoutes.otp,
-            arguments: {
-              'verificationId': verificationId,
-              'phone': fullPhone,
-            },
-          );
-        },
-        codeAutoRetrievalTimeout: (String verificationId) {},
-      );
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Error: $e")),
-      );
-    }
-
-    setState(() => _isLoading = false);
+    await _authService.verifyPhoneNumber(
+      phoneNumber: fullPhone,
+      codeSent: (verificationId) {
+        setState(() => _isLoading = false);
+        Navigator.pushNamed(
+          context,
+          AppRoutes.otp,
+          arguments: {
+            'verificationId': verificationId,
+            'phone': fullPhone,
+          },
+        );
+      },
+      onError: (error) {
+        setState(() => _isLoading = false);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text("Verification failed: $error"),
+            backgroundColor: AppColors.primary,
+          ),
+        );
+      },
+    );
   }
 
   @override
   void dispose() {
     _phoneController.dispose();
-    _phoneFocusNode.dispose();
     super.dispose();
   }
 
@@ -104,79 +89,125 @@ class SignInScreenState extends State<SignInScreen> {
           Container(color: AppColors.black40),
           Center(
             child: SingleChildScrollView(
-              padding: const EdgeInsets.all(24),
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
               child: Column(
                 children: [
-                  Text(
+                  const Text(
                     'STEP INTO A WORLD OF\nFLAVOR, FRESHNESS, AND\nENDLESS POSSIBILITIES!',
-                    style: TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                      color: AppColors.white,
-                      fontFamily: 'Montserrat',
-                      height: 1.2,
-                    ),
                     textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: 22,
+                      fontWeight: FontWeight.bold,
+                      fontFamily: 'Montserrat',
+                      color: AppColors.white,
+                      height: 1.3,
+                    ),
                   ),
-                  const SizedBox(height: 40),
+                  const SizedBox(height: 32),
                   Container(
-                    width: double.infinity,
                     padding: const EdgeInsets.all(24),
                     decoration: BoxDecoration(
                       color: AppColors.white90,
-                      borderRadius: BorderRadius.circular(16),
+                      borderRadius: BorderRadius.circular(20),
                     ),
                     child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
+                        const Text(
+                          'Log in or sign up',
+                          style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                            fontFamily: 'Montserrat',
+                            color: AppColors.textDark,
+                          ),
+                        ),
+                        const SizedBox(height: 6),
+                        const Text(
+                          'We’ll send you an SMS for verification.',
+                          style: TextStyle(
+                            fontSize: 15,
+                            fontFamily: 'Inter',
+                            color: AppColors.textMedium,
+                          ),
+                        ),
+                        const SizedBox(height: 24),
                         Row(
                           children: [
-                            GestureDetector(
-                              onTap: () => setState(() => showCountryPicker = true),
-                              child: Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(8),
-                                  border: Border.all(color: AppColors.grey.shade300),
-                                ),
-                                child: Row(
-                                  children: [
-                                    Text(
-                                      countryCode,
-                                      style: TextStyle(
-                                        fontSize: 18,
-                                        color: AppColors.grey[800],
-                                        fontFamily: 'Inter',
-                                        fontWeight: FontWeight.w500,
-                                      ),
-                                    ),
-                                    const Icon(Icons.arrow_drop_down),
-                                  ],
-                                ),
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 12),
+                              decoration: BoxDecoration(
+                                border: Border.all(color: AppColors.primary),
+                                borderRadius: BorderRadius.circular(12),
+                                color: AppColors.white,
+                              ),
+                              child: DropdownButton<String>(
+                                value: countryCode,
+                                underline: const SizedBox(),
+                                icon: const Icon(Icons.keyboard_arrow_down),
+                                items: CountryCodes.codes.map((c) {
+                                  final flag = getFlagEmoji(c['iso'] ?? '');
+                                  return DropdownMenuItem<String>(
+                                    value: c['code'],
+                                    child: Text('$flag ${c['code']}'),
+                                  );
+                                }).toList(),
+                                onChanged: (value) {
+                                  if (value != null) {
+                                    setState(() => countryCode = value);
+                                  }
+                                },
                               ),
                             ),
-                            const SizedBox(width: 8),
+                            const SizedBox(width: 12),
                             Expanded(
-                              child: TextFormField(
+                              child: TextField(
                                 controller: _phoneController,
-                                focusNode: _phoneFocusNode,
                                 keyboardType: TextInputType.phone,
-                                style: const TextStyle(fontSize: 18),
+                                inputFormatters: [
+                                  FilteringTextInputFormatter.digitsOnly,
+                                ],
+                                style: const TextStyle(fontSize: 16),
                                 decoration: InputDecoration(
-                                  hintText: 'Enter your phone number',
-                                  hintStyle: const TextStyle(fontSize: 18),
-                                  border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(8),
-                                    borderSide: BorderSide(color: AppColors.grey.shade300),
+                                  hintText: 'Mobile number',
+                                  hintStyle: const TextStyle(color: AppColors.textMedium),
+                                  filled: true,
+                                  fillColor: AppColors.white,
+                                  contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                                  enabledBorder: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                    borderSide: const BorderSide(color: AppColors.primary),
                                   ),
-                                  contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                                  focusedBorder: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                    borderSide: const BorderSide(color: AppColors.primaryDark, width: 2),
+                                  ),
                                 ),
                               ),
                             ),
                           ],
                         ),
+                        const SizedBox(height: 20),
+                        const Text.rich(
+                          TextSpan(
+                            text: 'By proceeding, you agree to our ',
+                            children: [
+                              TextSpan(
+                                text: 'Terms and Conditions',
+                                style: TextStyle(color: AppColors.primaryDark),
+                              ),
+                              TextSpan(text: ' and '),
+                              TextSpan(
+                                text: 'Privacy Policy.',
+                                style: TextStyle(color: AppColors.primaryDark),
+                              ),
+                            ],
+                          ),
+                          style: TextStyle(fontSize: 13, fontFamily: 'Inter', color: AppColors.textMedium),
+                        ),
                         const SizedBox(height: 24),
                         SizedBox(
-                          height: 56,
+                          height: 52,
                           width: double.infinity,
                           child: ElevatedButton(
                             onPressed: _isLoading ? null : _startPhoneVerification,
@@ -185,6 +216,7 @@ class SignInScreenState extends State<SignInScreen> {
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(12),
                               ),
+                              elevation: 2,
                             ),
                             child: _isLoading
                                 ? const CircularProgressIndicator(color: Colors.white)
@@ -192,83 +224,12 @@ class SignInScreenState extends State<SignInScreen> {
                                     'Send OTP',
                                     style: TextStyle(
                                       fontSize: 18,
-                                      fontWeight: FontWeight.bold,
+                                      fontWeight: FontWeight.w600,
                                       fontFamily: 'Inter',
                                       color: Colors.white,
                                     ),
                                   ),
                           ),
-                        ),
-                        const SizedBox(height: 16),
-                        const Text(
-                          'Or Join with social media',
-                          style: TextStyle(
-                            color: Colors.grey,
-                            fontFamily: 'Inter',
-                            fontSize: 16,
-                          ),
-                        ),
-                        const SizedBox(height: 24),
-                        SizedBox(
-                          height: 56,
-                          width: double.infinity,
-                          child: ElevatedButton.icon(
-                            onPressed: () {},
-                            icon: const Icon(Icons.facebook, size: 24),
-                            label: const Text(
-                              'Sign in with Facebook',
-                              style: TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.w600,
-                                fontFamily: 'Inter',
-                              ),
-                            ),
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: const Color(0xFF1877F2),
-                              foregroundColor: Colors.white,
-                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                            ),
-                          ),
-                        ),
-                        const SizedBox(height: 20),
-                        SizedBox(
-                          height: 56,
-                          width: double.infinity,
-                          child: ElevatedButton.icon(
-                            onPressed: () {
-                              Navigator.pushNamed(context, AppRoutes.signup);
-                            },
-                            icon: const Icon(Icons.g_mobiledata, size: 28),
-                            label: const Text(
-                              'Sign in with Google',
-                              style: TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.w600,
-                                fontFamily: 'Inter',
-                              ),
-                            ),
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.green,
-                              foregroundColor: Colors.white,
-                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                            ),
-                          ),
-                        ),
-                        const SizedBox(height: 16),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            const Text("Don't have an account?", style: TextStyle(fontFamily: 'Inter')),
-                            TextButton(
-                              onPressed: () {
-                                Navigator.pushNamed(context, AppRoutes.signup);
-                              },
-                              child: const Text(
-                                'Sign Up',
-                                style: TextStyle(fontWeight: FontWeight.bold, fontFamily: 'Inter'),
-                              ),
-                            ),
-                          ],
                         ),
                       ],
                     ),
@@ -277,63 +238,6 @@ class SignInScreenState extends State<SignInScreen> {
               ),
             ),
           ),
-          if (showCountryPicker)
-            GestureDetector(
-              onTap: () => setState(() {
-                showCountryPicker = false;
-                searchQuery = '';
-              }),
-              child: Container(
-                color: AppColors.black50,
-                child: Center(
-                  child: SingleChildScrollView(
-                    child: AlertDialog(
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                      title: const Text('Select Country'),
-                      content: SizedBox(
-                        width: double.maxFinite,
-                        height: 400,
-                        child: Column(
-                          children: [
-                            TextField(
-                              decoration: InputDecoration(
-                                hintText: 'Search country...',
-                                prefixIcon: const Icon(Icons.search),
-                                border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-                              ),
-                              onChanged: (value) => setState(() => searchQuery = value),
-                            ),
-                            const SizedBox(height: 16),
-                            Expanded(
-                              child: ListView.builder(
-                                itemCount: filteredCountries.length,
-                                itemBuilder: (context, index) {
-                                  final country = filteredCountries[index];
-                                  return ListTile(
-                                    leading: Text(country['code']!, style: const TextStyle(fontWeight: FontWeight.bold)),
-                                    title: Text(country['name']!),
-                                    onTap: () => _selectCountry(country['code']!),
-                                  );
-                                },
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      actions: [
-                        TextButton(
-                          onPressed: () => setState(() {
-                            showCountryPicker = false;
-                            searchQuery = '';
-                          }),
-                          child: const Text('Cancel'),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-            ),
         ],
       ),
     );

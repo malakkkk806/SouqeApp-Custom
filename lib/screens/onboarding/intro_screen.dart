@@ -30,30 +30,30 @@ class IntroScreen extends StatelessWidget {
           children: [
             const Spacer(flex: 2), // Top spacer to push content down
 
-            // Centered Logo + Title
-            Center(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Image.asset(
-                    AppImages.logo,
-                    height: size.height * 0.15,
-                    fit: BoxFit.contain,
-                  ),
-                  const SizedBox(height: 12),
-                  const Text(
-                    'SOUQÉ',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 50,
-                      fontWeight: FontWeight.bold,
-                      letterSpacing: 1.2,
-                      fontFamily: 'Montserrat',
-                    ),
-                  ),
-                ],
+            SizedBox(height: size.height * 0.1),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 32),
+              child: Align(
+                alignment: Alignment.centerLeft,
+                child: Image.asset(
+                  AppImages.logo,
+                  height: size.height * 0.15,
+                  fit: BoxFit.contain,
+                ),
               ),
             ),
+            const SizedBox(height: 8),
+            const Text(
+              'SOUQÉ',
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 75,
+                fontWeight: FontWeight.bold,
+                letterSpacing: 1.2,
+                fontFamily: 'Montserrat',
+              ),
+            ),
+            
 
             const Spacer(flex: 3), // Bottom spacer
 
@@ -64,16 +64,13 @@ class IntroScreen extends StatelessWidget {
                 width: double.infinity,
                 child: ElevatedButton(
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.white,
-                    foregroundColor: AppColors.primary,
+                    backgroundColor: AppColors.primary,
+                    foregroundColor: AppColors.white,
                     padding: const EdgeInsets.symmetric(vertical: 16),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(30),
-                    ),
-                    textStyle: const TextStyle(
-                      fontSize: 18,
+                      textStyle: const TextStyle(
+                      fontSize: 22,
                       fontWeight: FontWeight.bold,
-                      fontFamily: 'Inter',
+                      fontFamily: 'Montserrat',
                     ),
                   ),
                   onPressed: () => _navigateToOnboarding(context),
