@@ -24,6 +24,24 @@ class _MedicalHistoryScreenState extends State<MedicalHistoryScreen> {
     'None', 'Diabetes', 'Asthma', 'Hypertension', 'Heart Disease', 'Epilepsy'
   ];
 
+  void _showSnackBar(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          message,
+          style: const TextStyle(color: Colors.white),
+        ),
+        backgroundColor: AppColors.primary,
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+        ),
+        margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        duration: const Duration(seconds: 4),
+      ),
+    );
+  }
+
   void _selectMultiple({
     required String title,
     required List<String> options,
@@ -116,16 +134,12 @@ class _MedicalHistoryScreenState extends State<MedicalHistoryScreen> {
   Future<void> _saveToFirestore() async {
     final user = FirebaseAuth.instance.currentUser;
     if (user == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('User not logged in')),
-      );
+      _showSnackBar('User not logged in');
       return;
     }
 
     if (selectedAllergies.isEmpty || selectedConditions.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please complete all fields')),
-      );
+      _showSnackBar('Please complete all fields');
       return;
     }
 
@@ -144,9 +158,7 @@ class _MedicalHistoryScreenState extends State<MedicalHistoryScreen> {
 
       Navigator.pushReplacementNamed(context, AppRoutes.home);
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to save data: $e')),
-      );
+      _showSnackBar('Failed to save data: $e');
     }
   }
 
