@@ -2,11 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:firebase_core/firebase_core.dart';
 //import 'firebase_options.dart';
-<<<<<<< HEAD
 import 'package:provider/provider.dart';  // This imports both Provider and ChangeNotifierProvider
-=======
-import 'firebase_options.dart';
->>>>>>> b85921e9675a6a7a464204649f255bfb1766c9e1
 
 // Constants
 import 'constants/app_routes.dart';
