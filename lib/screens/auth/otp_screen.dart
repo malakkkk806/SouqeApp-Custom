@@ -13,13 +13,13 @@ class OTPScreen extends StatefulWidget {
 }
 
 class _OTPScreenState extends State<OTPScreen> {
-  late String verificationId;
-  late String phone;
+  String? verificationId;
+  String? phone;
   final List<FocusNode> _focusNodes = List.generate(6, (_) => FocusNode());
   final List<TextEditingController> _otpControllers = List.generate(6, (_) => TextEditingController());
 
   final FirebaseAuth _auth = FirebaseAuth.instance;
-  late Timer _timer;
+  Timer? _timer;
   int _start = 30;
   bool _isResendEnabled = false;
   bool _isLoading = false;
@@ -27,21 +27,30 @@ class _OTPScreenState extends State<OTPScreen> {
   @override
   void initState() {
     super.initState();
-    Future.microtask(() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
       final args = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
-      verificationId = args?['verificationId'] ?? '';
-      phone = args?['phone'] ?? '';
-      startTimer();
+      if (args != null) {
+        setState(() {
+          verificationId = args['verificationId'];
+          phone = args['phone'];
+        });
+        startTimer();
+      }
     });
   }
 
   void startTimer() {
+    _timer?.cancel();
     _isResendEnabled = false;
     _start = 30;
     _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      if (!mounted) {
+        timer.cancel();
+        return;
+      }
       if (_start == 0) {
         setState(() => _isResendEnabled = true);
-        _timer.cancel();
+        timer.cancel();
       } else {
         setState(() => _start--);
       }
@@ -50,7 +59,7 @@ class _OTPScreenState extends State<OTPScreen> {
 
   @override
   void dispose() {
-    _timer.cancel();
+    _timer?.cancel();
     for (final controller in _otpControllers) {
       controller.dispose();
     }
@@ -61,6 +70,16 @@ class _OTPScreenState extends State<OTPScreen> {
   }
 
   void _verifyOTP() async {
+    if (verificationId == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Verification ID not found. Please try again.'),
+          backgroundColor: AppColors.primary,
+        ),
+      );
+      return;
+    }
+
     final code = _otpControllers.map((c) => c.text).join();
 
     if (code.length != 6) {
@@ -77,7 +96,7 @@ class _OTPScreenState extends State<OTPScreen> {
 
     try {
       final credential = PhoneAuthProvider.credential(
-        verificationId: verificationId,
+        verificationId: verificationId!,
         smsCode: code,
       );
 
@@ -102,16 +121,28 @@ class _OTPScreenState extends State<OTPScreen> {
   }
 
   void _resendCode() async {
+    if (phone == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Phone number not found. Please try again.'),
+          backgroundColor: AppColors.primary,
+        ),
+      );
+      return;
+    }
+    
     startTimer();
     await _auth.verifyPhoneNumber(
-      phoneNumber: phone,
+      phoneNumber: phone!,
       verificationCompleted: (_) {},
       verificationFailed: (FirebaseAuthException e) {
+        if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text("Verification failed: ${e.message}")),
         );
       },
       codeSent: (String newVerificationId, int? resendToken) {
+        if (!mounted) return;
         setState(() => verificationId = newVerificationId);
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text("New OTP sent.")),
@@ -134,7 +165,11 @@ class _OTPScreenState extends State<OTPScreen> {
             keyboardType: TextInputType.number,
             textAlign: TextAlign.center,
             style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-            decoration: const InputDecoration(counterText: '', border: OutlineInputBorder()),
+            decoration: const InputDecoration(
+              counterText: '', 
+              border: OutlineInputBorder(),
+              contentPadding: EdgeInsets.symmetric(vertical: 12),
+            ),
             onChanged: (value) {
               if (value.isNotEmpty && index < 5) {
                 _focusNodes[index + 1].requestFocus();
@@ -167,8 +202,15 @@ class _OTPScreenState extends State<OTPScreen> {
                       onPressed: () => Navigator.pop(context),
                     ),
                     const SizedBox(height: 20),
-                    Center(
-                      child: Text('SOUQÉ', style: TextStyle(fontSize: 48, fontWeight: FontWeight.bold, color: AppColors.white)),
+                    const Center(
+                      child: Text(
+                        'SOUQÉ',
+                        style: TextStyle(
+                          fontSize: 48,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
+                      ),
                     ),
                     const SizedBox(height: 40),
                     Container(
@@ -180,10 +222,24 @@ class _OTPScreenState extends State<OTPScreen> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text('Enter OTP', style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: AppColors.primary)),
+                          const Text(
+                            'Enter OTP',
+                            style: TextStyle(
+                              fontSize: 28,
+                              fontWeight: FontWeight.bold,
+                              color: AppColors.primary,
+                            ),
+                          ),
                           const SizedBox(height: 8),
-                          Text('We’ve sent a 6-digit verification code to $phone.',
-                              style: TextStyle(fontSize: 16, color: AppColors.grey)),
+                          Text(
+                            phone != null 
+                              ? 'We have sent a 6-digit verification code to $phone.'
+                              : 'We have sent a 6-digit verification code to your phone.',
+                            style: const TextStyle(
+                              fontSize: 16,
+                              color: AppColors.grey,
+                            ),
+                          ),
                           const SizedBox(height: 32),
                           Center(child: _buildOTPFields()),
                           const SizedBox(height: 16),
@@ -191,9 +247,15 @@ class _OTPScreenState extends State<OTPScreen> {
                             child: _isResendEnabled
                                 ? TextButton(
                                     onPressed: _resendCode,
-                                    child: const Text('Resend Code', style: TextStyle(fontWeight: FontWeight.bold)),
+                                    child: const Text(
+                                      'Resend Code',
+                                      style: TextStyle(fontWeight: FontWeight.bold),
+                                    ),
                                   )
-                                : Text('Resend available in $_start sec', style: TextStyle(color: AppColors.grey)),
+                                : Text(
+                                    'Resend available in $_start sec',
+                                    style: const TextStyle(color: AppColors.grey),
+                                  ),
                           ),
                           const SizedBox(height: 24),
                           SizedBox(

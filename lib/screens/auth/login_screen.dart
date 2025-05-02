@@ -182,7 +182,7 @@ class _LogInScreenState extends State<LogInScreen> {
                             ),
                           ),
                         ),
-                        const SizedBox(height: 24),
+                        const SizedBox(height: 16),
                         SizedBox(
                           width: double.infinity,
                           height: 50,
@@ -196,13 +196,20 @@ class _LogInScreenState extends State<LogInScreen> {
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
-                            child: const Text('Log In'),
+                            child: const Text('Log In',
+                                      style: TextStyle(
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.w600,
+                                        fontFamily: 'Inter',
+                                        color: Colors.white,
+                                      ),
+                                    ),
                           ),
                         ),
                         const SizedBox(height: 16),
                         ElevatedButton.icon(
                           icon: const Icon(Icons.g_mobiledata),
-                          label: const Text("Sign in with Google"),
+                          label: const Text("Login with Google"),
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.white,
                             foregroundColor: Colors.black,
