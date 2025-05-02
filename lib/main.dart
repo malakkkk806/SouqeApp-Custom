@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:firebase_core/firebase_core.dart';
 //import 'firebase_options.dart';
-import 'package:provider/provider.dart';  // This imports both Provider and ChangeNotifierProvider
+// This imports both Provider and ChangeNotifierProvider
 
 // Constants
 import 'constants/app_routes.dart';
@@ -26,7 +26,7 @@ import 'screens/explore/explore_screen.dart';
 import 'screens/profile/account_screen.dart';
 
 // Providers
-import 'providers/cart_provider.dart';  // Ensure this path is correct
+// Ensure this path is correct
 
 Future<void> main() async {
   try {
