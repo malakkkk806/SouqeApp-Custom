@@ -13,12 +13,13 @@ class OTPScreen extends StatefulWidget {
 }
 
 class _OTPScreenState extends State<OTPScreen> {
-  late String verificationId;
-  late String phone;
-  final TextEditingController _otpController = TextEditingController();
-  final FirebaseAuth _auth = FirebaseAuth.instance;
+  String? verificationId;
+  String? phone;
+  final List<FocusNode> _focusNodes = List.generate(6, (_) => FocusNode());
+  final List<TextEditingController> _otpControllers = List.generate(6, (_) => TextEditingController());
 
-  late Timer _timer;
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+  Timer? _timer;
   int _start = 30;
   bool _isResendEnabled = false;
   bool _isLoading = false;
@@ -26,45 +27,65 @@ class _OTPScreenState extends State<OTPScreen> {
   @override
   void initState() {
     super.initState();
-    Future.microtask(() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
       final args = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
-      verificationId = args?['verificationId'] ?? '';
-      phone = args?['phone'] ?? '';
-      startTimer();
+      if (args != null) {
+        setState(() {
+          verificationId = args['verificationId'];
+          phone = args['phone'];
+        });
+        startTimer();
+      }
     });
   }
 
   void startTimer() {
+    _timer?.cancel();
     _isResendEnabled = false;
     _start = 30;
     _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      if (!mounted) {
+        timer.cancel();
+        return;
+      }
       if (_start == 0) {
-        setState(() {
-          _isResendEnabled = true;
-        });
-        _timer.cancel();
+        setState(() => _isResendEnabled = true);
+        timer.cancel();
       } else {
-        setState(() {
-          _start--;
-        });
+        setState(() => _start--);
       }
     });
   }
 
   @override
   void dispose() {
-    _timer.cancel();
-    _otpController.dispose();
+    _timer?.cancel();
+    for (final controller in _otpControllers) {
+      controller.dispose();
+    }
+    for (final node in _focusNodes) {
+      node.dispose();
+    }
     super.dispose();
   }
 
   void _verifyOTP() async {
-    final code = _otpController.text.trim();
+    if (verificationId == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Verification ID not found. Please try again.'),
+          backgroundColor: AppColors.primary,
+        ),
+      );
+      return;
+    }
+
+    final code = _otpControllers.map((c) => c.text).join();
 
     if (code.length != 6) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('Please enter a valid 6-digit code'),
+          content: Text('Please enter the 6-digit code'),
           backgroundColor: AppColors.primary,
         ),
       );
@@ -75,38 +96,54 @@ class _OTPScreenState extends State<OTPScreen> {
 
     try {
       final credential = PhoneAuthProvider.credential(
-        verificationId: verificationId,
+        verificationId: verificationId!,
         smsCode: code,
       );
 
       final result = await _auth.signInWithCredential(credential);
 
+      if (!mounted) return;
+
       if (result.user != null) {
-        Navigator.pushReplacementNamed(context, AppRoutes.medicalHistory);
+        Navigator.pushReplacementNamed(context, AppRoutes.login);
       }
     } on FirebaseAuthException catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error: ${e.message}')),
-      );
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error: ${e.message}')),
+        );
+      }
     } finally {
-      setState(() => _isLoading = false);
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
     }
   }
 
   void _resendCode() async {
+    if (phone == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Phone number not found. Please try again.'),
+          backgroundColor: AppColors.primary,
+        ),
+      );
+      return;
+    }
+    
     startTimer();
     await _auth.verifyPhoneNumber(
-      phoneNumber: phone,
-      verificationCompleted: (PhoneAuthCredential credential) {},
+      phoneNumber: phone!,
+      verificationCompleted: (_) {},
       verificationFailed: (FirebaseAuthException e) {
+        if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text("Verification failed: ${e.message}")),
         );
       },
       codeSent: (String newVerificationId, int? resendToken) {
-        setState(() {
-          verificationId = newVerificationId;
-        });
+        if (!mounted) return;
+        setState(() => verificationId = newVerificationId);
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text("New OTP sent.")),
         );
@@ -115,19 +152,43 @@ class _OTPScreenState extends State<OTPScreen> {
     );
   }
 
+  Widget _buildOTPFields() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: List.generate(6, (index) {
+        return SizedBox(
+          width: 45,
+          child: TextField(
+            controller: _otpControllers[index],
+            focusNode: _focusNodes[index],
+            maxLength: 1,
+            keyboardType: TextInputType.number,
+            textAlign: TextAlign.center,
+            style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            decoration: const InputDecoration(
+              counterText: '', 
+              border: OutlineInputBorder(),
+              contentPadding: EdgeInsets.symmetric(vertical: 12),
+            ),
+            onChanged: (value) {
+              if (value.isNotEmpty && index < 5) {
+                _focusNodes[index + 1].requestFocus();
+              } else if (value.isEmpty && index > 0) {
+                _focusNodes[index - 1].requestFocus();
+              }
+            },
+          ),
+        );
+      }),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Stack(
         children: [
-          Container(
-            decoration: BoxDecoration(
-              image: DecorationImage(
-                image: AssetImage(AppImages.bagPhoto),
-                fit: BoxFit.cover,
-              ),
-            ),
-          ),
+          Image.asset(AppImages.bagPhoto, fit: BoxFit.cover, width: double.infinity, height: double.infinity),
           Container(color: AppColors.black40),
           SingleChildScrollView(
             child: SafeArea(
@@ -141,15 +202,13 @@ class _OTPScreenState extends State<OTPScreen> {
                       onPressed: () => Navigator.pop(context),
                     ),
                     const SizedBox(height: 20),
-                    Center(
+                    const Center(
                       child: Text(
                         'SOUQÉ',
                         style: TextStyle(
                           fontSize: 48,
                           fontWeight: FontWeight.bold,
-                          color: AppColors.white,
-                          letterSpacing: 2,
-                          fontFamily: 'Montserrat',
+                          color: Colors.white,
                         ),
                       ),
                     ),
@@ -163,42 +222,26 @@ class _OTPScreenState extends State<OTPScreen> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(
+                          const Text(
                             'Enter OTP',
                             style: TextStyle(
                               fontSize: 28,
                               fontWeight: FontWeight.bold,
-                              fontFamily: 'Montserrat',
                               color: AppColors.primary,
                             ),
                           ),
                           const SizedBox(height: 8),
                           Text(
-                            'We’ve sent a 6-digit verification code to $phone.',
-                            style: TextStyle(
+                            phone != null 
+                              ? 'We have sent a 6-digit verification code to $phone.'
+                              : 'We have sent a 6-digit verification code to your phone.',
+                            style: const TextStyle(
                               fontSize: 16,
-                              fontFamily: 'Inter',
                               color: AppColors.grey,
                             ),
                           ),
                           const SizedBox(height: 32),
-                          TextFormField(
-                            controller: _otpController,
-                            keyboardType: TextInputType.number,
-                            maxLength: 6,
-                            decoration: const InputDecoration(
-                              labelText: 'Enter OTP',
-                              border: OutlineInputBorder(),
-                              counterText: '',
-                            ),
-                            style: const TextStyle(
-                              letterSpacing: 16,
-                              fontSize: 20,
-                              fontFamily: 'Inter',
-                              fontWeight: FontWeight.bold,
-                            ),
-                            textAlign: TextAlign.center,
-                          ),
+                          Center(child: _buildOTPFields()),
                           const SizedBox(height: 16),
                           Center(
                             child: _isResendEnabled
@@ -206,38 +249,38 @@ class _OTPScreenState extends State<OTPScreen> {
                                     onPressed: _resendCode,
                                     child: const Text(
                                       'Resend Code',
-                                      style: TextStyle(
-                                        fontFamily: 'Inter',
-                                        color: AppColors.primary,
-                                        fontWeight: FontWeight.bold,
-                                      ),
+                                      style: TextStyle(fontWeight: FontWeight.bold),
                                     ),
                                   )
                                 : Text(
                                     'Resend available in $_start sec',
-                                    style: const TextStyle(
-                                      fontFamily: 'Inter',
-                                      color: AppColors.grey,
-                                    ),
+                                    style: const TextStyle(color: AppColors.grey),
                                   ),
                           ),
                           const SizedBox(height: 24),
                           SizedBox(
+                            height: 52,
                             width: double.infinity,
-                            height: 50,
                             child: ElevatedButton(
                               onPressed: _isLoading ? null : _verifyOTP,
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: AppColors.primary,
-                                foregroundColor: AppColors.white,
-                                textStyle: const TextStyle(
-                                  fontFamily: 'Montserrat',
-                                  fontWeight: FontWeight.bold,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
                                 ),
+                                elevation: 2,
                               ),
                               child: _isLoading
                                   ? const CircularProgressIndicator(color: Colors.white)
-                                  : const Text('Verify'),
+                                  : const Text(
+                                      'Verify',
+                                      style: TextStyle(
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.w600,
+                                        fontFamily: 'Inter',
+                                        color: Colors.white,
+                                      ),
+                                    ),
                             ),
                           ),
                         ],

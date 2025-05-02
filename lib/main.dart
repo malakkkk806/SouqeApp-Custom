@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:firebase_core/firebase_core.dart';
+<<<<<<< HEAD
 import 'package:provider/provider.dart';  // This imports both Provider and ChangeNotifierProvider
+=======
+import 'firebase_options.dart';
+>>>>>>> b85921e9675a6a7a464204649f255bfb1766c9e1
 
 // Constants
 import 'constants/app_routes.dart';
@@ -28,25 +32,40 @@ import 'screens/profile/account_screen.dart';
 import 'providers/cart_provider.dart';  // Ensure this path is correct
 
 Future<void> main() async {
-  WidgetsFlutterBinding.ensureInitialized();
+  try {
+    WidgetsFlutterBinding.ensureInitialized();
 
+<<<<<<< HEAD
   // Initialize Firebase
   await Firebase.initializeApp();
+=======
+    await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
+>>>>>>> b85921e9675a6a7a464204649f255bfb1766c9e1
 
-  // System UI styling
-  SystemChrome.setSystemUIOverlayStyle(
-    const SystemUiOverlayStyle(
-      statusBarColor: AppColors.primary,
-      statusBarIconBrightness: Brightness.light,
-    ),
-  );
+    SystemChrome.setSystemUIOverlayStyle(
+      const SystemUiOverlayStyle(
+        statusBarColor: AppColors.primary,
+        statusBarIconBrightness: Brightness.light,
+      ),
+    );
 
+<<<<<<< HEAD
   runApp(
     ChangeNotifierProvider(
       create: (_) => CartProvider(),
       child: const MyApp(),
     ),
   );
+=======
+    debugPrint('Firebase initialized successfully');
+  } catch (e) {
+    debugPrint('Error initializing Firebase: $e');
+  }
+
+  runApp(const MyApp());
+>>>>>>> b85921e9675a6a7a464204649f255bfb1766c9e1
 }
 
 class MyApp extends StatelessWidget {
