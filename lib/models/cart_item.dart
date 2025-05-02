@@ -17,7 +17,6 @@ class CartItem {
 
   double get totalPrice => price * quantity;
 
-  // Convert CartItem to JSON
   Map<String, dynamic> toJson() => {
         'productId': productId,
         'name': name,
@@ -27,17 +26,15 @@ class CartItem {
         'allergens': allergens,
       };
 
-  // Create CartItem from JSON
   factory CartItem.fromJson(Map<String, dynamic> json) => CartItem(
-        productId: json['productId'],
-        name: json['name'],
-        price: json['price'],
-        imageUrl: json['imageUrl'],
-        quantity: json['quantity'],
-        allergens: List<String>.from(json['allergens']),
+        productId: json['productId'] as String,
+        name: json['name'] as String,
+        price: (json['price'] as num).toDouble(),
+        imageUrl: json['imageUrl'] as String,
+        quantity: (json['quantity'] as num).toInt(),
+        allergens: (json['allergens'] as List<dynamic>).cast<String>(),
       );
 
-  // Create a copy with optional changes
   CartItem copyWith({
     String? productId,
     String? name,
@@ -52,7 +49,17 @@ class CartItem {
       price: price ?? this.price,
       imageUrl: imageUrl ?? this.imageUrl,
       quantity: quantity ?? this.quantity,
-      allergens: allergens ?? this.allergens,
+      allergens: allergens ?? List.from(this.allergens),
     );
   }
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is CartItem &&
+          runtimeType == other.runtimeType &&
+          productId == other.productId;
+
+  @override
+  int get hashCode => productId.hashCode;
 }
