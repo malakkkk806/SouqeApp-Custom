@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:firebase_core/firebase_core.dart';
+//import 'firebase_options.dart';
 <<<<<<< HEAD
 import 'package:provider/provider.dart';  // This imports both Provider and ChangeNotifierProvider
 =======
@@ -35,14 +36,9 @@ Future<void> main() async {
   try {
     WidgetsFlutterBinding.ensureInitialized();
 
-<<<<<<< HEAD
-  // Initialize Firebase
-  await Firebase.initializeApp();
-=======
     await Firebase.initializeApp(
-      options: DefaultFirebaseOptions.currentPlatform,
+     // options: DefaultFirebaseOptions.currentPlatform,
     );
->>>>>>> b85921e9675a6a7a464204649f255bfb1766c9e1
 
     SystemChrome.setSystemUIOverlayStyle(
       const SystemUiOverlayStyle(
@@ -51,21 +47,12 @@ Future<void> main() async {
       ),
     );
 
-<<<<<<< HEAD
-  runApp(
-    ChangeNotifierProvider(
-      create: (_) => CartProvider(),
-      child: const MyApp(),
-    ),
-  );
-=======
     debugPrint('Firebase initialized successfully');
   } catch (e) {
     debugPrint('Error initializing Firebase: $e');
   }
 
   runApp(const MyApp());
->>>>>>> b85921e9675a6a7a464204649f255bfb1766c9e1
 }
 
 class MyApp extends StatelessWidget {
