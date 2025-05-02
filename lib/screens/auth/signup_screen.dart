@@ -31,6 +31,24 @@ class _SignUpScreenState extends State<SignUpScreen> {
     super.dispose();
   }
 
+  void _showSnackBar(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          message,
+          style: const TextStyle(color: Colors.white),
+        ),
+        backgroundColor: AppColors.primary,
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+        ),
+        margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        duration: const Duration(seconds: 4),
+      ),
+    );
+  }
+
   void _submitSignup() async {
     if (_formKey.currentState!.validate()) {
       try {
@@ -42,9 +60,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
           Navigator.pushReplacementNamed(context, AppRoutes.medicalHistory);
         }
       } catch (e) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Signup failed: $e")),
-        );
+        _showSnackBar("Signup failed: $e");
       }
     }
   }
@@ -56,9 +72,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
         Navigator.pushReplacementNamed(context, AppRoutes.medicalHistory);
       }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Google sign-in failed: $e")),
-      );
+      _showSnackBar("Google sign-in failed: $e");
     }
   }
 
@@ -67,7 +81,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
     return Scaffold(
       body: Stack(
         children: [
-          // Background
           Container(
             decoration: BoxDecoration(
               image: DecorationImage(
@@ -76,9 +89,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
               ),
             ),
           ),
-          // Overlay
           Container(color: AppColors.black40),
-          // Content
           SingleChildScrollView(
             child: SafeArea(
               child: Padding(
@@ -91,7 +102,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       onPressed: () => Navigator.pop(context),
                     ),
                     const SizedBox(height: 20),
-                    Center(
+                    const Center(
                       child: Text(
                         'SOUQÉ',
                         style: TextStyle(

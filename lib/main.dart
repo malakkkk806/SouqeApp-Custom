@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:firebase_core/firebase_core.dart';
-// import 'firebase_options.dart';
+import 'package:provider/provider.dart';
 
-// Constants
+// import 'firebase_options.dart';
 import 'constants/app_routes.dart';
 import 'constants/colors.dart';
 
@@ -24,6 +24,8 @@ import 'screens/cart/track_order_screen.dart';
 import 'screens/explore/explore_screen.dart';
 import 'screens/profile/account_screen.dart';
 
+// Providers
+import 'providers/cart_provider.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -39,9 +41,14 @@ Future<void> main() async {
     ),
   );
 
-  debugPrint('Flutter app is launching...');
-
-  runApp(const MyApp());
+  runApp(
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => CartProvider()),
+      ],
+      child: const MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {

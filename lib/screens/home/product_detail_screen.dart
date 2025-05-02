@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:souqe/constants/app_routes.dart';
 import 'package:souqe/constants/colors.dart';
