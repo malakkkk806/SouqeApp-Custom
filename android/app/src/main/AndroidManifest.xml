@@ -2,7 +2,7 @@
     package="com.example.mobapp">
 
     <application
-        android:label="souqe"
+        android:label="Souqé"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher"
         android:usesCleartextTraffic="true">
