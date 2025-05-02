@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:geocoding/geocoding.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:provider/provider.dart';
 import 'package:souqe/constants/app_images.dart';
 import 'package:souqe/constants/colors.dart';
+import 'package:souqe/screens/explore/explore_screen.dart';
 import 'package:souqe/widgets/common/bottom_nav_bar.dart';
 import 'package:souqe/screens/home/product_detail_screen.dart';
 import 'package:souqe/models/product.dart';
@@ -19,6 +22,7 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   int _currentIndex = 0;
   final Set<String> _favoriteProductIds = {};
+  String _currentAddress = 'Fetching location...';
 
   final List<Product> products = [
     Product(
@@ -77,21 +81,147 @@ class _HomeScreenState extends State<HomeScreen> {
     ),
   ];
 
-  Widget _buildTabScreen() {
-    switch (_currentIndex) {
-      case 0:
-        return _buildShopContent();
-      case 1:
-        return const Center(child: Text("Explore Screen"));
-      case 2:
-        return const CartScreen();
-      case 3:
-        return const Center(child: Text("Favourite Screen"));
-      case 4:
-        return const Center(child: Text("Account Screen"));
-      default:
-        return _buildShopContent();
+  @override
+  void initState() {
+    super.initState();
+    _fetchLocation();
+  }
+
+  Future<void> _fetchLocation() async {
+    bool serviceEnabled;
+    LocationPermission permission;
+
+    serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!serviceEnabled) {
+      setState(() => _currentAddress = 'Location services are disabled.');
+      return;
     }
+
+    permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+      if (permission == LocationPermission.denied) {
+        setState(() => _currentAddress = 'Location permission denied.');
+        return;
+      }
+    }
+
+    if (permission == LocationPermission.deniedForever) {
+      setState(() => _currentAddress = 'Location permissions are permanently denied.');
+      return;
+    }
+
+    final position = await Geolocator.getCurrentPosition();
+    final placemarks = await placemarkFromCoordinates(position.latitude, position.longitude);
+
+    final place = placemarks.first;
+    setState(() {
+      _currentAddress = '${place.locality}, ${place.administrativeArea}, ${place.country}';
+    });
+  }
+
+  Widget _buildShopContent() {
+    return SafeArea(
+      child: SingleChildScrollView(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Column(
+              children: [
+                Image.asset(AppImages.logo2, height: 50),
+                const SizedBox(height: 6),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Icon(Icons.location_on,
+                        color: AppColors.primary, size: 18),
+                    const SizedBox(width: 4),
+                    Text(
+                      _currentAddress,
+                      style: const TextStyle(
+                        fontWeight: FontWeight.w600,
+                        fontFamily: 'Inter',
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 12),
+              ],
+            ),
+            TextField(
+              decoration: InputDecoration(
+                hintText: 'Search Store',
+                prefixIcon: const Icon(Icons.search),
+                filled: true,
+                fillColor: AppColors.surface,
+                contentPadding: const EdgeInsets.symmetric(horizontal: 16),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide.none,
+                ),
+              ),
+            ),
+            const SizedBox(height: 16),
+            ClipRRect(
+              borderRadius: BorderRadius.circular(12),
+              child: Image.asset(
+                AppImages.banner1,
+                height: 140,
+                fit: BoxFit.cover,
+              ),
+            ),
+            const SizedBox(height: 20),
+            _buildSection("Exclusive Offer", products.sublist(0, 3)),
+            const SizedBox(height: 20),
+            _buildSection("Best Selling", products.sublist(3)),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSection(String title, List<Product> productList) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              title,
+              style: const TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                fontFamily: 'Montserrat',
+              ),
+            ),
+            TextButton(
+              onPressed: () {},
+              child: const Text(
+                "See all",
+                style: TextStyle(color: AppColors.primary),
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 10),
+        SizedBox(
+          height: 265,
+          child: ListView.separated(
+            scrollDirection: Axis.horizontal,
+            itemCount: productList.length,
+            separatorBuilder: (_, __) => const SizedBox(width: 12),
+            itemBuilder: (context, index) {
+              return SizedBox(
+                width: 160,
+                child: _buildProductCard(productList[index]),
+              );
+            },
+          ),
+        ),
+      ],
+    );
   }
 
   Widget _buildProductCard(Product product) {
@@ -114,14 +244,13 @@ class _HomeScreenState extends State<HomeScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Product image with favorite icon overlay
             Stack(
               children: [
                 AspectRatio(
                   aspectRatio: 1,
                   child: ClipRRect(
-                    borderRadius: const BorderRadius.vertical(
-                        top: Radius.circular(12)),
+                    borderRadius:
+                        const BorderRadius.vertical(top: Radius.circular(12)),
                     child: Image.asset(
                       product.imageUrl,
                       fit: BoxFit.contain,
@@ -193,7 +322,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
-                  const SizedBox(height: 2), // Reduced spacing between description and price
+                  const SizedBox(height: 2),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -212,7 +341,8 @@ class _HomeScreenState extends State<HomeScreen> {
                         padding: EdgeInsets.zero,
                         constraints: const BoxConstraints(),
                         onPressed: () {
-                          final cart = Provider.of<CartProvider>(context, listen: false);
+                          final cart = Provider.of<CartProvider>(context,
+                              listen: false);
                           cart.addItem(CartItem(
                             productId: product.id,
                             name: product.name,
@@ -228,7 +358,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                 style: const TextStyle(fontSize: 13),
                               ),
                               behavior: SnackBarBehavior.floating,
-                              backgroundColor: AppColors.primary.withOpacity(0.9),
+                              backgroundColor:
+                                  AppColors.primary.withOpacity(0.9),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(10),
                               ),
@@ -255,107 +386,21 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _buildSection(String title, List<Product> productList) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(
-              title,
-              style: const TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                fontFamily: 'Montserrat',
-              ),
-            ),
-            TextButton(
-              onPressed: () {},
-              child: const Text(
-                "See all",
-                style: TextStyle(color: AppColors.primary),
-              ),
-            ),
-          ],
-        ),
-        const SizedBox(height: 10),
-        SizedBox(
-          height: 265,
-          child: ListView.separated(
-            scrollDirection: Axis.horizontal,
-            itemCount: productList.length,
-            separatorBuilder: (_, __) => const SizedBox(width: 12),
-            itemBuilder: (context, index) {
-              return SizedBox(
-                width: 160,
-                child: _buildProductCard(productList[index]),
-              );
-            },
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildShopContent() {
-    return SafeArea(
-      child: SingleChildScrollView(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Column(
-              children: [
-                Image.asset(AppImages.logo2, height: 50),
-                const SizedBox(height: 6),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: const [
-                    Icon(Icons.location_on, color: AppColors.primary, size: 18),
-                    SizedBox(width: 4),
-                    Text(
-                      'Shoubra, Faculty Of Enginnering',
-                      style: TextStyle(
-                        fontWeight: FontWeight.w600,
-                        fontFamily: 'Inter',
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 12),
-              ],
-            ),
-            TextField(
-              decoration: InputDecoration(
-                hintText: 'Search Store',
-                prefixIcon: const Icon(Icons.search),
-                filled: true,
-                fillColor: AppColors.surface,
-                contentPadding: const EdgeInsets.symmetric(horizontal: 16),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide.none,
-                ),
-              ),
-            ),
-            const SizedBox(height: 16),
-            ClipRRect(
-              borderRadius: BorderRadius.circular(12),
-              child: Image.asset(
-                AppImages.banner1,
-                height: 140,
-                fit: BoxFit.cover,
-              ),
-            ),
-            const SizedBox(height: 20),
-            _buildSection("Exclusive Offer", products.sublist(0, 3)),
-            const SizedBox(height: 20),
-            _buildSection("Best Selling", products.sublist(3)),
-          ],
-        ),
-      ),
-    );
+  Widget _buildTabScreen() {
+    switch (_currentIndex) {
+      case 0:
+        return _buildShopContent();
+      case 1:
+        return const ExploreScreen();
+      case 2:
+        return const CartScreen();
+      case 3:
+        return const FavouriteScreen();
+      case 4:
+        return const AccountScreen;
+      default:
+        return _buildShopContent();
+    }
   }
 
   @override
