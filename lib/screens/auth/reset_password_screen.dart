@@ -25,19 +25,28 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
     super.dispose();
   }
 
+  void _showSnackBar(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          message,
+          style: const TextStyle(color: Colors.white),
+        ),
+        backgroundColor: AppColors.primary,
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+        ),
+        margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        duration: const Duration(seconds: 3),
+      ),
+    );
+  }
+
   void _resetPassword() {
     if (_formKey.currentState!.validate()) {
-      // You could also update the password in Firebase if the user is logged in:
-      // FirebaseAuth.instance.currentUser?.updatePassword(_passwordController.text.trim());
+      _showSnackBar('Password successfully reset!');
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Password successfully reset!'),
-          backgroundColor: AppColors.primary,
-        ),
-      );
-
-      // Navigate to login
       Future.delayed(const Duration(seconds: 1), () {
         Navigator.pushReplacementNamed(context, AppRoutes.login);
       });
@@ -186,6 +195,9 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                                   textStyle: const TextStyle(
                                     fontFamily: 'Montserrat',
                                     fontWeight: FontWeight.bold,
+                                  ),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(12),
                                   ),
                                 ),
                                 child: const Text('Reset Password'),

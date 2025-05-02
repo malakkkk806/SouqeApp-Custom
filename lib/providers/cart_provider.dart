@@ -1,5 +1,5 @@
 import 'package:flutter/foundation.dart';
-import '../models/cart_item.dart';
+import 'package:souqe/models/cart_item.dart';
 
 class CartProvider with ChangeNotifier {
   final Map<String, CartItem> _items = {};

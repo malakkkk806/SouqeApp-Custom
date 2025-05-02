@@ -23,6 +23,24 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
     super.dispose();
   }
 
+  void _showSnackBar(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          message,
+          style: const TextStyle(color: Colors.white),
+        ),
+        backgroundColor: AppColors.primary,
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+        ),
+        margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        duration: const Duration(seconds: 4),
+      ),
+    );
+  }
+
   Future<void> _resetPassword() async {
     if (!_formKey.currentState!.validate()) return;
 
@@ -30,16 +48,9 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
     try {
       await _auth.sendPasswordResetEmail(email: _emailController.text.trim());
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Password reset link sent! Check your email.'),
-          backgroundColor: AppColors.primary,
-        ),
-      );
+      _showSnackBar('Password reset link sent! Check your email.');
     } on FirebaseAuthException catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(e.message ?? 'Reset failed')),
-      );
+      _showSnackBar(e.message ?? 'Reset failed');
     } finally {
       setState(() => _loading = false);
     }
@@ -145,6 +156,9 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                                   textStyle: const TextStyle(
                                     fontFamily: 'Montserrat',
                                     fontWeight: FontWeight.bold,
+                                  ),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(12),
                                   ),
                                 ),
                                 child: _loading

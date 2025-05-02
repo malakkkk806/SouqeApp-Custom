@@ -1,54 +1,54 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:firebase_core/firebase_core.dart';
-//import 'firebase_options.dart';
-// This imports both Provider and ChangeNotifierProvider
+import 'package:provider/provider.dart';
 
-// Constants
+// import 'firebase_options.dart';
 import 'constants/app_routes.dart';
 import 'constants/colors.dart';
 
 // Screens
 import 'screens/onboarding/intro_screen.dart';
 import 'screens/onboarding/onboarding_screen.dart';
-import 'screens/auth/signin_screen.dart';
 import 'screens/auth/login_screen.dart';
+import 'screens/auth/signin_screen.dart';
 import 'screens/auth/signup_screen.dart';
 import 'screens/auth/forgot_password_screen.dart';
 import 'screens/auth/otp_screen.dart';
 import 'screens/auth/reset_password_screen.dart';
+import 'screens/medical/medical_history_screen.dart';
 import 'screens/home/home_screen.dart';
 import 'screens/cart/cart_screen.dart';
 import 'screens/cart/order_status_screen.dart';
 import 'screens/cart/track_order_screen.dart';
-import 'screens/medical/medical_history_screen.dart';
 import 'screens/explore/explore_screen.dart';
 import 'screens/profile/account_screen.dart';
 
 // Providers
-// Ensure this path is correct
+import 'providers/cart_provider.dart';
 
 Future<void> main() async {
-  try {
-    WidgetsFlutterBinding.ensureInitialized();
+  WidgetsFlutterBinding.ensureInitialized();
 
-    await Firebase.initializeApp(
-     // options: DefaultFirebaseOptions.currentPlatform,
-    );
+  await Firebase.initializeApp(
+    // options: DefaultFirebaseOptions.currentPlatform,
+  );
 
-    SystemChrome.setSystemUIOverlayStyle(
-      const SystemUiOverlayStyle(
-        statusBarColor: AppColors.primary,
-        statusBarIconBrightness: Brightness.light,
-      ),
-    );
+  SystemChrome.setSystemUIOverlayStyle(
+    const SystemUiOverlayStyle(
+      statusBarColor: AppColors.primary,
+      statusBarIconBrightness: Brightness.light,
+    ),
+  );
 
-    debugPrint('Firebase initialized successfully');
-  } catch (e) {
-    debugPrint('Error initializing Firebase: $e');
-  }
-
-  runApp(const MyApp());
+  runApp(
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => CartProvider()),
+      ],
+      child: const MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {

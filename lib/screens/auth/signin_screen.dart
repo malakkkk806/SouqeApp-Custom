@@ -27,18 +27,31 @@ class _SignInScreenState extends State<SignInScreen> {
         .join();
   }
 
+  void _showSnackBar(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          message,
+          style: const TextStyle(color: Colors.white),
+        ),
+        backgroundColor: AppColors.primary,
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+        ),
+        margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        duration: const Duration(seconds: 4),
+      ),
+    );
+  }
+
   void _startPhoneVerification() async {
     final rawInput = _phoneController.text.trim();
     final sanitized = rawInput.startsWith('0') ? rawInput.substring(1) : rawInput;
     final fullPhone = '$countryCode$sanitized';
 
     if (sanitized.isEmpty || sanitized.length < 8) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text("Enter a valid phone number"),
-          backgroundColor: AppColors.primary,
-        ),
-      );
+      _showSnackBar("Enter a valid phone number");
       return;
     }
 
@@ -59,12 +72,7 @@ class _SignInScreenState extends State<SignInScreen> {
       },
       onError: (error) {
         setState(() => _isLoading = false);
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text("Verification failed: $error"),
-            backgroundColor: AppColors.primary,
-          ),
-        );
+        _showSnackBar("Verification failed: $error");
       },
     );
   }

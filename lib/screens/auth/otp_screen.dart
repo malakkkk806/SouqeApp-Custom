@@ -69,26 +69,34 @@ class _OTPScreenState extends State<OTPScreen> {
     super.dispose();
   }
 
+  void _showSnackBar(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          message,
+          style: const TextStyle(color: Colors.white),
+        ),
+        backgroundColor: AppColors.primary,
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+        ),
+        margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        duration: const Duration(seconds: 4),
+      ),
+    );
+  }
+
   void _verifyOTP() async {
     if (verificationId == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Verification ID not found. Please try again.'),
-          backgroundColor: AppColors.primary,
-        ),
-      );
+      _showSnackBar('Verification ID not found. Please try again.');
       return;
     }
 
     final code = _otpControllers.map((c) => c.text).join();
 
     if (code.length != 6) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Please enter the 6-digit code'),
-          backgroundColor: AppColors.primary,
-        ),
-      );
+      _showSnackBar('Please enter the 6-digit code');
       return;
     }
 
@@ -109,9 +117,7 @@ class _OTPScreenState extends State<OTPScreen> {
       }
     } on FirebaseAuthException catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error: ${e.message}')),
-        );
+        _showSnackBar('Error: ${e.message}');
       }
     } finally {
       if (mounted) {
@@ -122,31 +128,22 @@ class _OTPScreenState extends State<OTPScreen> {
 
   void _resendCode() async {
     if (phone == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Phone number not found. Please try again.'),
-          backgroundColor: AppColors.primary,
-        ),
-      );
+      _showSnackBar('Phone number not found. Please try again.');
       return;
     }
-    
+
     startTimer();
     await _auth.verifyPhoneNumber(
       phoneNumber: phone!,
       verificationCompleted: (_) {},
       verificationFailed: (FirebaseAuthException e) {
         if (!mounted) return;
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Verification failed: ${e.message}")),
-        );
+        _showSnackBar("Verification failed: ${e.message}");
       },
       codeSent: (String newVerificationId, int? resendToken) {
         if (!mounted) return;
         setState(() => verificationId = newVerificationId);
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("New OTP sent.")),
-        );
+        _showSnackBar("New OTP sent.");
       },
       codeAutoRetrievalTimeout: (_) {},
     );
@@ -166,7 +163,7 @@ class _OTPScreenState extends State<OTPScreen> {
             textAlign: TextAlign.center,
             style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             decoration: const InputDecoration(
-              counterText: '', 
+              counterText: '',
               border: OutlineInputBorder(),
               contentPadding: EdgeInsets.symmetric(vertical: 12),
             ),
@@ -232,9 +229,9 @@ class _OTPScreenState extends State<OTPScreen> {
                           ),
                           const SizedBox(height: 8),
                           Text(
-                            phone != null 
-                              ? 'We have sent a 6-digit verification code to $phone.'
-                              : 'We have sent a 6-digit verification code to your phone.',
+                            phone != null
+                                ? 'We have sent a 6-digit verification code to $phone.'
+                                : 'We have sent a 6-digit verification code to your phone.',
                             style: const TextStyle(
                               fontSize: 16,
                               color: AppColors.grey,
