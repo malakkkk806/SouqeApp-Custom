@@ -26,6 +26,19 @@ class _LogInScreenState extends State<LogInScreen> {
     super.dispose();
   }
 
+  void _showSnackBar(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message, style: const TextStyle(color: Colors.white)),
+        backgroundColor: AppColors.primary,
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        duration: const Duration(seconds: 4),
+      ),
+    );
+  }
+
   void _submitLogin() async {
     if (_formKey.currentState!.validate()) {
       try {
@@ -37,9 +50,7 @@ class _LogInScreenState extends State<LogInScreen> {
           Navigator.pushReplacementNamed(context, AppRoutes.medicalHistory);
         }
       } catch (e) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(e.toString())),
-        );
+        _showSnackBar("Login failed: ${e.toString()}");
       }
     }
   }
@@ -51,9 +62,7 @@ class _LogInScreenState extends State<LogInScreen> {
         Navigator.pushReplacementNamed(context, AppRoutes.medicalHistory);
       }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Google sign-in failed: $e")),
-      );
+      _showSnackBar("Google sign-in failed: $e");
     }
   }
 
@@ -173,7 +182,10 @@ class _LogInScreenState extends State<LogInScreen> {
                             alignment: Alignment.centerRight,
                             child: TextButton(
                               onPressed: () {
-                                Navigator.pushNamed(context, AppRoutes.forgotPassword);
+                                Navigator.pushNamed(
+                                  context,
+                                  AppRoutes.forgotPassword,
+                                );
                               },
                               child: const Text(
                                 'Forget Password?',
@@ -184,7 +196,7 @@ class _LogInScreenState extends State<LogInScreen> {
                               ),
                             ),
                           ),
-                          const SizedBox(height: 12),
+                          const SizedBox(height: 16),
                           SizedBox(
                             width: double.infinity,
                             height: 52,
@@ -213,7 +225,7 @@ class _LogInScreenState extends State<LogInScreen> {
                               ),
                             ),
                           ),
-                          const SizedBox(height: 12),
+                          const SizedBox(height: 16),
                           SizedBox(
                             width: 240,
                             height: 48,
@@ -247,7 +259,10 @@ class _LogInScreenState extends State<LogInScreen> {
                               ),
                               TextButton(
                                 onPressed: () {
-                                  Navigator.pushNamed(context, AppRoutes.signup);
+                                  Navigator.pushNamed(
+                                    context,
+                                    AppRoutes.signup,
+                                  );
                                 },
                                 child: const Text(
                                   'Sign up',
