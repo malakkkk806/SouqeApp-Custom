@@ -26,7 +26,12 @@ class _OTPScreenState extends State<OTPScreen> {
   @override
   void initState() {
     super.initState();
-    startTimer();
+    Future.microtask(() {
+      final args = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
+      verificationId = args?['verificationId'] ?? '';
+      phone = args?['phone'] ?? '';
+      startTimer();
+    });
   }
 
   void startTimer() {
@@ -88,12 +93,30 @@ class _OTPScreenState extends State<OTPScreen> {
     }
   }
 
+  void _resendCode() async {
+    startTimer();
+    await _auth.verifyPhoneNumber(
+      phoneNumber: phone,
+      verificationCompleted: (PhoneAuthCredential credential) {},
+      verificationFailed: (FirebaseAuthException e) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("Verification failed: ${e.message}")),
+        );
+      },
+      codeSent: (String newVerificationId, int? resendToken) {
+        setState(() {
+          verificationId = newVerificationId;
+        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("New OTP sent.")),
+        );
+      },
+      codeAutoRetrievalTimeout: (_) {},
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    final args = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
-    verificationId = args?['verificationId'] ?? '';
-    phone = args?['phone'] ?? '';
-
     return Scaffold(
       body: Stack(
         children: [
@@ -180,10 +203,7 @@ class _OTPScreenState extends State<OTPScreen> {
                           Center(
                             child: _isResendEnabled
                                 ? TextButton(
-                                    onPressed: () {
-                                      startTimer();
-                                      // TODO: Implement resend logic
-                                    },
+                                    onPressed: _resendCode,
                                     child: const Text(
                                       'Resend Code',
                                       style: TextStyle(
