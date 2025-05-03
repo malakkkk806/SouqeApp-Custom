@@ -1,4 +1,4 @@
-import '/models/product.dart'; 
+import '/models/product.dart';
 
 class FruitsAndVegetables {
   static List<Product> getProducts() {
@@ -16,8 +16,9 @@ class FruitsAndVegetables {
         reviewCount: 200,
         allergens: [],
         relatedProducts: ["Peanut Butter", "Yogurt"],
-        suggestedProductId: "prod_yogurt_001", 
-        relatedProduct: [], categoryId: '1',
+        suggestedProductId: "prod_yogurt_001",
+        relatedProduct: [],
+        categoryId: '1',
       ),
       Product(
         id: "prod_carrot_001",
@@ -32,50 +33,157 @@ class FruitsAndVegetables {
         reviewCount: 150,
         allergens: [],
         relatedProducts: ["Hummus", "Celery"],
-        suggestedProductId: null, relatedProduct: [], categoryId: '1',
+        suggestedProductId: null,
+        relatedProduct: [],
+        categoryId: '1',
       ),
-      // Add more products...
+      Product(
+        id: "prod_apple_001",
+        name: "Red Apples",
+        description: "Fresh red apples",
+        price: 1.5,
+        imageUrl: "https://images.pexels.com/photos/102104/pexels-photo-102104.jpeg",
+        category: "Fruits & Vegetables",
+        stockQuantity: 100,
+        isAvailable: true,
+        rating: 4.6,
+        reviewCount: 175,
+        allergens: [],
+        relatedProducts: ["Caramel Dip", "Peanut Butter"],
+        suggestedProductId: null,
+        relatedProduct: [],
+        categoryId: '1',
+      ),
+      Product(
+        id: "prod_spinach_001",
+        name: "Spinach",
+        description: "Fresh organic spinach leaves",
+        price: 2.0,
+        imageUrl: "https://images.pexels.com/photos/1435895/pexels-photo-1435895.jpeg",
+        category: "Fruits & Vegetables",
+        stockQuantity: 60,
+        isAvailable: true,
+        rating: 4.8,
+        reviewCount: 90,
+        allergens: [],
+        relatedProducts: ["Feta Cheese", "Olive Oil"],
+        suggestedProductId: "prod_oil_001",
+        relatedProduct: [],
+        categoryId: '1',
+      ),
     ];
   }
 }
 
-class MeatAndSeafood {
+class FrozenFoods {
   static List<Product> getProducts() {
     return [
       Product(
-        id: "prod_chicken_001",
+        id: "prod_chicken_001_frozen",
         name: "Broiler Chicken",
         description: "Fresh and tender broiler chicken meat",
         price: 8.5,
         imageUrl: "https://images.pexels.com/photos/65175/pexels-photo-65175.jpeg",
-        category: "Meat & Seafood",
+        category: "Frozen Foods",
         stockQuantity: 100,
         isAvailable: true,
         rating: 4.6,
         reviewCount: 180,
         allergens: ["Meat"],
         relatedProducts: ["Garlic", "Lemon", "Rosemary"],
-        suggestedProductId: "prod_cheese_001", relatedProduct: [], categoryId: '',
+        suggestedProductId: "prod_cheese_001",
+        relatedProduct: [],
+        categoryId: '4',
       ),
       Product(
-        id: "prod_salmon_001",
+        id: "prod_salmon_001_frozen",
         name: "Salmon Fillet",
         description: "Fresh Atlantic salmon fillet",
         price: 12.0,
         imageUrl: "https://images.pexels.com/photos/65175/pexels-photo-65175.jpeg",
-        category: "Meat & Seafood",
+        category: "Frozen Foods",
         stockQuantity: 80,
         isAvailable: true,
         rating: 4.8,
         reviewCount: 90,
         allergens: ["Fish"],
         relatedProducts: ["Lemon", "Dill"],
-        suggestedProductId: null, relatedProduct: [], categoryId: '',
+        suggestedProductId: null,
+        relatedProduct: [],
+        categoryId: '4',
       ),
-      // Add more products...
+      Product(
+        id: "prod_beef_001",
+        name: "Ground Beef",
+        description: "Lean ground beef",
+        price: 7.5,
+        imageUrl: "https://images.pexels.com/photos/616404/pexels-photo-616404.jpeg",
+        category: "Frozen Foods",
+        stockQuantity: 100,
+        isAvailable: true,
+        rating: 4.6,
+        reviewCount: 110,
+        allergens: ["Meat"],
+        relatedProducts: ["Burger Buns", "Cheddar Cheese"],
+        suggestedProductId: null,
+        relatedProduct: [],
+        categoryId: '4',
+      ),
+      Product(
+        id: "prod_shrimp_001",
+        name: "Shrimp",
+        description: "Fresh jumbo shrimp",
+        price: 9.99,
+        imageUrl: "https://images.pexels.com/photos/3577430/pexels-photo-3577430.jpeg",
+        category: "Frozen Foods",
+        stockQuantity: 60,
+        isAvailable: true,
+        rating: 4.7,
+        reviewCount: 75,
+        allergens: ["Shellfish"],
+        relatedProducts: ["Cocktail Sauce", "Lemon"],
+        suggestedProductId: null,
+        relatedProduct: [],
+        categoryId: '4',
+      ),
+      Product(
+        id: "prod_frozen_peas_001",
+        name: "Frozen Green Peas",
+        description: "Frozen organic green peas",
+        price: 1.5,
+        imageUrl: "https://images.pexels.com/photos/103124/pexels-photo-103124.jpeg",
+        category: "Frozen Foods",
+        stockQuantity: 120,
+        isAvailable: true,
+        rating: 4.5,
+        reviewCount: 90,
+        allergens: [],
+        relatedProducts: ["Carrots", "Corn"],
+        suggestedProductId: null,
+        relatedProduct: [],
+        categoryId: '4'
+      ),
+      Product(
+        id: "prod_frozen_pizza_001",
+        name: "Frozen Margherita Pizza",
+        description: "Classic margherita frozen pizza",
+        price: 4.0,
+        imageUrl: "https://images.pexels.com/photos/2619967/pexels-photo-2619967.jpeg",
+        category: "Frozen Foods",
+        stockQuantity: 80,
+        isAvailable: true,
+        rating: 4.6,
+        reviewCount: 100,
+        allergens: ["Gluten", "Dairy"],
+        relatedProducts: ["Garlic Bread", "Soda"],
+        suggestedProductId: null,
+        relatedProduct: [],
+        categoryId: '4',
+      ),
     ];
   }
 }
+
 
 class DairyAndEggs {
   static List<Product> getProducts() {
@@ -93,7 +201,9 @@ class DairyAndEggs {
         reviewCount: 180,
         allergens: ["Dairy"],
         relatedProducts: ["Cereal", "Cookies"],
-        suggestedProductId: null, relatedProduct: [], categoryId: '',
+        suggestedProductId: null,
+        relatedProduct: [],
+        categoryId: '11',
       ),
       Product(
         id: "prod_eggs_001",
@@ -108,12 +218,48 @@ class DairyAndEggs {
         reviewCount: 160,
         allergens: ["Eggs"],
         relatedProducts: ["Bacon", "Toast"],
-        suggestedProductId: null, relatedProduct: [], categoryId: '',
+        suggestedProductId: null,
+        relatedProduct: [],
+        categoryId: '11',
       ),
-      // Add more products...
+      Product(
+        id: "prod_cheese_001",
+        name: "Feta Cheese",
+        description: "Tangy and creamy Greek feta cheese",
+        price: 5.0,
+        imageUrl: "https://images.pexels.com/photos/1739748/pexels-photo-1739748.jpeg",
+        category: "Dairy & Eggs",
+        stockQuantity: 50,
+        isAvailable: true,
+        rating: 4.8,
+        reviewCount: 95,
+        allergens: ["Dairy"],
+        relatedProducts: ["Olives", "Tomatoes"],
+        suggestedProductId: null,
+        relatedProduct: [],
+        categoryId: '11',
+      ),
+      Product(
+        id: "prod_yogurt_001",
+        name: "Greek Yogurt",
+        description: "Thick and creamy Greek yogurt",
+        price: 1.5,
+        imageUrl: "https://images.pexels.com/photos/704569/pexels-photo-704569.jpeg",
+        category: "Dairy & Eggs",
+        stockQuantity: 100,
+        isAvailable: true,
+        rating: 4.9,
+        reviewCount: 140,
+        allergens: ["Dairy"],
+        relatedProducts: ["Granola", "Berries"],
+        suggestedProductId: null,
+        relatedProduct: [],
+        categoryId: '11',
+      ),
     ];
   }
 }
+
 class CondimentsAndSpices {
   static List<Product> getProducts() {
     return [
@@ -131,7 +277,8 @@ class CondimentsAndSpices {
         allergens: [],
         relatedProducts: ["Ginger"],
         suggestedProductId: null,
-        relatedProduct: [], categoryId: '',
+        relatedProduct: [],
+        categoryId: '6',
       ),
       Product(
         id: "prod_ginger_001",
@@ -147,11 +294,48 @@ class CondimentsAndSpices {
         allergens: [],
         relatedProducts: ["Pepper"],
         suggestedProductId: null,
-        relatedProduct: [], categoryId: '',
+        relatedProduct: [],
+        categoryId: '6',
+      ),
+      Product(
+        id: "prod_ketchup_001",
+        name: "Tomato Ketchup",
+        description: "Classic tomato ketchup bottle",
+        price: 2.0,
+        imageUrl: "https://images.pexels.com/photos/4791265/pexels-photo-4791265.jpeg",
+        category: "Condiments & Spices",
+        stockQuantity: 110,
+        isAvailable: true,
+        rating: 4.5,
+        reviewCount: 95,
+        allergens: [],
+        relatedProducts: ["Fries", "Hot Dog"],
+        suggestedProductId: null,
+        relatedProduct: [],
+        categoryId: '6',
+      ),
+      Product(
+        id: "prod_salt_001",
+        name: "Sea Salt",
+        description: "Pure sea salt",
+        price: 1.0,
+        imageUrl: "https://images.pexels.com/photos/4109881/pexels-photo-4109881.jpeg",
+        category: "Condiments & Spices",
+        stockQuantity: 140,
+        isAvailable: true,
+        rating: 4.6,
+        reviewCount: 90,
+        allergens: [],
+        relatedProducts: ["Pepper", "Garlic Powder"],
+        suggestedProductId: null,
+        relatedProduct: [],
+        categoryId: '6',
       ),
     ];
   }
 }
+
+
 class PantryStaples {
   static List<Product> getProducts() {
     return [
@@ -169,7 +353,8 @@ class PantryStaples {
         allergens: [],
         relatedProducts: ["Rice"],
         suggestedProductId: null,
-        relatedProduct: [], categoryId: '',
+        relatedProduct: [],
+        categoryId: '3',
       ),
       Product(
         id: "prod_rice_001",
@@ -185,14 +370,307 @@ class PantryStaples {
         allergens: [],
         relatedProducts: ["Curry Powder", "Lentils"],
         suggestedProductId: null,
-        relatedProduct: [], categoryId: '',
+        relatedProduct: [],
+        categoryId: '3',
       ),
+      Product(
+        id: "prod_pasta_001",
+        name: "Spaghetti Pasta",
+        description: "Durum wheat spaghetti",
+        price: 1.2,
+        imageUrl: "https://images.pexels.com/photos/1437267/pexels-photo-1437267.jpeg",
+        category: "Pantry Staples",
+        stockQuantity: 150,
+        isAvailable: true,
+        rating: 4.5,
+        reviewCount: 100,
+        allergens: ["Gluten"],
+        relatedProducts: ["Tomato Sauce", "Parmesan Cheese"],
+        suggestedProductId: null,
+        relatedProduct: [],
+        categoryId: '3',
+      ),
+    ];
+  }
+}
+
+class Bakeries {
+  static List<Product> getProducts() {
+    return [
+      Product(
+        id: "prod_bread_001",
+        name: "Whole Wheat Bread",
+        description: "Soft and healthy whole wheat bread loaf",
+        price: 3.0,
+        imageUrl: "https://images.pexels.com/photos/2434/bread-food-healthy-breakfast.jpg",
+        category: "Bakery",
+        stockQuantity: 70,
+        isAvailable: true,
+        rating: 4.5,
+        reviewCount: 75,
+        allergens: ["Gluten"],
+        relatedProducts: ["Butter", "Jam"],
+        suggestedProductId: null,
+        relatedProduct: [],
+        categoryId: '10',
+      ),
+      Product(
+        id: "prod_baguette_001",
+        name: "French Baguette",
+        description: "Crispy French baguette",
+        price: 2.0,
+        imageUrl: "https://images.pexels.com/photos/2434/bread-food-healthy-breakfast.jpg",
+        category: "Bakery",
+        stockQuantity: 90,
+        isAvailable: true,
+        rating: 4.6,
+        reviewCount: 130,
+        allergens: ["Gluten"],
+        relatedProducts: ["Brie Cheese", "Olive Oil"],
+        suggestedProductId: null,
+        relatedProduct: [],
+        categoryId: '10',
+      ),
+      Product(
+        id: "prod_croissant_001",
+        name: "Butter Croissant",
+        description: "Flaky butter croissant",
+        price: 1.5,
+        imageUrl: "https://images.pexels.com/photos/461198/pexels-photo-461198.jpeg",
+        category: "Bakery",
+        stockQuantity: 100,
+        isAvailable: true,
+        rating: 4.7,
+        reviewCount: 140,
+        allergens: ["Gluten", "Dairy"],
+        relatedProducts: ["Jam", "Coffee"],
+        suggestedProductId: null,
+        relatedProduct: [],
+        categoryId: '10',
+      ),
+      Product(
+        id: "prod_muffin_001",
+        name: "Blueberry Muffin",
+        description: "Sweet and soft blueberry muffin",
+        price: 2.2,
+        imageUrl: "https://images.pexels.com/photos/1628064/pexels-photo-1628064.jpeg",
+        category: "Bakery",
+        stockQuantity: 80,
+        isAvailable: true,
+        rating: 4.8,
+        reviewCount: 90,
+        allergens: ["Gluten", "Dairy", "Eggs"],
+        relatedProducts: ["Coffee", "Milk"],
+        suggestedProductId: null,
+        relatedProduct: [],
+        categoryId: '10',
+      ),
+    ];
+  }
+}
+
+class Beverages {
+  static List<Product> getProducts() {
+    return [
+      Product(
+        id: "prod_juice_001",
+        name: "Orange Juice",
+        description: "Freshly squeezed orange juice",
+        price: 3.0,
+        imageUrl: "https://images.pexels.com/photos/96974/pexels-photo-96974.jpeg",
+        category: "Beverages",
+        stockQuantity: 100,
+        isAvailable: true,
+        rating: 4.7,
+        reviewCount: 120,
+        allergens: [],
+        relatedProducts: ["Croissant", "Eggs"],
+        suggestedProductId: null,
+        relatedProduct: [],
+        categoryId: '12',
+      ),
+      Product(
+        id: "prod_tea_001",
+        name: "Green Tea",
+        description: "Organic green tea bags",
+        price: 2.5,
+        imageUrl: "https://images.pexels.com/photos/1417945/pexels-photo-1417945.jpeg",
+        category: "Beverages",
+        stockQuantity: 90,
+        isAvailable: true,
+        rating: 4.6,
+        reviewCount: 100,
+        allergens: [],
+        relatedProducts: ["Honey", "Lemon"],
+        suggestedProductId: null,
+        relatedProduct: [],
+        categoryId: '12',
+      ),
+    ];
+  }
+}
+
+class SnacksAndSweets {
+  static List<Product> getProducts() {
+    return [
+      Product(
+        id: "prod_chocolate_001",
+        name: "Milk Chocolate Bar",
+        description: "Creamy milk chocolate bar",
+        price: 1.0,
+        imageUrl: "https://images.pexels.com/photos/4109994/pexels-photo-4109994.jpeg",
+        category: "Snacks & Sweets",
+        stockQuantity: 150,
+        isAvailable: true,
+        rating: 4.8,
+        reviewCount: 130,
+        allergens: ["Dairy"],
+        relatedProducts: ["Cookies", "Milk"],
+        suggestedProductId: null,
+        relatedProduct: [],
+        categoryId: '5',
+      ),
+      Product(
+        id: "prod_chips_001",
+        name: "Potato Chips",
+        description: "Crispy salted potato chips",
+        price: 1.5,
+        imageUrl: "https://images.pexels.com/photos/678414/pexels-photo-678414.jpeg",
+        category: "Snacks & Sweets",
+        stockQuantity: 130,
+        isAvailable: true,
+        rating: 4.4,
+        reviewCount: 85,
+        allergens: [],
+        relatedProducts: ["Soda", "Dip"],
+        suggestedProductId: null,
+        relatedProduct: [],
+        categoryId: '5',
+      ),
+    ];
+  }
+}
+
+class HealthAndCare {
+  static List<Product> getProducts() {
+    return [
+      Product(
+        id: "prod_shampoo_001",
+        name: "Herbal Shampoo",
+        description: "Gentle herbal shampoo",
+        price: 5.0,
+        imageUrl: "https://images.pexels.com/photos/6621462/pexels-photo-6621462.jpeg",
+        category: "Health & Personal Care",
+        stockQuantity: 90,
+        isAvailable: true,
+        rating: 4.7,
+        reviewCount: 110,
+        allergens: [],
+        relatedProducts: ["Conditioner", "Hair Oil"],
+        suggestedProductId: null,
+        relatedProduct: [],
+        categoryId: '7',
+      ),
+      Product(
+        id: "prod_toothpaste_001",
+        name: "Mint Toothpaste",
+        description: "Refreshing mint flavor toothpaste",
+        price: 2.5,
+        imageUrl: "https://images.pexels.com/photos/6621497/pexels-photo-6621497.jpeg",
+        category: "Health & Personal Care",
+        stockQuantity: 100,
+        isAvailable: true,
+        rating: 4.6,
+        reviewCount: 95,
+        allergens: [],
+        relatedProducts: ["Toothbrush", "Mouthwash"],
+        suggestedProductId: null,
+        relatedProduct: [],
+        categoryId: '7',
+      ),
+    ];
+  }
+}
+
+class HouseholdSupplies {
+  static List<Product> getProducts() {
+    return [
+      Product(
+        id: "prod_detergent_001",
+        name: "Laundry Detergent",
+        description: "Concentrated liquid detergent",
+        price: 6.0,
+        imageUrl: "https://images.pexels.com/photos/4791274/pexels-photo-4791274.jpeg",
+        category: "Household Supplies",
+        stockQuantity: 90,
+        isAvailable: true,
+        rating: 4.5,
+        reviewCount: 80,
+        allergens: [],
+        relatedProducts: ["Fabric Softener", "Bleach"],
+        suggestedProductId: null, 
+        relatedProduct: [], categoryId: '8'
+      )
+    ];
+  }
+}
+
+class ChildCare {
+  static List<Product> getProducts() {
+    return [
+      Product(
+        id: "prod_diapers_001",
+        name: "Baby Diapers",
+        description: "Soft and absorbent diapers",
+        price: 10.0,
+        imageUrl: "https://images.pexels.com/photos/1001897/pexels-photo-1001897.jpeg",
+        category: "Baby & Child Care",
+        stockQuantity: 80,
+        isAvailable: true,
+        rating: 4.8,
+        reviewCount: 140,
+        allergens: [],
+        relatedProducts: ["Baby Wipes", "Baby Lotion"],
+        suggestedProductId: null, relatedProduct: [], categoryId: '9'
+      )
+    ];
+  }
+}
+
+class PetSupplies {
+  static List<Product> getProducts() {
+    return [
+      Product(
+        id: "prod_dogfood_001",
+        name: "Dry Dog Food",
+        description: "Nutritious kibble for dogs",
+        price: 20.0,
+        imageUrl: "https://images.pexels.com/photos/4587998/pexels-photo-4587998.jpeg",
+        category: "Pet Supplies",
+        stockQuantity: 70,
+        isAvailable: true,
+        rating: 4.9,
+        reviewCount: 100,
+        allergens: [],
+        relatedProducts: ["Dog Treats", "Chew Toys"],
+        suggestedProductId: null, relatedProduct: [], categoryId: '14'
+      )
     ];
   }
 }
 
 final List<Product> allProducts = [
   ...FruitsAndVegetables.getProducts(),
-  ...MeatAndSeafood.getProducts(),
+  ...FrozenFoods.getProducts(),
   ...DairyAndEggs.getProducts(),
+  ...CondimentsAndSpices.getProducts(),
+  ...PantryStaples.getProducts(),
+  ...Bakeries.getProducts(),
+  ...Beverages.getProducts(),
+  ...SnacksAndSweets.getProducts(),
+  ...HealthAndCare.getProducts(),
+  ...HouseholdSupplies.getProducts(),
+  ...ChildCare.getProducts(),
+  ...PetSupplies.getProducts(),
+
 ];
