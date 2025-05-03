@@ -14,7 +14,6 @@ class AppRoutes {
   static const String orderConfirmation = '/order-confirmation';
   static const String profile = '/profile';
   static const String medicalHistory = '/medical-history';
-  static const String otp = '/otp';
   static const String resetPassword = '/reset-password';
   static const String favorite = '/favorite';
   static const String account = '/account';

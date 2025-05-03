@@ -22,7 +22,9 @@ class _SignInScreenState extends State<SignInScreen> {
 
   String getFlagEmoji(String isoCountryCode) {
     if (isoCountryCode.length != 2) return '';
-    return isoCountryCode.toUpperCase().codeUnits
+    return isoCountryCode
+        .toUpperCase()
+        .codeUnits
         .map((c) => String.fromCharCode(c + 127397))
         .join();
   }
@@ -30,15 +32,10 @@ class _SignInScreenState extends State<SignInScreen> {
   void _showSnackBar(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text(
-          message,
-          style: const TextStyle(color: Colors.white),
-        ),
+        content: Text(message, style: const TextStyle(color: Colors.white)),
         backgroundColor: AppColors.primary,
         behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         duration: const Duration(seconds: 4),
       ),
@@ -47,7 +44,8 @@ class _SignInScreenState extends State<SignInScreen> {
 
   void _startPhoneVerification() async {
     final rawInput = _phoneController.text.trim();
-    final sanitized = rawInput.startsWith('0') ? rawInput.substring(1) : rawInput;
+    final sanitized =
+        rawInput.startsWith('0') ? rawInput.substring(1) : rawInput;
     final fullPhone = '$countryCode$sanitized';
 
     if (sanitized.isEmpty || sanitized.length < 8) {
@@ -63,11 +61,8 @@ class _SignInScreenState extends State<SignInScreen> {
         setState(() => _isLoading = false);
         Navigator.pushNamed(
           context,
-          AppRoutes.otp,
-          arguments: {
-            'verificationId': verificationId,
-            'phone': fullPhone,
-          },
+          AppRoutes.login,
+          arguments: {'verificationId': verificationId, 'phone': fullPhone},
         );
       },
       onError: (error) {
@@ -143,7 +138,9 @@ class _SignInScreenState extends State<SignInScreen> {
                         Row(
                           children: [
                             Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 12),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 12,
+                              ),
                               decoration: BoxDecoration(
                                 border: Border.all(color: AppColors.primary),
                                 borderRadius: BorderRadius.circular(12),
@@ -153,13 +150,14 @@ class _SignInScreenState extends State<SignInScreen> {
                                 value: countryCode,
                                 underline: const SizedBox(),
                                 icon: const Icon(Icons.keyboard_arrow_down),
-                                items: CountryCodes.codes.map((c) {
-                                  final flag = getFlagEmoji(c['iso'] ?? '');
-                                  return DropdownMenuItem<String>(
-                                    value: c['code'],
-                                    child: Text('$flag ${c['code']}'),
-                                  );
-                                }).toList(),
+                                items:
+                                    CountryCodes.codes.map((c) {
+                                      final flag = getFlagEmoji(c['iso'] ?? '');
+                                      return DropdownMenuItem<String>(
+                                        value: c['code'],
+                                        child: Text('$flag ${c['code']}'),
+                                      );
+                                    }).toList(),
                                 onChanged: (value) {
                                   if (value != null) {
                                     setState(() => countryCode = value);
@@ -178,17 +176,27 @@ class _SignInScreenState extends State<SignInScreen> {
                                 style: const TextStyle(fontSize: 16),
                                 decoration: InputDecoration(
                                   hintText: 'Mobile number',
-                                  hintStyle: const TextStyle(color: AppColors.textMedium),
+                                  hintStyle: const TextStyle(
+                                    color: AppColors.textMedium,
+                                  ),
                                   filled: true,
                                   fillColor: AppColors.white,
-                                  contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                                  contentPadding: const EdgeInsets.symmetric(
+                                    horizontal: 16,
+                                    vertical: 14,
+                                  ),
                                   enabledBorder: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(12),
-                                    borderSide: const BorderSide(color: AppColors.primary),
+                                    borderSide: const BorderSide(
+                                      color: AppColors.primary,
+                                    ),
                                   ),
                                   focusedBorder: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(12),
-                                    borderSide: const BorderSide(color: AppColors.primaryDark, width: 2),
+                                    borderSide: const BorderSide(
+                                      color: AppColors.primaryDark,
+                                      width: 2,
+                                    ),
                                   ),
                                 ),
                               ),
@@ -211,14 +219,26 @@ class _SignInScreenState extends State<SignInScreen> {
                               ),
                             ],
                           ),
-                          style: TextStyle(fontSize: 13, fontFamily: 'Inter', color: AppColors.textMedium),
+                          style: TextStyle(
+                            fontSize: 13,
+                            fontFamily: 'Inter',
+                            color: AppColors.textMedium,
+                          ),
                         ),
                         const SizedBox(height: 24),
                         SizedBox(
                           height: 52,
                           width: double.infinity,
                           child: ElevatedButton(
-                            onPressed: _isLoading ? null : _startPhoneVerification,
+                            onPressed:
+                                _isLoading
+                                    ? null
+                                    : () {
+                                      Navigator.pushNamed(
+                                        context,
+                                        AppRoutes.signup,
+                                      );
+                                    },
                             style: ElevatedButton.styleFrom(
                               backgroundColor: AppColors.primary,
                               shape: RoundedRectangleBorder(
@@ -226,17 +246,25 @@ class _SignInScreenState extends State<SignInScreen> {
                               ),
                               elevation: 2,
                             ),
-                            child: _isLoading
-                                ? const CircularProgressIndicator(color: Colors.white)
-                                : const Text(
-                                    'Send OTP',
-                                    style: TextStyle(
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.w600,
-                                      fontFamily: 'Inter',
-                                      color: Colors.white,
+                            child:
+                                _isLoading
+                                    ? const SizedBox(
+                                      width: 24,
+                                      height: 24,
+                                      child: CircularProgressIndicator(
+                                        strokeWidth: 2,
+                                        color: Colors.white,
+                                      ),
+                                    )
+                                    : const Text(
+                                      'Login or Signup',
+                                      style: TextStyle(
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.w600,
+                                        fontFamily: 'Inter',
+                                        color: Colors.white,
+                                      ),
                                     ),
-                                  ),
                           ),
                         ),
                       ],

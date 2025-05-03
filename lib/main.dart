@@ -16,7 +16,6 @@ import 'screens/auth/login_screen.dart';
 import 'screens/auth/signin_screen.dart';
 import 'screens/auth/signup_screen.dart';
 import 'screens/auth/forgot_password_screen.dart';
-import 'screens/auth/otp_screen.dart';
 import 'screens/auth/reset_password_screen.dart';
 import 'screens/medical/medical_history_screen.dart';
 import 'screens/home/home_screen.dart';
@@ -94,7 +93,6 @@ class MyApp extends StatelessWidget {
         AppRoutes.forgotPassword: (context) => const ForgotPasswordScreen(),
         AppRoutes.medicalHistory: (context) => const MedicalHistoryScreen(),
         AppRoutes.cart: (context) => const CartScreen(),
-        AppRoutes.otp: (context) => const OTPScreen(),
         AppRoutes.resetPassword: (context) => const ResetPasswordScreen(),
         AppRoutes.explore: (context) => const ExploreScreen(),
         AppRoutes.trackOrder: (context) => const TrackOrderScreen(),
