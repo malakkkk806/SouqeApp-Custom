@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:souqe/providers/cart_provider.dart';
-import 'package:souqe/constants/colors.dart';
-import 'package:souqe/models/cart_item.dart';
+//import 'package:souqe/providers/cart_provider.dart';
+//import 'package:souqe/constants/colors.dart';
+//import 'package:souqe/models/cart_item.dart';
 import 'package:souqe/providers/favorites_provider.dart'; 
 class FavoritesScreen extends StatelessWidget {
+  const FavoritesScreen({super.key});
+
   @override
   Widget build(BuildContext context) {
     final favoritesProvider = Provider.of<FavoritesProvider>(context);

@@ -4,8 +4,6 @@ import 'package:souqe/providers/favorites_provider.dart';
 import 'package:souqe/screens/cart/cart_screen.dart';
 import 'package:souqe/screens/explore/explore_screen.dart';
 import 'package:souqe/screens/favourite/favourite_screen.dart';
-import 'package:souqe/screens/home/home_screen.dart'; // Create this for your home content
-import 'package:souqe/screens/profile/profile_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -35,7 +33,6 @@ class _HomeScreenState extends State<HomeScreen> {
           ExploreScreen(),     // Your explore screen
           CartScreen(),        // Your cart screen
           FavoritesScreen(),   // Your favorites screen
-          ProfileScreen(),     // Your profile screen
         ],
       ),
       bottomNavigationBar: Consumer<FavoritesProvider>(

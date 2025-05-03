@@ -1,90 +1,91 @@
-import 'package:flutter/material.dart';
-import 'package:souqe/constants/colors.dart';
-import 'package:souqe/models/product.dart';
-
-class CartItem extends StatelessWidget {
-  final Product product;
+class CartItemWidget {
+  final String productId;
   final String name;
-  final int quantity;
-  final VoidCallback onRemove;
-  final VoidCallback onAdd;
-  final String category; // Add this
-  const CartItem({
-    super.key,
-    required this.product,
-    required this.quantity,
-    required this.onRemove,
-    required this.onAdd,
-    required this.name, required this.category,
+  final double price;
+  final String imageUrl;
+  final String category;
+  int quantity;
+  final List<String> allergens;
+  final bool isSelected;
+
+  CartItemWidget({
+    required this.productId,
+    required this.name,
+    required this.price,
+    required this.imageUrl,
+    required this.category,
+    required this.allergens,
+    this.quantity = 1,
+    this.isSelected = true,
   });
 
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.symmetric(vertical: 8),
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: AppColors.surface,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 4,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Row(
-        children: [
-          Image.asset(
-            product.imageUrl,
-            width: 64,
-            height: 64,
-            fit: BoxFit.cover,
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  product.name,
-                  style: const TextStyle(
-                    fontFamily: 'Montserrat',
-                    fontWeight: FontWeight.w600,
-                    fontSize: 16,
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  product.formattedPrice,
-                  style: const TextStyle(
-                    fontFamily: 'Inter',
-                    fontSize: 14,
-                    color: Colors.grey,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          Row(
-            children: [
-              IconButton(
-                icon: const Icon(Icons.remove_circle_outline),
-                onPressed: onRemove,
-              ),
-              Text(
-                quantity.toString(),
-                style: const TextStyle(fontFamily: 'Inter'),
-              ),
-              IconButton(
-                icon: const Icon(Icons.add_circle_outline),
-                onPressed: onAdd,
-              ),
-            ],
-          ),
-        ],
-      ),
+  double get totalPrice => price * quantity;
+
+  Map<String, dynamic> toJson() => {
+        'productId': productId,
+        'name': name,
+        'price': price,
+        'imageUrl': imageUrl,
+        'category': category,
+        'quantity': quantity,
+        'allergens': allergens,
+        'isSelected': isSelected,
+      };
+
+  factory CartItemWidget.fromJson(Map<String, dynamic> json) => CartItemWidget(
+        productId: json['productId'] as String,
+        name: json['name'] as String,
+        price: (json['price'] as num).toDouble(),
+        imageUrl: json['imageUrl'] as String,
+        category: json['category'] as String,
+        quantity: (json['quantity'] as num).toInt(),
+        allergens: (json['allergens'] as List<dynamic>).cast<String>(),
+        isSelected: json['isSelected'] as bool? ?? true,
+      );
+
+  CartItemWidget copyWith({
+    String? productId,
+    String? name,
+    double? price,
+    String? imageUrl,
+    String? category,
+    int? quantity,
+    List<String>? allergens,
+    bool? isSelected,
+  }) {
+    return CartItemWidget(
+      productId: productId ?? this.productId,
+      name: name ?? this.name,
+      price: price ?? this.price,
+      imageUrl: imageUrl ?? this.imageUrl,
+      category: category ?? this.category,
+      quantity: quantity ?? this.quantity,
+      allergens: allergens ?? List.from(this.allergens),
+      isSelected: isSelected ?? this.isSelected,
     );
+  }
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is CartItemWidget &&
+          runtimeType == other.runtimeType &&
+          productId == other.productId;
+
+  @override
+  int get hashCode => productId.hashCode;
+
+  @override
+  String toString() {
+    return 'CartItem{'
+        'productId: $productId, '
+        'name: $name, '
+        'price: $price, '
+        'imageUrl: $imageUrl, '
+        'category: $category, '
+        'quantity: $quantity, '
+        'allergens: $allergens, '
+        'isSelected: $isSelected'
+        '}';
   }
 }

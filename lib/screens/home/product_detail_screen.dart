@@ -4,11 +4,11 @@ import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:souqe/constants/app_routes.dart';
 import 'package:souqe/constants/colors.dart';
 import 'package:souqe/models/product.dart';
-import 'package:souqe/mock/dummy_products.dart';
 import 'package:souqe/providers/cart_provider.dart';
-import 'package:souqe/models/cart_item.dart';
+import 'package:souqe/providers/product_provider.dart';
+import 'package:souqe/models/cart_item_model.dart';
+import 'package:souqe/widgets/cart/cart_item.dart';
 import 'package:souqe/providers/favorites_provider.dart';
-import 'package:souqe/models/product.dart';
 
 class ProductDetailScreen extends StatefulWidget {
   final Product product;
@@ -30,7 +30,8 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
       dialogType: DialogType.warning,
       animType: AnimType.rightSlide,
       title: 'Allergen Warning',
-      desc: 'This product contains the following allergens:\n\n'
+      desc:
+          'This product contains the following allergens:\n\n'
           '${widget.product.allergens.map((e) => '• $e').join('\n')}',
       btnOkOnPress: () {
         setState(() {
@@ -43,110 +44,111 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
     ).show();
   }
 
- Future<void> _addToCart() async {
-  try {
-    final cart = Provider.of<CartProvider>(context, listen: false);
-    final product = widget.product;
+  Future<void> _addToCart() async {
+    try {
+      final cart = Provider.of<CartProvider>(context, listen: false);
+      final product = widget.product;
 
-    // Validate product data
-    if (product.id.isEmpty) throw Exception('Product ID is empty');
-    if (quantity <= 0) throw Exception('Quantity must be at least 1');
-    if (product.price <= 0) throw Exception('Invalid product price');
+      if (product.id.isEmpty) throw Exception('Product ID is empty');
+      if (quantity <= 0) throw Exception('Quantity must be at least 1');
+      if (product.price <= 0) throw Exception('Invalid product price');
 
-    final cartItem = CartItem(
-      productId: product.id,
-      name: product.name,
-      price: product.price,
-      imageUrl: product.imageUrl,
-      category: product.categories.join(', '),
-      quantity: quantity,
-      allergens: product.allergens,
-    );
+      final cartItem = CartItem(
+        productId: product.id,
+        name: product.name,
+        price: product.price,
+        imageUrl: product.imageUrl,
+        quantity: quantity,
+        allergens: product.allergens,
+      );
 
-    // Debug print before adding
-    debugPrint('Attempting to add: ${cartItem.toString()}');
+      final cartItem = CartItem(
+        productId: product.id,
+        name: product.name,
+        price: product.price,
+        imageUrl: product.imageUrl,
+        category: product.categories.join(', '),
+        quantity: quantity,
+        allergens: product.allergens,
+      );
 
-    // Add to cart
-    cart.addItem(cartItem);
+      cart.addItem(cartItem);
 
-    // Verify addition
-    if (!cart.items.containsKey(product.id)) {
-      throw Exception('Item not found in cart after addition');
+      if (!cart.items.containsKey(product.id)) {
+        throw Exception('Item not found in cart after addition');
+      }
+
+      // Add to cart
+      cart.addItem(cartItem, productId: '');
+
+      setState(() => isAddedToCart = true);
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Row(
+            children: [
+              const Icon(Icons.check_circle, color: Colors.white),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  'Added $quantity ${quantity > 1 ? 'items' : 'item'} of ${product.name}',
+                  style: const TextStyle(fontSize: 16),
+                ),
+              ),
+            ],
+          ),
+          duration: const Duration(seconds: 2),
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10),
+          ),
+          backgroundColor: Colors.green,
+          action: SnackBarAction(
+            label: 'VIEW CART',
+            textColor: Colors.white,
+            onPressed: () => Navigator.pushNamed(context, AppRoutes.cart),
+          ),
+        ),
+      );
+    } catch (e, stackTrace) {
+      debugPrint('Add to cart error: $e');
+      debugPrint('Stack trace: $stackTrace');
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Row(
+            children: [
+              const Icon(Icons.error_outline, color: Colors.white),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  'Failed to add: ${e.toString().replaceFirst('Exception: ', '')}',
+                  style: const TextStyle(fontSize: 16),
+                ),
+              ),
+            ],
+          ),
+          duration: const Duration(seconds: 3),
+          behavior: SnackBarBehavior.floating,
+          backgroundColor: Colors.red,
+          action: SnackBarAction(
+            label: 'RETRY',
+            textColor: Colors.white,
+            onPressed: _addToCart,
+          ),
+        ),
+      );
+      setState(() => isAddedToCart = false);
     }
-
-    // Update UI state
-    setState(() => isAddedToCart = true);
-
-    // Show success feedback
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Row(
-          children: [
-            const Icon(Icons.check_circle, color: Colors.white),
-            const SizedBox(width: 8),
-            Expanded(
-              child: Text(
-                'Added $quantity ${quantity > 1 ? 'items' : 'item'} of ${product.name}',
-                style: const TextStyle(fontSize: 16),
-              ),
-            ),
-          ],
-        ),
-        duration: const Duration(seconds: 2),
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(10),
-        ),
-        backgroundColor: Colors.green,
-        action: SnackBarAction(
-          label: 'VIEW CART',
-          textColor: Colors.white,
-          onPressed: () => Navigator.pushNamed(context, AppRoutes.cart),
-        ),
-      ),
-    );
-
-    // Debug print after successful addition
-    debugPrint('Successfully added to cart. Total items: ${cart.itemCount}');
-
-  } catch (e, stackTrace) {
-    debugPrint('Add to cart error: $e');
-    debugPrint('Stack trace: $stackTrace');
-
-    // Show error feedback
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Row(
-          children: [
-            const Icon(Icons.error_outline, color: Colors.white),
-            const SizedBox(width: 8),
-            Expanded(
-              child: Text(
-                'Failed to add: ${e.toString().replaceFirst('Exception: ', '')}',
-                style: const TextStyle(fontSize: 16),
-              ),
-            ),
-          ],
-        ),
-        duration: const Duration(seconds: 3),
-        behavior: SnackBarBehavior.floating,
-        backgroundColor: Colors.red,
-        action: SnackBarAction(
-          label: 'RETRY',
-          textColor: Colors.white,
-          onPressed: _addToCart,
-        ),
-      ),
-    );
-    
-    // Reset UI state on failure
-    setState(() => isAddedToCart = false);
   }
-}
 
   @override
   Widget build(BuildContext context) {
     final product = widget.product;
+    final productProvider = Provider.of<ProductProvider>(
+      context,
+      listen: false,
+    );
 
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -166,8 +168,10 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
               color: Colors.red,
             ),
             onPressed: () {
-              Provider.of<FavoritesProvider>(context, listen: false)
-                  .toggleFavorite(product);
+              Provider.of<FavoritesProvider>(
+                context,
+                listen: false,
+              ).toggleFavorite(product);
             },
           ),
         ],
@@ -190,11 +194,13 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                 ),
               ),
 
-              // Allergen Warning
               if (product.allergens.isNotEmpty)
                 Container(
                   margin: const EdgeInsets.symmetric(vertical: 12),
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 6,
+                  ),
                   decoration: BoxDecoration(
                     color: Colors.red.shade100,
                     borderRadius: BorderRadius.circular(8),
@@ -212,35 +218,30 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
 
               const SizedBox(height: 16),
 
-              // Product Details
               Expanded(
                 child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 12,
+                  ),
                   child: SingleChildScrollView(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        // Product Name
                         Center(
-                          child: Column(
-                            children: [
-                              Text(
-                                product.name,
-                                style: const TextStyle(
-                                  fontSize: 25,
-                                  fontWeight: FontWeight.bold,
-                                  fontFamily: 'Montserrat',
-                                  color: AppColors.primary,
-                                ),
-                              ),
-                              const SizedBox(height: 4),
-                            ],
+                          child: Text(
+                            product.name,
+                            style: const TextStyle(
+                              fontSize: 25,
+                              fontWeight: FontWeight.bold,
+                              fontFamily: 'Montserrat',
+                              color: AppColors.primary,
+                            ),
                           ),
                         ),
 
                         const SizedBox(height: 8),
 
-                        // Product Description
                         Text(
                           product.description,
                           style: const TextStyle(
@@ -252,11 +253,9 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
 
                         const SizedBox(height: 16),
 
-                        // Quantity Selector and Price
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            // Quantity Selector
                             Container(
                               decoration: BoxDecoration(
                                 border: Border.all(color: AppColors.textLight),
@@ -289,8 +288,6 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                                 ],
                               ),
                             ),
-                            
-                            // Total Price
                             Text(
                               '\$${(product.price * quantity).toStringAsFixed(2)}',
                               style: const TextStyle(
@@ -304,7 +301,6 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                         ),
                         const SizedBox(height: 24),
 
-                        // Product Details Section
                         const Text(
                           'Product Detail',
                           style: TextStyle(
@@ -325,7 +321,6 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
 
                         const SizedBox(height: 24),
 
-                        // Nutrition Info
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
@@ -338,14 +333,20 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                               ),
                             ),
                             Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 8,
+                                vertical: 4,
+                              ),
                               decoration: BoxDecoration(
                                 color: AppColors.surface,
                                 borderRadius: BorderRadius.circular(8),
                               ),
                               child: const Text(
                                 '100gr',
-                                style: TextStyle(fontSize: 14, fontFamily: 'Inter'),
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  fontFamily: 'Inter',
+                                ),
                               ),
                             ),
                           ],
@@ -353,52 +354,56 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
 
                         const SizedBox(height: 24),
 
-                        // Reviews
+                        const Text(
+                          'Review',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w500,
+                            fontFamily: 'Inter',
+                          ),
+                        ),
+                        const SizedBox(height: 4),
                         Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: const [
-                            Text(
-                              'Review',
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w500,
-                                fontFamily: 'Inter',
-                              ),
+                          children: List.generate(
+                            5,
+                            (index) => Icon(
+                              Icons.star,
+                              color:
+                                  index < product.rating.floor()
+                                      ? Colors.orange
+                                      : Colors.grey.shade300,
+                              size: 20,
                             ),
-                            Row(
-                              children: [
-                                Icon(Icons.star, color: Colors.orange, size: 20),
-                                Icon(Icons.star, color: Colors.orange, size: 20),
-                                Icon(Icons.star, color: Colors.orange, size: 20),
-                                Icon(Icons.star, color: Colors.orange, size: 20),
-                                Icon(Icons.star, color: Colors.orange, size: 20),
-                              ],
-                            ),
-                          ],
+                          ),
                         ),
 
                         const SizedBox(height: 32),
 
-                        // Add to Cart Button
                         SizedBox(
                           width: double.infinity,
                           child: ElevatedButton(
                             onPressed: () {
-                              if (product.allergens.isNotEmpty && !hasSeenWarning) {
+                              if (product.allergens.isNotEmpty &&
+                                  !hasSeenWarning) {
                                 _showAllergenWarning();
                               } else {
                                 _addToCart();
                               }
                             },
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: isAddedToCart ? Colors.green : AppColors.primary,
+                              backgroundColor:
+                                  isAddedToCart
+                                      ? Colors.green
+                                      : AppColors.primary,
                               padding: const EdgeInsets.symmetric(vertical: 16),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(12),
                               ),
                             ),
                             child: Text(
-                              isAddedToCart ? '✓ Added to Cart' : 'Add To Basket',
+                              isAddedToCart
+                                  ? '✓ Added to Cart'
+                                  : 'Add To Basket',
                               style: const TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.bold,
@@ -417,7 +422,6 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
             ],
           ),
 
-          // Suggested Product Banner
           if (showSuggestion && product.suggestedProductId != null)
             Positioned(
               bottom: 20,
@@ -428,19 +432,24 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                 borderRadius: BorderRadius.circular(12),
                 child: InkWell(
                   onTap: () {
-                    final suggested = dummyProducts.firstWhere(
-                      (p) => p.id == product.suggestedProductId,
-                      orElse: () => product,
+                    final suggested = productProvider.getProductByName(
+                      product.suggestedProductId!,
                     );
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) => ChangeNotifierProvider.value(
-                          value: Provider.of<CartProvider>(context, listen: false),
-                          child: ProductDetailScreen(product: suggested),
+                    if (suggested != null) {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder:
+                              (_) => ChangeNotifierProvider.value(
+                                value: Provider.of<CartProvider>(
+                                  context,
+                                  listen: false,
+                                ),
+                                child: ProductDetailScreen(product: suggested),
+                              ),
                         ),
-                      ),
-                    );
+                      );
+                    }
                   },
                   child: Container(
                     padding: const EdgeInsets.all(12),
@@ -450,11 +459,14 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                     ),
                     child: Row(
                       children: [
-                        const Icon(Icons.info_outline, color: AppColors.primary),
+                        const Icon(
+                          Icons.info_outline,
+                          color: AppColors.primary,
+                        ),
                         const SizedBox(width: 8),
                         Expanded(
                           child: Text(
-                            'You may also like: ${dummyProducts.firstWhere((p) => p.id == product.suggestedProductId, orElse: () => product).name}',
+                            'You may also like: ${productProvider.getProductByName(product.suggestedProductId!)?.name ?? ''}',
                             style: const TextStyle(
                               fontSize: 13,
                               fontFamily: 'Inter',
