@@ -5,12 +5,15 @@ import 'package:provider/provider.dart';
 import 'package:souqe/constants/app_images.dart';
 import 'package:souqe/constants/colors.dart';
 import 'package:souqe/screens/explore/explore_screen.dart';
+import 'package:souqe/screens/profile/account_screen.dart';
 import 'package:souqe/widgets/common/bottom_nav_bar.dart';
 import 'package:souqe/screens/home/product_detail_screen.dart';
 import 'package:souqe/models/product.dart';
 import 'package:souqe/providers/cart_provider.dart';
 import 'package:souqe/models/cart_item.dart';
 import 'package:souqe/screens/cart/cart_screen.dart';
+import 'package:souqe/utils/product_upload.dart';
+
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -25,66 +28,80 @@ class _HomeScreenState extends State<HomeScreen> {
   String _currentAddress = 'Fetching location...';
 
   final List<Product> products = [
-    Product(
-      id: '1',
-      name: 'Red Apple',
-      description: '1kg, Priceg',
-      price: 4.99,
-      imageUrl: AppImages.apple,
-      categories: ['Fruits'],
-      allergens: [],
-    ),
-    Product(
-      id: '2',
-      name: 'Organic Bananas',
-      description: '7pcs, Priceg',
-      price: 4.99,
-      imageUrl: AppImages.banana,
-      categories: ['Fruits'],
-      allergens: [],
-    ),
-    Product(
-      id: '3',
-      name: 'Beef Bone',
-      description: '1kg, Priceg',
-      price: 4.99,
-      imageUrl: AppImages.beef,
-      categories: ['Meat'],
-      allergens: [],
-    ),
-    Product(
-      id: '4',
-      name: 'Broiler Chicken',
-      description: '1kg, Priceg',
-      price: 4.99,
-      imageUrl: AppImages.chicken,
-      categories: ['Meat'],
-      allergens: [],
-    ),
-    Product(
-      id: '5',
-      name: 'Pepper',
-      description: '1kg, Priceg',
-      price: 4.99,
-      imageUrl: AppImages.pepper,
-      categories: ['Species'],
-      allergens: [],
-    ),
-    Product(
-      id: '6',
-      name: 'Ginger',
-      description: '0.5kg, Priceg',
-      price: 4.99,
-      imageUrl: AppImages.ginger,
-      categories: ['Species'],
-      allergens: [],
-    ),
-  ];
+  Product(
+    id: '1',
+    name: 'Red Apple',
+    description: '1kg, Priceg',
+    price: 4.99,
+    imageUrl: AppImages.apple,
+    category: 'Fruits',
+    stockQuantity: 100,
+    allergens: [],
+    relatedProducts: ['Organic Bananas'],
+  ),
+  Product(
+    id: '2',
+    name: 'Organic Bananas',
+    description: '7pcs, Priceg',
+    price: 4.99,
+    imageUrl: AppImages.banana,
+    category: 'Fruits',
+    stockQuantity: 120,
+    allergens: [],
+    relatedProducts: ['Red Apple'],
+  ),
+  Product(
+    id: '3',
+    name: 'Beef Bone',
+    description: '1kg, Priceg',
+    price: 4.99,
+    imageUrl: AppImages.beef,
+    category: 'Meat',
+    stockQuantity: 80,
+    allergens: ['Meat'],
+    relatedProducts: ['Broiler Chicken'],
+  ),
+  Product(
+    id: '4',
+    name: 'Broiler Chicken',
+    description: '1kg, Priceg',
+    price: 4.99,
+    imageUrl: AppImages.chicken,
+    category: 'Meat',
+    stockQuantity: 90,
+    allergens: ['Meat'],
+    relatedProducts: ['Beef Bone'],
+    suggestedProductId: '2',
+  ),
+  Product(
+    id: '5',
+    name: 'Pepper',
+    description: '1kg, Priceg',
+    price: 4.99,
+    imageUrl: AppImages.pepper,
+    category: 'Spices',
+    stockQuantity: 60,
+    allergens: [],
+    relatedProducts: ['Ginger'],
+  ),
+  Product(
+    id: '6',
+    name: 'Ginger',
+    description: '0.5kg, Priceg',
+    price: 4.99,
+    imageUrl: AppImages.ginger,
+    category: 'Spices',
+    stockQuantity: 70,
+    allergens: [],
+    relatedProducts: ['Pepper'],
+  ),
+];
 
   @override
   void initState() {
     super.initState();
     _fetchLocation();
+    uploadInitialProducts();
   }
 
   Future<void> _fetchLocation() async {
@@ -395,9 +412,9 @@ class _HomeScreenState extends State<HomeScreen> {
       case 2:
         return const CartScreen();
       case 3:
-        return const FavouriteScreen();
+        return const Center(child: Text("Favourite Screen"));
       case 4:
-        return const AccountScreen;
+        return const AccountScreen();
       default:
         return _buildShopContent();
     }
