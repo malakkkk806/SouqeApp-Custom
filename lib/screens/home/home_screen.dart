@@ -15,6 +15,7 @@ import 'package:souqe/screens/home/all_products_screen.dart';
 import 'package:souqe/models/product.dart';
 import 'package:souqe/providers/favorites_provider.dart';
 import 'package:souqe/utils/product_upload.dart';
+import 'package:souqe/widgets/common/bottom_nav_bar.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -28,37 +29,37 @@ class _HomeScreenState extends State<HomeScreen> {
 
   String _currentAddress = 'Fetching location...';
 
-final List<Product> products = [
-  Product(
-    id: 'prod_apple_001',
-    name: 'Red Apples',
-    description: 'Fresh red apples',
-    price: 1.5,
-    imageUrl: AppImages.apple,
-    category: 'Fruits & Vegetables',
-    stockQuantity: 100,
-    isAvailable: true,
-    rating: 4.6,
-    reviewCount: 175,
-    allergens: [],
-    relatedProducts: ['Caramel Dip', 'Peanut Butter'],
-    suggestedProductId: null,
-  ),
-  Product(
-    id: 'prod_banana_001',
-    name: 'Bananas',
-    description: 'Fresh organic bananas',
-    price: 1.2,
-    imageUrl: AppImages.banana,
-    category: 'Fruits & Vegetables',
-    stockQuantity: 150,
-    isAvailable: true,
-    rating: 4.7,
-    reviewCount: 200,
-    allergens: [],
-    relatedProducts: ['Peanut Butter', 'Yogurt'],
-    suggestedProductId: 'prod_yogurt_001',
-  ),
+  final List<Product> products = [
+    Product(
+      id: 'prod_apple_001',
+      name: 'Red Apples',
+      description: 'Fresh red apples',
+      price: 1.5,
+      imageUrl: AppImages.apple,
+      category: 'Fruits & Vegetables',
+      stockQuantity: 100,
+      isAvailable: true,
+      rating: 4.6,
+      reviewCount: 175,
+      allergens: [],
+      relatedProducts: ['Caramel Dip', 'Peanut Butter'],
+      suggestedProductId: null,
+    ),
+    Product(
+      id: 'prod_banana_001',
+      name: 'Bananas',
+      description: 'Fresh organic bananas',
+      price: 1.2,
+      imageUrl: AppImages.banana,
+      category: 'Fruits & Vegetables',
+      stockQuantity: 150,
+      isAvailable: true,
+      rating: 4.7,
+      reviewCount: 200,
+      allergens: [],
+      relatedProducts: ['Peanut Butter', 'Yogurt'],
+      suggestedProductId: 'prod_yogurt_001',
+    ),
   Product(
     id: 'prod_beef_001',
     name: 'Ground Beef',
@@ -491,34 +492,9 @@ final List<Product> products = [
     return Scaffold(
       backgroundColor: AppColors.background,
       body: _buildTabScreen(),
-      bottomNavigationBar: BottomNavigationBar(
+      bottomNavigationBar: BottomNavBar(
         currentIndex: _currentIndex,
         onTap: (index) => setState(() => _currentIndex = index),
-        selectedItemColor: AppColors.primary,
-        unselectedItemColor: Colors.grey,
-        type: BottomNavigationBarType.fixed,
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.store),
-            label: 'Shop',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.explore),
-            label: 'Explore',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.shopping_cart),
-            label: 'Cart',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.favorite),
-            label: 'Favorites',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person),
-            label: 'Account',
-          ),
-        ],
       ),
     );
   }

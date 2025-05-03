@@ -8,6 +8,7 @@ import 'package:souqe/providers/cart_provider.dart';
 import 'package:souqe/providers/product_provider.dart';
 import 'package:souqe/models/cart_item_model.dart';
 import 'package:souqe/providers/favorites_provider.dart';
+import 'package:souqe/widgets/common/bottom_nav_bar.dart';
 
 class ProductDetailScreen extends StatefulWidget {
   final Product product;
@@ -22,6 +23,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
   bool hasSeenWarning = false;
   bool showSuggestion = false;
   bool isAddedToCart = false;
+  int _currentIndex = 0; // Define _currentIndex
 
   void _showAllergenWarning() {
     AwesomeDialog(
@@ -144,10 +146,8 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
               color: Colors.red,
             ),
             onPressed: () {
-              Provider.of<FavoritesProvider>(
-                context,
-                listen: false,
-              ).toggleFavorite(product);
+              Provider.of<FavoritesProvider>(context, listen: false)
+                  .toggleFavorite(product);
             },
           ),
         ],
@@ -413,6 +413,12 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
               ),
             ),
         ],
+      ),
+      bottomNavigationBar: BottomNavBar(
+        currentIndex: _currentIndex, // Adjust this based on your current tab index
+        onTap: (index) {
+          setState(() => _currentIndex = index);
+        },
       ),
     );
   }

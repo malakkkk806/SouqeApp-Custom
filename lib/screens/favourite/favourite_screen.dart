@@ -1,11 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-//import 'package:souqe/providers/cart_provider.dart';
-//import 'package:souqe/constants/colors.dart';
-//import 'package:souqe/models/cart_item.dart';
-import 'package:souqe/providers/favorites_provider.dart'; 
-class FavoritesScreen extends StatelessWidget {
+import 'package:souqe/providers/favorites_provider.dart';
+import 'package:souqe/widgets/common/bottom_nav_bar.dart';
+import 'package:souqe/constants/app_routes.dart';
+
+class FavoritesScreen extends StatefulWidget {
   const FavoritesScreen({super.key});
+
+  @override
+  State<FavoritesScreen> createState() => _FavoritesScreenState();
+}
+
+class _FavoritesScreenState extends State<FavoritesScreen> {
+  
+
 
   @override
   Widget build(BuildContext context) {
@@ -13,9 +21,9 @@ class FavoritesScreen extends StatelessWidget {
     final favorites = favoritesProvider.favorites;
 
     return Scaffold(
-      appBar: AppBar(title: Text('My Favorites')),
+      appBar: AppBar(title: const Text('My Favorites')),
       body: favorites.isEmpty
-          ? Center(child: Text('No favorites yet'))
+          ? const Center(child: Text('No favorites yet'))
           : ListView.builder(
               itemCount: favorites.length,
               itemBuilder: (ctx, i) => ListTile(
@@ -24,6 +32,7 @@ class FavoritesScreen extends StatelessWidget {
                 subtitle: Text('\$${favorites[i].price}'),
               ),
             ),
+      
     );
   }
 }

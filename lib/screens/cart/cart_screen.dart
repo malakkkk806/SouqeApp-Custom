@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:souqe/providers/cart_provider.dart';
 import 'package:souqe/constants/colors.dart';
@@ -51,27 +51,7 @@ class _CartScreenState extends State<CartScreen> {
             ),
         ],
       ),
-      bottomNavigationBar: BottomNavBar(
-        currentIndex: 2,
-        onTap: (index) {
-          switch (index) {
-            case 0:
-              Navigator.pushNamed(context, '/home');
-              break;
-            case 1:
-              Navigator.pushNamed(context, '/explore');
-              break;
-            case 2:
-              break;
-            case 3:
-              Navigator.pushNamed(context, '/favourite');
-              break;
-            case 4:
-              Navigator.pushNamed(context, '/profile');
-              break;
-          }
-        },
-      ),
+      
       body: Column(
         children: [
           Expanded(
@@ -82,22 +62,21 @@ class _CartScreenState extends State<CartScreen> {
                       children: [
                         Icon(Icons.shopping_cart_outlined, size: 64, color: Colors.grey),
                         SizedBox(height: 16),
-                        Text('Your cart is empty',
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontFamily: 'Montserrat',
-                              color: Colors.grey,
-                            )),
+                        Text(
+                          'Your cart is empty',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontFamily: 'Montserrat',
+                            color: Colors.grey,
+                          ),
+                        ),
                       ],
                     ),
                   )
                 : ListView.separated(
                     padding: const EdgeInsets.all(16),
                     itemCount: items.length,
-                    separatorBuilder: (_, __) => const Divider(
-                      height: 40,
-                      color: Color(0xFFE0E0E0),
-                    ),
+                    separatorBuilder: (_, __) => const Divider(height: 40, color: Color(0xFFE0E0E0)),
                     itemBuilder: (ctx, index) {
                       final item = items[index];
                       return _buildCartItem(item, cart);
@@ -116,18 +95,7 @@ class _CartScreenState extends State<CartScreen> {
       children: [
         ClipRRect(
           borderRadius: BorderRadius.circular(12),
-          child: Image.network(
-            item.imageUrl,
-            width: 100,
-            height: 100,
-            fit: BoxFit.contain,
-            errorBuilder: (_, __, ___) => Container(
-              width: 100,
-              height: 100,
-              color: Colors.grey[200],
-              child: const Icon(Icons.image, color: Colors.grey),
-            ),
-          ),
+          child: _buildProductImage(item.imageUrl),
         ),
         const SizedBox(width: 24),
         Expanded(
@@ -202,6 +170,36 @@ class _CartScreenState extends State<CartScreen> {
         ),
       ],
     );
+  }
+
+  Widget _buildProductImage(String imageUrl) {
+    if (imageUrl.startsWith('http')) {
+      return Image.network(
+        imageUrl,
+        width: 100,
+        height: 100,
+        fit: BoxFit.contain,
+        errorBuilder: (_, __, ___) => Container(
+          width: 100,
+          height: 100,
+          color: Colors.grey[200],
+          child: const Icon(Icons.broken_image, color: Colors.grey),
+        ),
+      );
+    } else {
+      return Image.asset(
+        imageUrl,
+        width: 100,
+        height: 100,
+        fit: BoxFit.contain,
+        errorBuilder: (_, __, ___) => Container(
+          width: 100,
+          height: 100,
+          color: Colors.grey[200],
+          child: const Icon(Icons.image, color: Colors.grey),
+        ),
+      );
+    }
   }
 
   Widget _quantityButton(String label, VoidCallback onTap) {

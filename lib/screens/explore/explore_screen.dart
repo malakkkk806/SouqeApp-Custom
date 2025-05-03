@@ -3,6 +3,7 @@ import '../../mock/explore_categories.dart';
 import '../../constants/app_routes.dart';
 import '../../constants/colors.dart';
 import '../../widgets/explore/explore_card.dart';
+import '../../widgets/common/bottom_nav_bar.dart';
 
 class ExploreScreen extends StatefulWidget {
   const ExploreScreen({super.key});
@@ -12,35 +13,12 @@ class ExploreScreen extends StatefulWidget {
 }
 
 class _ExploreScreenState extends State<ExploreScreen> {
-  int _selectedIndex = 1; // Explore is at index 1
-
-  void _onItemTapped(int index) {
-    if (index == _selectedIndex) return;
-
-    setState(() => _selectedIndex = index);
-
-    switch (index) {
-      case 0:
-        Navigator.pushNamed(context, AppRoutes.home);
-        break;
-      case 1:
-        break;
-      case 2:
-        Navigator.pushNamed(context, AppRoutes.cart);
-        break;
-      case 3:
-        Navigator.pushNamed(context, AppRoutes.favorite);
-        break;
-      case 4:
-        Navigator.pushNamed(context, AppRoutes.account);
-        break;
-    }
-  }
+  
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.white,
       body: SafeArea(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -62,7 +40,7 @@ class _ExploreScreenState extends State<ExploreScreen> {
                   hintText: 'Search',
                   prefixIcon: const Icon(Icons.search),
                   filled: true,
-                  fillColor: const Color(0xFFF1F1F1),
+                  fillColor: AppColors.white,
                   contentPadding: const EdgeInsets.symmetric(vertical: 0),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(30),
@@ -95,21 +73,7 @@ class _ExploreScreenState extends State<ExploreScreen> {
           ],
         ),
       ),
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _selectedIndex,
-        onTap: _onItemTapped,
-        selectedItemColor: AppColors.primary,
-        unselectedItemColor: Colors.grey,
-        showUnselectedLabels: true,
-        type: BottomNavigationBarType.fixed,
-        items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Shop'),
-          BottomNavigationBarItem(icon: Icon(Icons.explore), label: 'Explore'),
-          BottomNavigationBarItem(icon: Icon(Icons.shopping_cart), label: 'Cart'),
-          BottomNavigationBarItem(icon: Icon(Icons.favorite), label: 'Favourite'),
-          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Account'),
-        ],
-      ),
+    
     );
   }
 }

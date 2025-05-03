@@ -11,6 +11,7 @@ import 'package:souqe/screens/home/product_detail_screen.dart';
 import 'package:souqe/screens/explore/explore_screen.dart';
 import 'package:souqe/screens/profile/account_screen.dart';
 import 'package:souqe/screens/home/home_screen.dart';
+import 'package:souqe/widgets/common/bottom_nav_bar.dart';
 
 class AllProductsScreen extends StatefulWidget {
   final String title;
@@ -30,6 +31,8 @@ class _AllProductsScreenState extends State<AllProductsScreen> {
   int _currentIndex = 0;
 
   void _onNavBarTap(int index) {
+    if (index == _currentIndex) return;
+
     setState(() => _currentIndex = index);
     Widget screen;
 
@@ -53,7 +56,10 @@ class _AllProductsScreenState extends State<AllProductsScreen> {
         return;
     }
 
-    Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => screen));
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (_) => screen),
+    );
   }
 
   @override
@@ -96,19 +102,9 @@ class _AllProductsScreenState extends State<AllProductsScreen> {
           ),
         ),
       ),
-      bottomNavigationBar: BottomNavigationBar(
+      bottomNavigationBar: BottomNavBar(
         currentIndex: _currentIndex,
         onTap: _onNavBarTap,
-        selectedItemColor: AppColors.primary,
-        unselectedItemColor: Colors.grey,
-        type: BottomNavigationBarType.fixed,
-        items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.store), label: 'Shop'),
-          BottomNavigationBarItem(icon: Icon(Icons.explore), label: 'Explore'),
-          BottomNavigationBarItem(icon: Icon(Icons.shopping_cart), label: 'Cart'),
-          BottomNavigationBarItem(icon: Icon(Icons.favorite), label: 'Favorites'),
-          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Account'),
-        ],
       ),
     );
   }
