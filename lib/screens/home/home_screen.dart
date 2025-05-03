@@ -15,7 +15,6 @@ import 'package:souqe/screens/home/all_products_screen.dart';
 import 'package:souqe/models/product.dart';
 import 'package:souqe/providers/favorites_provider.dart';
 import 'package:souqe/utils/product_upload.dart';
-import 'package:souqe/widgets/common/bottom_nav_bar.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -492,10 +491,6 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       backgroundColor: AppColors.background,
       body: _buildTabScreen(),
-      bottomNavigationBar: BottomNavBar(
-        currentIndex: _currentIndex,
-        onTap: (index) => setState(() => _currentIndex = index),
-      ),
     );
   }
 }

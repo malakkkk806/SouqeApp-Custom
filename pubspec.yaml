@@ -85,6 +85,8 @@ flutter:
     - assets/images/milk.png
     - assets/images/bakery.png
     - assets/images/fruits.png
+    - assets/images/carrots.png
+    - assets/images/shrimp.png
   fonts:
     - family: Montserrat
       fonts:

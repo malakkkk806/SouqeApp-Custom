@@ -28,39 +28,7 @@ class AllProductsScreen extends StatefulWidget {
 }
 
 class _AllProductsScreenState extends State<AllProductsScreen> {
-  int _currentIndex = 0;
 
-  void _onNavBarTap(int index) {
-    if (index == _currentIndex) return;
-
-    setState(() => _currentIndex = index);
-    Widget screen;
-
-    switch (index) {
-      case 0:
-        screen = const HomeScreen();
-        break;
-      case 1:
-        screen = const ExploreScreen();
-        break;
-      case 2:
-        screen = const CartScreen();
-        break;
-      case 3:
-        screen = const FavoritesScreen();
-        break;
-      case 4:
-        screen = const AccountScreen(userAddress: '');
-        break;
-      default:
-        return;
-    }
-
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(builder: (_) => screen),
-    );
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -101,10 +69,6 @@ class _AllProductsScreenState extends State<AllProductsScreen> {
             ),
           ),
         ),
-      ),
-      bottomNavigationBar: BottomNavBar(
-        currentIndex: _currentIndex,
-        onTap: _onNavBarTap,
       ),
     );
   }
