@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:souqe/providers/favorites_provider.dart';
-import 'package:souqe/widgets/common/bottom_nav_bar.dart';
-import 'package:souqe/constants/app_routes.dart';
 
 class FavoritesScreen extends StatefulWidget {
   const FavoritesScreen({super.key});

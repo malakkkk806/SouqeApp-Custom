@@ -9,6 +9,11 @@ import 'package:souqe/providers/product_provider.dart';
 import 'package:souqe/models/cart_item_model.dart';
 import 'package:souqe/providers/favorites_provider.dart';
 import 'package:souqe/widgets/common/bottom_nav_bar.dart';
+import 'package:souqe/screens/home/home_screen.dart';
+import 'package:souqe/screens/explore/explore_screen.dart';
+import 'package:souqe/screens/cart/cart_screen.dart';
+import 'package:souqe/screens/favourite/favourite_screen.dart';
+import 'package:souqe/screens/profile/account_screen.dart';
 
 class ProductDetailScreen extends StatefulWidget {
   final Product product;
@@ -23,7 +28,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
   bool hasSeenWarning = false;
   bool showSuggestion = false;
   bool isAddedToCart = false;
-  int _currentIndex = 0; // Define _currentIndex
+  int _currentIndex = 0; // Track the current tab index for BottomNavBar
 
   void _showAllergenWarning() {
     AwesomeDialog(
@@ -120,6 +125,23 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
         ),
       );
       setState(() => isAddedToCart = false);
+    }
+  }
+
+  Widget _buildTabScreen(int index) {
+    switch (_currentIndex) {
+      case 0:
+        return const HomeScreen();
+      case 1:
+        return const ExploreScreen();
+      case 2:
+        return const CartScreen();
+      case 3:
+        return const FavoritesScreen();
+      case 4:
+        return AccountScreen(userAddress: ''); // Pass actual address if needed
+      default:
+        return const HomeScreen();
     }
   }
 
@@ -364,60 +386,20 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
               ),
             ],
           ),
-          if (showSuggestion && product.suggestedProductId != null)
-            Positioned(
-              bottom: 20,
-              right: 20,
-              child: Material(
-                elevation: 4,
-                color: AppColors.surface,
-                borderRadius: BorderRadius.circular(12),
-                child: InkWell(
-                  onTap: () {
-                    final suggested = productProvider.getProductByName(
-                      product.suggestedProductId!,
-                    );
-                    if (suggested != null) {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => ProductDetailScreen(product: suggested),
-                        ),
-                      );
-                    }
-                  },
-                  child: Container(
-                    padding: const EdgeInsets.all(12),
-                    width: 220,
-                    child: Row(
-                      children: [
-                        const Icon(Icons.info_outline, color: AppColors.primary),
-                        const SizedBox(width: 8),
-                        Expanded(
-                          child: Text(
-                            'You may also like: ${productProvider.getProductByName(product.suggestedProductId!)?.name ?? ''}',
-                            style: const TextStyle(fontSize: 13, fontFamily: 'Inter'),
-                          ),
-                        ),
-                        GestureDetector(
-                          onTap: () => setState(() => showSuggestion = false),
-                          child: const Padding(
-                            padding: EdgeInsets.only(left: 6),
-                            child: Icon(Icons.close, size: 16),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-            ),
         ],
       ),
       bottomNavigationBar: BottomNavBar(
-        currentIndex: _currentIndex, // Adjust this based on your current tab index
+        currentIndex: _currentIndex,
         onTap: (index) {
-          setState(() => _currentIndex = index);
+          if (index != _currentIndex) {
+            Navigator.pushAndRemoveUntil(
+              context,
+              MaterialPageRoute(
+                builder: (context) => _buildTabScreen(index),
+              ),
+              (route) => false,
+            );
+          }
         },
       ),
     );

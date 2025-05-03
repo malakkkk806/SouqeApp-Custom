@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../mock/explore_categories.dart';
-import '../../constants/app_routes.dart';
 import '../../constants/colors.dart';
 import '../../widgets/explore/explore_card.dart';
-import '../../widgets/common/bottom_nav_bar.dart';
 
 class ExploreScreen extends StatefulWidget {
   const ExploreScreen({super.key});
