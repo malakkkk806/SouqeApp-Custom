@@ -24,7 +24,6 @@ class _ExploreScreenState extends State<ExploreScreen> {
         Navigator.pushNamed(context, AppRoutes.home);
         break;
       case 1:
-        // Already on Explore, do nothing
         break;
       case 2:
         Navigator.pushNamed(context, AppRoutes.cart);
@@ -85,7 +84,10 @@ class _ExploreScreenState extends State<ExploreScreen> {
                     childAspectRatio: 0.9,
                   ),
                   itemBuilder: (context, index) {
-                    return ExploreCard(category: exploreCategories[index]);
+                    return ExploreCard(
+                      category: exploreCategories[index],
+                      onTap: () {}, // Added required onTap parameter
+                    );
                   },
                 ),
               ),

@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
-import 'package:souqe/models/cart_item.dart';
+import 'package:souqe/models/cart_item_model.dart';
+import 'package:flutter/material.dart';
 
 class CartProvider with ChangeNotifier {
   final Map<String, CartItem> _items = {};
@@ -13,7 +14,7 @@ class CartProvider with ChangeNotifier {
   bool get isNotEmpty => _items.isNotEmpty;
 
   // Core Operations
-  void addItem(CartItem item) {
+  void addItem(CartItem item, {required String productId}) {
     try {
       // Validate input
       if (item.quantity <= 0) throw ArgumentError('Quantity must be positive');

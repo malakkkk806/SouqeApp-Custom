@@ -6,7 +6,9 @@ import 'package:souqe/constants/colors.dart';
 import 'package:souqe/models/product.dart';
 import 'package:souqe/providers/cart_provider.dart';
 import 'package:souqe/providers/product_provider.dart';
-import 'package:souqe/models/cart_item.dart';
+import 'package:souqe/models/cart_item_model.dart';
+import 'package:souqe/widgets/cart/cart_item.dart';
+import 'package:souqe/providers/favorites_provider.dart';
 
 class ProductDetailScreen extends StatefulWidget {
   final Product product;
@@ -28,7 +30,8 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
       dialogType: DialogType.warning,
       animType: AnimType.rightSlide,
       title: 'Allergen Warning',
-      desc: 'This product contains the following allergens:\n\n'
+      desc:
+          'This product contains the following allergens:\n\n'
           '${widget.product.allergens.map((e) => '• $e').join('\n')}',
       btnOkOnPress: () {
         setState(() {
@@ -59,11 +62,24 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
         allergens: product.allergens,
       );
 
+      final cartItem = CartItem(
+        productId: product.id,
+        name: product.name,
+        price: product.price,
+        imageUrl: product.imageUrl,
+        category: product.categories.join(', '),
+        quantity: quantity,
+        allergens: product.allergens,
+      );
+
       cart.addItem(cartItem);
 
       if (!cart.items.containsKey(product.id)) {
         throw Exception('Item not found in cart after addition');
       }
+
+      // Add to cart
+      cart.addItem(cartItem, productId: '');
 
       setState(() => isAddedToCart = true);
 
@@ -129,7 +145,10 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
   @override
   Widget build(BuildContext context) {
     final product = widget.product;
-    final productProvider = Provider.of<ProductProvider>(context, listen: false);
+    final productProvider = Provider.of<ProductProvider>(
+      context,
+      listen: false,
+    );
 
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -142,9 +161,18 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
         ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.favorite_border, color: Colors.black),
-            tooltip: 'Add to Favorites',
-            onPressed: () {},
+            icon: Icon(
+              Provider.of<FavoritesProvider>(context).isFavorite(product.id)
+                  ? Icons.favorite
+                  : Icons.favorite_border,
+              color: Colors.red,
+            ),
+            onPressed: () {
+              Provider.of<FavoritesProvider>(
+                context,
+                listen: false,
+              ).toggleFavorite(product);
+            },
           ),
         ],
       ),
@@ -169,7 +197,10 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
               if (product.allergens.isNotEmpty)
                 Container(
                   margin: const EdgeInsets.symmetric(vertical: 12),
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 6,
+                  ),
                   decoration: BoxDecoration(
                     color: Colors.red.shade100,
                     borderRadius: BorderRadius.circular(8),
@@ -189,7 +220,10 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
 
               Expanded(
                 child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 12,
+                  ),
                   child: SingleChildScrollView(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -237,12 +271,14 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                                       }
                                     },
                                   ),
-                                  Text('$quantity',
-                                      style: const TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.w600,
-                                        fontFamily: 'Inter',
-                                      )),
+                                  Text(
+                                    '$quantity',
+                                    style: const TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w600,
+                                      fontFamily: 'Inter',
+                                    ),
+                                  ),
                                   IconButton(
                                     icon: const Icon(Icons.add),
                                     onPressed: () {
@@ -263,7 +299,6 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                             ),
                           ],
                         ),
-
                         const SizedBox(height: 24),
 
                         const Text(
@@ -298,13 +333,21 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                               ),
                             ),
                             Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 8,
+                                vertical: 4,
+                              ),
                               decoration: BoxDecoration(
                                 color: AppColors.surface,
                                 borderRadius: BorderRadius.circular(8),
                               ),
-                              child: const Text('100gr',
-                                  style: TextStyle(fontSize: 14, fontFamily: 'Inter')),
+                              child: const Text(
+                                '100gr',
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  fontFamily: 'Inter',
+                                ),
+                              ),
                             ),
                           ],
                         ),
@@ -323,11 +366,14 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                         Row(
                           children: List.generate(
                             5,
-                            (index) => Icon(Icons.star,
-                                color: index < product.rating.floor()
-                                    ? Colors.orange
-                                    : Colors.grey.shade300,
-                                size: 20),
+                            (index) => Icon(
+                              Icons.star,
+                              color:
+                                  index < product.rating.floor()
+                                      ? Colors.orange
+                                      : Colors.grey.shade300,
+                              size: 20,
+                            ),
                           ),
                         ),
 
@@ -337,21 +383,27 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                           width: double.infinity,
                           child: ElevatedButton(
                             onPressed: () {
-                              if (product.allergens.isNotEmpty && !hasSeenWarning) {
+                              if (product.allergens.isNotEmpty &&
+                                  !hasSeenWarning) {
                                 _showAllergenWarning();
                               } else {
                                 _addToCart();
                               }
                             },
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: isAddedToCart ? Colors.green : AppColors.primary,
+                              backgroundColor:
+                                  isAddedToCart
+                                      ? Colors.green
+                                      : AppColors.primary,
                               padding: const EdgeInsets.symmetric(vertical: 16),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(12),
                               ),
                             ),
                             child: Text(
-                              isAddedToCart ? '✓ Added to Cart' : 'Add To Basket',
+                              isAddedToCart
+                                  ? '✓ Added to Cart'
+                                  : 'Add To Basket',
                               style: const TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.bold,
@@ -380,15 +432,21 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                 borderRadius: BorderRadius.circular(12),
                 child: InkWell(
                   onTap: () {
-                    final suggested = productProvider.getProductByName(product.suggestedProductId!);
+                    final suggested = productProvider.getProductByName(
+                      product.suggestedProductId!,
+                    );
                     if (suggested != null) {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (_) => ChangeNotifierProvider.value(
-                            value: Provider.of<CartProvider>(context, listen: false),
-                            child: ProductDetailScreen(product: suggested),
-                          ),
+                          builder:
+                              (_) => ChangeNotifierProvider.value(
+                                value: Provider.of<CartProvider>(
+                                  context,
+                                  listen: false,
+                                ),
+                                child: ProductDetailScreen(product: suggested),
+                              ),
                         ),
                       );
                     }
@@ -401,7 +459,10 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                     ),
                     child: Row(
                       children: [
-                        const Icon(Icons.info_outline, color: AppColors.primary),
+                        const Icon(
+                          Icons.info_outline,
+                          color: AppColors.primary,
+                        ),
                         const SizedBox(width: 8),
                         Expanded(
                           child: Text(

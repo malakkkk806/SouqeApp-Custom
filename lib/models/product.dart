@@ -52,7 +52,6 @@ class Product {
       suggestedProductId: data['suggestedProductId'],
     );
   }
-
   Map<String, dynamic> toFirestore() {
     return {
       'name': name,

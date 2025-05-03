@@ -26,7 +26,8 @@ import 'screens/profile/account_screen.dart';
 
 // Providers
 import 'providers/cart_provider.dart';
-import 'providers/product_provider.dart'; // ✅ Add this
+import 'providers/product_provider.dart';
+import 'providers/favorites_provider.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -46,7 +47,8 @@ Future<void> main() async {
     MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => CartProvider()),
-        ChangeNotifierProvider(create: (_) => ProductProvider()), // ✅ Added here
+        ChangeNotifierProvider(create: (_) => ProductProvider()),
+        ChangeNotifierProvider(create: (_) => FavoritesProvider()),
       ],
       child: const MyApp(),
     ),
@@ -93,9 +95,11 @@ class MyApp extends StatelessWidget {
         AppRoutes.resetPassword: (context) => const ResetPasswordScreen(),
         AppRoutes.explore: (context) => const ExploreScreen(),
         AppRoutes.trackOrder: (context) => const TrackOrderScreen(),
-        AppRoutes.account: (context) => const AccountScreen(),
+        AppRoutes.account: (context) => const AccountScreen(userAddress: ''),
         AppRoutes.orderStatus: (context) {
-          final args = ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>?;
+          final args =
+              ModalRoute.of(context)!.settings.arguments
+                  as Map<String, dynamic>?;
           final isSuccess = args?['success'] ?? false;
           return OrderStatusScreen(isSuccess: isSuccess);
         },

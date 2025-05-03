@@ -6,14 +6,16 @@ import 'package:souqe/constants/app_images.dart';
 import 'package:souqe/constants/colors.dart';
 import 'package:souqe/screens/explore/explore_screen.dart';
 import 'package:souqe/screens/profile/account_screen.dart';
+import 'package:souqe/screens/favourite/favourite_screen.dart';
 import 'package:souqe/widgets/common/bottom_nav_bar.dart';
 import 'package:souqe/screens/home/product_detail_screen.dart';
 import 'package:souqe/models/product.dart';
 import 'package:souqe/providers/cart_provider.dart';
-import 'package:souqe/models/cart_item.dart';
+import 'package:souqe/models/cart_item_model.dart';
 import 'package:souqe/screens/cart/cart_screen.dart';
 import 'package:souqe/utils/product_upload.dart';
-
+import 'package:souqe/screens/profile/account_screen.dart';
+import 'package:souqe/models/product.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -28,74 +30,74 @@ class _HomeScreenState extends State<HomeScreen> {
   String _currentAddress = 'Fetching location...';
 
   final List<Product> products = [
-  Product(
-    id: '1',
-    name: 'Red Apple',
-    description: '1kg, Priceg',
-    price: 4.99,
-    imageUrl: AppImages.apple,
-    category: 'Fruits',
-    stockQuantity: 100,
-    allergens: [],
-    relatedProducts: ['Organic Bananas'],
-  ),
-  Product(
-    id: '2',
-    name: 'Organic Bananas',
-    description: '7pcs, Priceg',
-    price: 4.99,
-    imageUrl: AppImages.banana,
-    category: 'Fruits',
-    stockQuantity: 120,
-    allergens: [],
-    relatedProducts: ['Red Apple'],
-  ),
-  Product(
-    id: '3',
-    name: 'Beef Bone',
-    description: '1kg, Priceg',
-    price: 4.99,
-    imageUrl: AppImages.beef,
-    category: 'Meat',
-    stockQuantity: 80,
-    allergens: ['Meat'],
-    relatedProducts: ['Broiler Chicken'],
-  ),
-  Product(
-    id: '4',
-    name: 'Broiler Chicken',
-    description: '1kg, Priceg',
-    price: 4.99,
-    imageUrl: AppImages.chicken,
-    category: 'Meat',
-    stockQuantity: 90,
-    allergens: ['Meat'],
-    relatedProducts: ['Beef Bone'],
-    suggestedProductId: '2',
-  ),
-  Product(
-    id: '5',
-    name: 'Pepper',
-    description: '1kg, Priceg',
-    price: 4.99,
-    imageUrl: AppImages.pepper,
-    category: 'Spices',
-    stockQuantity: 60,
-    allergens: [],
-    relatedProducts: ['Ginger'],
-  ),
-  Product(
-    id: '6',
-    name: 'Ginger',
-    description: '0.5kg, Priceg',
-    price: 4.99,
-    imageUrl: AppImages.ginger,
-    category: 'Spices',
-    stockQuantity: 70,
-    allergens: [],
-    relatedProducts: ['Pepper'],
-  ),
-];
+    Product(
+      id: '1',
+      name: 'Red Apple',
+      description: '1kg, Priceg',
+      price: 4.99,
+      imageUrl: AppImages.apple,
+      category: 'Fruits',
+      stockQuantity: 100,
+      allergens: [],
+      relatedProducts: ['Organic Bananas'],
+    ),
+    Product(
+      id: '2',
+      name: 'Organic Bananas',
+      description: '7pcs, Priceg',
+      price: 4.99,
+      imageUrl: AppImages.banana,
+      category: 'Fruits',
+      stockQuantity: 120,
+      allergens: [],
+      relatedProducts: ['Red Apple'],
+    ),
+    Product(
+      id: '3',
+      name: 'Beef Bone',
+      description: '1kg, Priceg',
+      price: 4.99,
+      imageUrl: AppImages.beef,
+      category: 'Meat',
+      stockQuantity: 80,
+      allergens: ['Meat'],
+      relatedProducts: ['Broiler Chicken'],
+    ),
+    Product(
+      id: '4',
+      name: 'Broiler Chicken',
+      description: '1kg, Priceg',
+      price: 4.99,
+      imageUrl: AppImages.chicken,
+      category: 'Meat',
+      stockQuantity: 90,
+      allergens: ['Meat'],
+      relatedProducts: ['Beef Bone'],
+      suggestedProductId: '2',
+    ),
+    Product(
+      id: '5',
+      name: 'Pepper',
+      description: '1kg, Priceg',
+      price: 4.99,
+      imageUrl: AppImages.pepper,
+      category: 'Spices',
+      stockQuantity: 60,
+      allergens: [],
+      relatedProducts: ['Ginger'],
+    ),
+    Product(
+      id: '6',
+      name: 'Ginger',
+      description: '0.5kg, Priceg',
+      price: 4.99,
+      imageUrl: AppImages.ginger,
+      category: 'Spices',
+      stockQuantity: 70,
+      allergens: [],
+      relatedProducts: ['Pepper'],
+    ),
+  ];
 
   @override
   void initState() {
@@ -124,16 +126,22 @@ class _HomeScreenState extends State<HomeScreen> {
     }
 
     if (permission == LocationPermission.deniedForever) {
-      setState(() => _currentAddress = 'Location permissions are permanently denied.');
+      setState(
+        () => _currentAddress = 'Location permissions are permanently denied.',
+      );
       return;
     }
 
     final position = await Geolocator.getCurrentPosition();
-    final placemarks = await placemarkFromCoordinates(position.latitude, position.longitude);
+    final placemarks = await placemarkFromCoordinates(
+      position.latitude,
+      position.longitude,
+    );
 
     final place = placemarks.first;
     setState(() {
-      _currentAddress = '${place.locality}, ${place.administrativeArea}, ${place.country}';
+      _currentAddress =
+          '${place.locality}, ${place.administrativeArea}, ${place.country}';
     });
   }
 
@@ -151,8 +159,11 @@ class _HomeScreenState extends State<HomeScreen> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Icon(Icons.location_on,
-                        color: AppColors.primary, size: 18),
+                    const Icon(
+                      Icons.location_on,
+                      color: AppColors.primary,
+                      size: 18,
+                    ),
                     const SizedBox(width: 4),
                     Text(
                       _currentAddress,
@@ -254,10 +265,8 @@ class _HomeScreenState extends State<HomeScreen> {
         );
       },
       child: Card(
-        elevation: 1,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-        ),
+        elevation: 2,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -266,12 +275,10 @@ class _HomeScreenState extends State<HomeScreen> {
                 AspectRatio(
                   aspectRatio: 1,
                   child: ClipRRect(
-                    borderRadius:
-                        const BorderRadius.vertical(top: Radius.circular(12)),
-                    child: Image.asset(
-                      product.imageUrl,
-                      fit: BoxFit.contain,
+                    borderRadius: const BorderRadius.vertical(
+                      top: Radius.circular(12),
                     ),
+                    child: Image.asset(product.imageUrl, fit: BoxFit.contain),
                   ),
                 ),
                 Positioned(
@@ -358,16 +365,22 @@ class _HomeScreenState extends State<HomeScreen> {
                         padding: EdgeInsets.zero,
                         constraints: const BoxConstraints(),
                         onPressed: () {
-                          final cart = Provider.of<CartProvider>(context,
-                              listen: false);
-                          cart.addItem(CartItem(
-                            productId: product.id,
-                            name: product.name,
-                            price: product.price,
-                            imageUrl: product.imageUrl,
-                            allergens: product.allergens,
-                            quantity: 1,
-                          ));
+                          final cart = Provider.of<CartProvider>(
+                            context,
+                            listen: false,
+                          );
+                          cart.addItem(
+                            CartItem(
+                              productId: product.id,
+                              name: product.name,
+                              price: product.price,
+                              imageUrl: product.imageUrl,
+                              allergens: product.allergens,
+                              quantity: 1,
+                              category: '',
+                            ),
+                            productId: '',
+                          );
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
                               content: Text(
@@ -375,8 +388,9 @@ class _HomeScreenState extends State<HomeScreen> {
                                 style: const TextStyle(fontSize: 13),
                               ),
                               behavior: SnackBarBehavior.floating,
-                              backgroundColor:
-                                  AppColors.primary.withOpacity(0.9),
+                              backgroundColor: AppColors.primary.withOpacity(
+                                0.9,
+                              ),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(10),
                               ),
@@ -403,6 +417,66 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
+  Widget _buildCategoryChips() {
+    final categories = [
+      {'title': 'Pulses', 'color': AppColors.surface, 'icon': AppImages.pulses},
+      {
+        'title': 'Rice',
+        'color': AppColors.secondary.withOpacity(0.15),
+        'icon': AppImages.rice,
+      },
+      {
+        'title': 'Oils',
+        'color': AppColors.primaryLight.withOpacity(0.1),
+        'icon': AppImages.oil,
+      },
+    ];
+
+    return SizedBox(
+      height: 100,
+      child: ListView.separated(
+        scrollDirection: Axis.horizontal,
+        itemCount: categories.length,
+        separatorBuilder: (_, __) => const SizedBox(width: 34),
+        itemBuilder: (context, index) {
+          final category = categories[index];
+          return Container(
+            width: 160,
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: category['color'] as Color,
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: Row(
+              children: [
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(12),
+                  child: Image.asset(
+                    category['icon'] as String,
+                    width: 50,
+                    height: 50,
+                    fit: BoxFit.cover,
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Text(
+                    category['title'] as String,
+                    style: const TextStyle(
+                      fontFamily: 'Inter',
+                      fontSize: 18,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          );
+        },
+      ),
+    );
+  }
+
   Widget _buildTabScreen() {
     switch (_currentIndex) {
       case 0:
@@ -412,9 +486,9 @@ class _HomeScreenState extends State<HomeScreen> {
       case 2:
         return const CartScreen();
       case 3:
-        return const Center(child: Text("Favourite Screen"));
+        return const FavoritesScreen();
       case 4:
-        return const AccountScreen();
+        return AccountScreen(userAddress: _currentAddress);
       default:
         return _buildShopContent();
     }
@@ -425,9 +499,10 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       backgroundColor: AppColors.background,
       body: _buildTabScreen(),
-      bottomNavigationBar: BottomNavBar(
+      bottomNavigationBar: BottomNavigationBar(
         currentIndex: _currentIndex,
         onTap: (index) => setState(() => _currentIndex = index),
+        items: [],
       ),
     );
   }
