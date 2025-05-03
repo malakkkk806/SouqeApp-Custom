@@ -25,7 +25,12 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   int _currentIndex = 0;
+
   String _currentAddress = 'Fetching location...';
+
+  final Set<String> _favoriteProductIds = {};
+  final String _currentAddress = 'Fetching location...';
+
 
   final List<Product> products = [
     Product(

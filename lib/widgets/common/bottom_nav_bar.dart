@@ -4,7 +4,6 @@ import 'package:souqe/providers/favorites_provider.dart';
 import 'package:souqe/screens/cart/cart_screen.dart';
 import 'package:souqe/screens/explore/explore_screen.dart';
 import 'package:souqe/screens/favourite/favourite_screen.dart';
-import 'package:souqe/screens/home/home_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
