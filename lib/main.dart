@@ -19,6 +19,7 @@ import 'screens/auth/reset_password_screen.dart';
 import 'screens/medical/medical_history_screen.dart';
 import 'screens/home/home_screen.dart';
 import 'screens/cart/cart_screen.dart';
+import 'package:souqe/screens/favourite/favourite_screen.dart';
 import 'screens/cart/order_status_screen.dart';
 import 'screens/cart/track_order_screen.dart';
 import 'screens/explore/explore_screen.dart';
@@ -96,6 +97,7 @@ class MyApp extends StatelessWidget {
         AppRoutes.explore: (context) => const ExploreScreen(),
         AppRoutes.trackOrder: (context) => const TrackOrderScreen(),
         AppRoutes.account: (context) => const AccountScreen(userAddress: ''),
+        AppRoutes.favorite: (context) => const FavoritesScreen(),
         AppRoutes.orderStatus: (context) {
           final args =
               ModalRoute.of(context)!.settings.arguments

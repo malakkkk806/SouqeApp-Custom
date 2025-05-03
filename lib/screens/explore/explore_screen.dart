@@ -29,7 +29,7 @@ class _ExploreScreenState extends State<ExploreScreen> {
         Navigator.pushNamed(context, AppRoutes.cart);
         break;
       case 3:
-        Navigator.pushNamed(context, AppRoutes.favourite);
+        Navigator.pushNamed(context, AppRoutes.favorite);
         break;
       case 4:
         Navigator.pushNamed(context, AppRoutes.account);

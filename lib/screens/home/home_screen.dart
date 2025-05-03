@@ -4,14 +4,16 @@ import 'package:geolocator/geolocator.dart';
 import 'package:provider/provider.dart';
 import 'package:souqe/constants/app_images.dart';
 import 'package:souqe/constants/colors.dart';
+import 'package:souqe/models/cart_item_model.dart';
+import 'package:souqe/providers/cart_provider.dart';
 import 'package:souqe/screens/explore/explore_screen.dart';
+import 'package:souqe/screens/cart/cart_screen.dart';
 import 'package:souqe/screens/profile/account_screen.dart';
 import 'package:souqe/screens/favourite/favourite_screen.dart';
 import 'package:souqe/screens/home/product_detail_screen.dart';
+import 'package:souqe/screens/home/all_products_screen.dart';
 import 'package:souqe/models/product.dart';
-import 'package:souqe/providers/cart_provider.dart';
-import 'package:souqe/models/cart_item_model.dart';
-import 'package:souqe/screens/cart/cart_screen.dart';
+import 'package:souqe/providers/favorites_provider.dart';
 import 'package:souqe/utils/product_upload.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -23,7 +25,6 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   int _currentIndex = 0;
-  final Set<String> _favoriteProductIds = {};
   String _currentAddress = 'Fetching location...';
 
   final List<Product> products = [
@@ -93,6 +94,28 @@ class _HomeScreenState extends State<HomeScreen> {
       stockQuantity: 70,
       allergens: [],
       relatedProducts: ['Pepper'],
+    ),
+    Product(
+      id: '7',
+      name: 'Pulses',
+      description: '1kg, Priceg',
+      price: 3.99,
+      imageUrl: AppImages.pulses,
+      category: 'Grains',
+      stockQuantity: 50,
+      allergens: [],
+      relatedProducts: ['Rice'],
+    ),
+    Product(
+      id: '8',
+      name: 'Rice',
+      description: '1kg, Priceg',
+      price: 2.99,
+      imageUrl: AppImages.rice,
+      category: 'Grains',
+      stockQuantity: 150,
+      allergens: [],
+      relatedProducts: ['Pulses'],
     ),
   ];
 
@@ -174,19 +197,6 @@ class _HomeScreenState extends State<HomeScreen> {
                 const SizedBox(height: 12),
               ],
             ),
-            TextField(
-              decoration: InputDecoration(
-                hintText: 'Search Store',
-                prefixIcon: const Icon(Icons.search),
-                filled: true,
-                fillColor: AppColors.surface,
-                contentPadding: const EdgeInsets.symmetric(horizontal: 16),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide.none,
-                ),
-              ),
-            ),
             const SizedBox(height: 16),
             ClipRRect(
               borderRadius: BorderRadius.circular(12),
@@ -197,9 +207,9 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
             const SizedBox(height: 20),
-            _buildSection("Exclusive Offer", products.sublist(0, 3)),
+            _buildSection("Exclusive Offer", products.sublist(0, 4)),
             const SizedBox(height: 20),
-            _buildSection("Best Selling", products.sublist(3)),
+            _buildSection("Best Selling", products.sublist(4)),
           ],
         ),
       ),
@@ -207,6 +217,16 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _buildSection(String title, List<Product> productList) {
+    List<Product> extendedList = [];
+    if (title == "Exclusive Offer") {
+      extendedList = products.sublist(0, 6);
+    } else if (title == "Best Selling") {
+      extendedList = products.sublist(4);
+      if (products.length > 6) {
+        extendedList.addAll(products.sublist(6, 8));
+      }
+    }
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -222,7 +242,17 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
             TextButton(
-              onPressed: () {},
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => AllProductsScreen(
+                      title: title,
+                      products: extendedList,
+                    ),
+                  ),
+                );
+              },
               child: const Text(
                 "See all",
                 style: TextStyle(color: AppColors.primary),
@@ -250,7 +280,8 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _buildProductCard(Product product) {
-    final isFavorite = _favoriteProductIds.contains(product.id);
+    final favoritesProvider = Provider.of<FavoritesProvider>(context);
+    final isFavorite = favoritesProvider.isFavorite(product.id);
 
     return GestureDetector(
       onTap: () {
@@ -284,16 +315,10 @@ class _HomeScreenState extends State<HomeScreen> {
                   child: IconButton(
                     icon: Icon(
                       isFavorite ? Icons.favorite : Icons.favorite_border,
-                      color: AppColors.primary,
+                      color: Colors.red,
                     ),
                     onPressed: () {
-                      setState(() {
-                        if (isFavorite) {
-                          _favoriteProductIds.remove(product.id);
-                        } else {
-                          _favoriteProductIds.add(product.id);
-                        }
-                      });
+                      favoritesProvider.toggleFavorite(product);
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
                           content: Text(
@@ -303,7 +328,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             style: const TextStyle(fontSize: 13),
                           ),
                           behavior: SnackBarBehavior.floating,
-                          backgroundColor: AppColors.primary.withOpacity(0.9),
+                          backgroundColor: Colors.red.withAlpha((0.9 * 255).round()),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(10),
                           ),
@@ -374,9 +399,9 @@ class _HomeScreenState extends State<HomeScreen> {
                               imageUrl: product.imageUrl,
                               allergens: product.allergens,
                               quantity: 1,
-                              category: '',
+                              category: product.category,
                             ),
-                            productId: '',
+                            productId: product.id,
                           );
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
@@ -385,9 +410,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                 style: const TextStyle(fontSize: 13),
                               ),
                               behavior: SnackBarBehavior.floating,
-                              backgroundColor: AppColors.primary.withOpacity(
-                                0.9,
-                              ),
+                              backgroundColor: AppColors.primary.withAlpha((0.9 * 255).round()),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(10),
                               ),
@@ -410,66 +433,6 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           ],
         ),
-      ),
-    );
-  }
-
-  Widget _buildCategoryChips() {
-    final categories = [
-      {'title': 'Pulses', 'color': AppColors.surface, 'icon': AppImages.pulses},
-      {
-        'title': 'Rice',
-        'color': AppColors.secondary.withOpacity(0.15),
-        'icon': AppImages.rice,
-      },
-      {
-        'title': 'Oils',
-        'color': AppColors.primaryLight.withOpacity(0.1),
-        'icon': AppImages.oil,
-      },
-    ];
-
-    return SizedBox(
-      height: 100,
-      child: ListView.separated(
-        scrollDirection: Axis.horizontal,
-        itemCount: categories.length,
-        separatorBuilder: (_, __) => const SizedBox(width: 34),
-        itemBuilder: (context, index) {
-          final category = categories[index];
-          return Container(
-            width: 160,
-            padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              color: category['color'] as Color,
-              borderRadius: BorderRadius.circular(20),
-            ),
-            child: Row(
-              children: [
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(12),
-                  child: Image.asset(
-                    category['icon'] as String,
-                    width: 50,
-                    height: 50,
-                    fit: BoxFit.cover,
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Text(
-                    category['title'] as String,
-                    style: const TextStyle(
-                      fontFamily: 'Inter',
-                      fontSize: 18,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          );
-        },
       ),
     );
   }
@@ -499,7 +462,31 @@ class _HomeScreenState extends State<HomeScreen> {
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _currentIndex,
         onTap: (index) => setState(() => _currentIndex = index),
-        items: [],
+        selectedItemColor: AppColors.primary,
+        unselectedItemColor: Colors.grey,
+        type: BottomNavigationBarType.fixed,
+        items: const [
+          BottomNavigationBarItem(
+            icon: Icon(Icons.store),
+            label: 'Shop',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.explore),
+            label: 'Explore',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.shopping_cart),
+            label: 'Cart',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.favorite),
+            label: 'Favorites',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.person),
+            label: 'Account',
+          ),
+        ],
       ),
     );
   }
