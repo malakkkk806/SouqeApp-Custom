@@ -43,7 +43,7 @@ class _HomeScreenState extends State<HomeScreen> {
       reviewCount: 175,
       allergens: [],
       relatedProducts: ['Caramel Dip', 'Peanut Butter'],
-      suggestedProductId: null,
+      suggestedProductId: null, relatedProduct: [], categoryId: '',
     ),
     Product(
       id: 'prod_banana_001',
@@ -58,7 +58,7 @@ class _HomeScreenState extends State<HomeScreen> {
       reviewCount: 200,
       allergens: [],
       relatedProducts: ['Peanut Butter', 'Yogurt'],
-      suggestedProductId: 'prod_yogurt_001',
+      suggestedProductId: 'prod_yogurt_001', relatedProduct: [], categoryId: '',
     ),
   Product(
     id: 'prod_beef_001',
@@ -73,7 +73,7 @@ class _HomeScreenState extends State<HomeScreen> {
     reviewCount: 110,
     allergens: ['Meat'],
     relatedProducts: ['Burger Buns', 'Cheddar Cheese'],
-    suggestedProductId: null,
+    suggestedProductId: null, relatedProduct: [], categoryId: '',
   ),
   Product(
     id: 'prod_chicken_001',
@@ -88,7 +88,7 @@ class _HomeScreenState extends State<HomeScreen> {
     reviewCount: 180,
     allergens: ['Meat'],
     relatedProducts: ['Garlic', 'Lemon', 'Rosemary'],
-    suggestedProductId: 'prod_cheese_001',
+    suggestedProductId: 'prod_cheese_001', relatedProduct: [], categoryId: '',
   ),
   Product(
     id: 'prod_pepper_001',
@@ -103,7 +103,7 @@ class _HomeScreenState extends State<HomeScreen> {
     reviewCount: 95,
     allergens: [],
     relatedProducts: ['Ginger'],
-    suggestedProductId: null,
+    suggestedProductId: null, relatedProduct: [], categoryId: '',
   ),
   Product(
     id: 'prod_ginger_001',
@@ -118,7 +118,7 @@ class _HomeScreenState extends State<HomeScreen> {
     reviewCount: 90,
     allergens: [],
     relatedProducts: ['Pepper'],
-    suggestedProductId: null,
+    suggestedProductId: null, relatedProduct: [], categoryId: '',
   ),
   Product(
     id: 'prod_pulses_001',
@@ -133,7 +133,7 @@ class _HomeScreenState extends State<HomeScreen> {
     reviewCount: 100,
     allergens: [],
     relatedProducts: ['Rice'],
-    suggestedProductId: null,
+    suggestedProductId: null, relatedProduct: [], categoryId: '',
   ),
   Product(
     id: 'prod_rice_001',
@@ -148,7 +148,7 @@ class _HomeScreenState extends State<HomeScreen> {
     reviewCount: 110,
     allergens: [],
     relatedProducts: ['Curry Powder', 'Lentils'],
-    suggestedProductId: null,
+    suggestedProductId: null, relatedProduct: [], categoryId: '',
   ),
 ];
 

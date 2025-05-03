@@ -92,7 +92,8 @@ class ProductProvider with ChangeNotifier {
           price: 0.0,
           imageUrl: '',
           category: '',
-          stockQuantity: 0,
+          stockQuantity: 0, 
+          relatedProduct: [], categoryId: '',
         ),
       );
     } catch (e) {

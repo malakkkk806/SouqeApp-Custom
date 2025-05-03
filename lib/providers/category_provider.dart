@@ -1,21 +1,15 @@
 import 'package:flutter/material.dart';
 import '../models/category.dart';
-import '../services/category_service.dart';
+import '../mock/explore_categories.dart';  // Import your category data
 
 class CategoryProvider with ChangeNotifier {
-  final CategoryService _categoryService = CategoryService();
-  List<Category> _categories = [];
+  List<Category> _categories = exploreCategories;
 
   List<Category> get categories => _categories;
 
-  CategoryProvider() {
-    _init();
-  }
-
-  void _init() {
-    _categoryService.getCategories().listen((data) {
-      _categories = data;
-      notifyListeners();
-    });
+  // You can replace this with API calls if you need to fetch categories from a server
+  void fetchCategories() {
+    // Simulate fetching categories
+    notifyListeners();
   }
 }

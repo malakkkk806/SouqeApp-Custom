@@ -7,6 +7,7 @@ class Product {
   final double price;
   final String imageUrl;
   final String category;
+  final String categoryId; // ✅ Add this
   final int stockQuantity;
   final bool isAvailable;
   final double rating;
@@ -22,6 +23,7 @@ class Product {
     required this.price,
     required this.imageUrl,
     required this.category,
+    required this.categoryId, // ✅ Add this
     required this.stockQuantity,
     this.isAvailable = true,
     this.rating = 0.0,
@@ -29,10 +31,8 @@ class Product {
     this.allergens = const [],
     this.relatedProducts = const [],
     this.suggestedProductId,
+    required List<String> relatedProduct,
   });
-
-  /// Returns formatted price like "$4.99"
-  String get formattedPrice => '\$${price.toStringAsFixed(2)}';
 
   factory Product.fromFirestore(DocumentSnapshot doc) {
     final data = doc.data() as Map<String, dynamic>;
@@ -43,6 +43,7 @@ class Product {
       price: (data['price'] ?? 0).toDouble(),
       imageUrl: data['imageUrl'] ?? '',
       category: data['category'] ?? '',
+      categoryId: data['categoryId'] ?? '', // ✅ Get it from Firestore
       stockQuantity: data['stockQuantity'] ?? 0,
       isAvailable: data['isAvailable'] ?? true,
       rating: (data['rating'] ?? 0).toDouble(),
@@ -50,8 +51,10 @@ class Product {
       allergens: List<String>.from(data['allergens'] ?? []),
       relatedProducts: List<String>.from(data['relatedProducts'] ?? []),
       suggestedProductId: data['suggestedProductId'],
+      relatedProduct: [],
     );
   }
+
   Map<String, dynamic> toFirestore() {
     return {
       'name': name,
@@ -59,6 +62,7 @@ class Product {
       'price': price,
       'imageUrl': imageUrl,
       'category': category,
+      'categoryId': categoryId, // ✅ Include in Firestore data
       'stockQuantity': stockQuantity,
       'isAvailable': isAvailable,
       'rating': rating,
@@ -68,5 +72,25 @@ class Product {
       'suggestedProductId': suggestedProductId,
       'updatedAt': FieldValue.serverTimestamp(),
     };
+  }
+
+  factory Product.fromMap(Map<String, dynamic> map) {
+    return Product(
+      id: map['id'],
+      name: map['name'],
+      description: map['description'],
+      price: map['price'],
+      imageUrl: map['imageUrl'],
+      category: map['category'],
+      categoryId: map['categoryId'], // ✅ Required
+      stockQuantity: map['stockQuantity'],
+      isAvailable: map['isAvailable'],
+      rating: map['rating'],
+      reviewCount: map['reviewCount'],
+      allergens: List<String>.from(map['allergens']),
+      relatedProducts: List<String>.from(map['relatedProducts']),
+      suggestedProductId: map['suggestedProductId'],
+      relatedProduct: [],
+    );
   }
 }
