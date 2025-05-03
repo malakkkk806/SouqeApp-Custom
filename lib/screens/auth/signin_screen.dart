@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:souqe/constants/app_routes.dart';
 import 'package:souqe/constants/colors.dart';
 import 'package:souqe/constants/app_images.dart';
@@ -16,6 +18,7 @@ class SignInScreen extends StatefulWidget {
 class _SignInScreenState extends State<SignInScreen> {
   final TextEditingController _phoneController = TextEditingController();
   final PhoneAuthService _authService = PhoneAuthService();
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   String countryCode = '+20';
   bool _isLoading = false;
@@ -42,10 +45,22 @@ class _SignInScreenState extends State<SignInScreen> {
     );
   }
 
+  Future<void> _saveUserToFirestore(User user, String phone) async {
+    try {
+      await _firestore.collection('users').doc(user.uid).set({
+        'phone': phone,
+        'createdAt': FieldValue.serverTimestamp(),
+        'updatedAt': FieldValue.serverTimestamp(),
+      }, SetOptions(merge: true));
+    } catch (e) {
+      debugPrint('Error saving user to Firestore: $e');
+      throw Exception('Failed to save user data');
+    }
+  }
+
   void _startPhoneVerification() async {
     final rawInput = _phoneController.text.trim();
-    final sanitized =
-        rawInput.startsWith('0') ? rawInput.substring(1) : rawInput;
+    final sanitized = rawInput.startsWith('0') ? rawInput.substring(1) : rawInput;
     final fullPhone = '$countryCode$sanitized';
 
     if (sanitized.isEmpty || sanitized.length < 8) {
@@ -55,21 +70,41 @@ class _SignInScreenState extends State<SignInScreen> {
 
     setState(() => _isLoading = true);
 
-    await _authService.verifyPhoneNumber(
-      phoneNumber: fullPhone,
-      codeSent: (verificationId) {
-        setState(() => _isLoading = false);
-        Navigator.pushNamed(
-          context,
-          AppRoutes.login,
-          arguments: {'verificationId': verificationId, 'phone': fullPhone},
-        );
-      },
-      onError: (error) {
-        setState(() => _isLoading = false);
-        _showSnackBar("Verification failed: $error");
-      },
-    );
+    try {
+      await _authService.verifyPhoneNumber(
+        phoneNumber: fullPhone,
+        codeSent: (verificationId) {
+          setState(() => _isLoading = false);
+          Navigator.pushNamed(
+            context,
+            AppRoutes.login,
+            arguments: {
+              'verificationId': verificationId,
+              'phone': fullPhone,
+            },
+          );
+        },
+        verificationCompleted: (AuthCredential credential) async {
+          try {
+            final UserCredential userCredential = 
+                await FirebaseAuth.instance.signInWithCredential(credential);
+            if (userCredential.user != null) {
+              await _saveUserToFirestore(userCredential.user!, fullPhone);
+              Navigator.pushReplacementNamed(context, AppRoutes.home);
+            }
+          } catch (e) {
+            _showSnackBar("Verification failed: $e");
+          }
+        },
+        onError: (error) {
+          setState(() => _isLoading = false);
+          _showSnackBar("Verification failed: $error");
+        },
+      );
+    } catch (e) {
+      setState(() => _isLoading = false);
+      _showSnackBar("Error: $e");
+    }
   }
 
   @override
@@ -125,22 +160,11 @@ class _SignInScreenState extends State<SignInScreen> {
                             color: AppColors.textDark,
                           ),
                         ),
-                        const SizedBox(height: 6),
-                        const Text(
-                          'We’ll send you an SMS for verification.',
-                          style: TextStyle(
-                            fontSize: 15,
-                            fontFamily: 'Inter',
-                            color: AppColors.textMedium,
-                          ),
-                        ),
                         const SizedBox(height: 24),
                         Row(
                           children: [
                             Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 12,
-                              ),
+                              padding: const EdgeInsets.symmetric(horizontal: 12),
                               decoration: BoxDecoration(
                                 border: Border.all(color: AppColors.primary),
                                 borderRadius: BorderRadius.circular(12),
@@ -150,14 +174,13 @@ class _SignInScreenState extends State<SignInScreen> {
                                 value: countryCode,
                                 underline: const SizedBox(),
                                 icon: const Icon(Icons.keyboard_arrow_down),
-                                items:
-                                    CountryCodes.codes.map((c) {
-                                      final flag = getFlagEmoji(c['iso'] ?? '');
-                                      return DropdownMenuItem<String>(
-                                        value: c['code'],
-                                        child: Text('$flag ${c['code']}'),
-                                      );
-                                    }).toList(),
+                                items: CountryCodes.codes.map((c) {
+                                  final flag = getFlagEmoji(c['iso'] ?? '');
+                                  return DropdownMenuItem<String>(
+                                    value: c['code'],
+                                    child: Text('$flag ${c['code']}'),
+                                  );
+                                }).toList(),
                                 onChanged: (value) {
                                   if (value != null) {
                                     setState(() => countryCode = value);
@@ -230,15 +253,7 @@ class _SignInScreenState extends State<SignInScreen> {
                           height: 52,
                           width: double.infinity,
                           child: ElevatedButton(
-                            onPressed:
-                                _isLoading
-                                    ? null
-                                    : () {
-                                      Navigator.pushNamed(
-                                        context,
-                                        AppRoutes.signup,
-                                      );
-                                    },
+                            onPressed: _isLoading ? null : _startPhoneVerification,
                             style: ElevatedButton.styleFrom(
                               backgroundColor: AppColors.primary,
                               shape: RoundedRectangleBorder(
@@ -246,25 +261,24 @@ class _SignInScreenState extends State<SignInScreen> {
                               ),
                               elevation: 2,
                             ),
-                            child:
-                                _isLoading
-                                    ? const SizedBox(
-                                      width: 24,
-                                      height: 24,
-                                      child: CircularProgressIndicator(
-                                        strokeWidth: 2,
-                                        color: Colors.white,
-                                      ),
-                                    )
-                                    : const Text(
-                                      'Login or Signup',
-                                      style: TextStyle(
-                                        fontSize: 18,
-                                        fontWeight: FontWeight.w600,
-                                        fontFamily: 'Inter',
-                                        color: Colors.white,
-                                      ),
+                            child: _isLoading
+                                ? const SizedBox(
+                                    width: 24,
+                                    height: 24,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                      color: Colors.white,
                                     ),
+                                  )
+                                : const Text(
+                                    'Login or Signup',
+                                    style: TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.w600,
+                                      fontFamily: 'Inter',
+                                      color: Colors.white,
+                                    ),
+                                  ),
                           ),
                         ),
                       ],

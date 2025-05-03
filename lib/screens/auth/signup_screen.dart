@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:souqe/constants/app_images.dart';
 import 'package:souqe/constants/colors.dart';
@@ -57,7 +58,14 @@ class _SignUpScreenState extends State<SignUpScreen> {
           _passwordController.text.trim(),
         );
         if (user != null) {
-          Navigator.pushReplacementNamed(context, AppRoutes.medicalHistory);
+        // Save additional user data to Firestore
+        await FirebaseFirestore.instance.collection('users').doc(user.uid).set({
+          'name': _nameController.text.trim(),
+          'email': _emailController.text.trim(),
+          'phone': '', // You can add phone field here or update it later
+          'createdAt': FieldValue.serverTimestamp(),
+        });
+        Navigator.pushReplacementNamed(context, AppRoutes.medicalHistory);
         }
       } catch (e) {
         _showSnackBar("Signup failed: $e");
