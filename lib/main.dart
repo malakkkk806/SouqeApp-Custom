@@ -23,6 +23,7 @@ import 'screens/cart/order_status_screen.dart';
 import 'screens/cart/track_order_screen.dart';
 import 'screens/explore/explore_screen.dart';
 import 'screens/profile/account_screen.dart';
+import 'screens/profile/my_orders_screen.dart';
 
 // Providers
 import 'providers/cart_provider.dart';
@@ -96,14 +97,10 @@ class MyApp extends StatelessWidget {
         AppRoutes.trackOrder: (context) => const TrackOrderScreen(),
         AppRoutes.account: (context) => const AccountScreen(userAddress: ''),
         AppRoutes.favorite: (context) => const FavoritesScreen(),
-        AppRoutes.orderStatus: (context) {
-          final args =
-              ModalRoute.of(context)!.settings.arguments
-                  as Map<String, dynamic>?;
-          final isSuccess = args?['success'] ?? false;
-          return OrderStatusScreen(isSuccess: isSuccess);
+        AppRoutes.orderStatus: (context) => const OrderStatusScreen(),
+        AppRoutes.myOrders: (context) => const MyOrdersScreen(),
+
         },
-      },
     );
   }
 }

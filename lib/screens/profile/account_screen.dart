@@ -146,19 +146,41 @@ class AccountScreen extends StatelessWidget {
               ),
               const SizedBox(height: 30),
 
-              // Account Options
               _buildSectionHeader('Orders'),
-              _buildOptionTile(
-                context,
-                title: 'My Orders',
-                icon: Icons.shopping_bag_outlined,
-                route: AppRoutes.orderStatus,
+
+              ListTile(
+                leading: const Icon(Icons.shopping_bag_outlined, color: AppColors.primary),
+                title: const Text('My Orders'),
+                trailing: const Icon(Icons.chevron_right),
+                onTap: () {
+                  Navigator.pushNamed(context, AppRoutes.myOrders);
+                },
               ),
-              _buildOptionTile(
-                context,
-                title: 'Track Order',
-                icon: Icons.delivery_dining,
-                route: AppRoutes.trackOrder,
+
+              ListTile(
+                leading: const Icon(Icons.delivery_dining, color: AppColors.primary),
+                title: const Text('Track Order'),
+                trailing: const Icon(Icons.chevron_right),
+                onTap: () async {
+                  final uid = FirebaseAuth.instance.currentUser?.uid;
+                  if (uid == null) return;
+
+                  final orders = await FirebaseFirestore.instance
+                      .collection('orders')
+                      .where('userID', isEqualTo: uid)
+                      .orderBy('timestamp', descending: true)
+                      .limit(1)
+                      .get();
+
+                  if (orders.docs.isNotEmpty) {
+                    final orderId = orders.docs.first.id;
+                    Navigator.pushNamed(context, AppRoutes.trackOrder, arguments: orderId);
+                  } else {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text("No orders available to track.")),
+                    );
+                  }
+                },
               ),
 
               const Divider(height: 40),

@@ -5,48 +5,43 @@ import 'package:souqe/constants/app_images.dart';
 import 'package:souqe/constants/app_routes.dart';
 
 class OrderStatusScreen extends StatefulWidget {
-  final String? orderId;
-  final bool isSuccess;
-  
-  const OrderStatusScreen({
-    super.key, 
-    this.orderId, 
-    required this.isSuccess
-  });
+  const OrderStatusScreen({super.key});
 
   @override
   State<OrderStatusScreen> createState() => _OrderStatusScreenState();
 }
 
 class _OrderStatusScreenState extends State<OrderStatusScreen> {
+  late String? orderId;
+  late bool isSuccess;
   late Future<Map<String, dynamic>> _orderFuture;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   @override
-  void initState() {
-    super.initState();
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final args = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
+
+    if (args == null || !args.containsKey('orderId') || !args.containsKey('success')) {
+      debugPrint('Missing order arguments. Popping screen...');
+      Navigator.pop(context);
+      return;
+    }
+
+    orderId = args['orderId'];
+    isSuccess = args['success'];
     _orderFuture = _fetchOrderDetails();
   }
 
   Future<Map<String, dynamic>> _fetchOrderDetails() async {
     try {
-      if (widget.orderId == null) {
-        throw Exception('No order ID provided');
-      }
-
-      final doc = await _firestore
-          .collection('orders')
-          .doc(widget.orderId)
-          .get();
-
-      if (!doc.exists) {
-        throw Exception('Order not found');
-      }
-
+      if (orderId == null) throw Exception('No order ID provided');
+      final doc = await _firestore.collection('orders').doc(orderId).get();
+      if (!doc.exists) throw Exception('Order not found');
       return doc.data()!;
     } catch (e) {
       debugPrint('Error fetching order: $e');
-      rethrow;
+      throw e;
     }
   }
 
@@ -66,15 +61,14 @@ class _OrderStatusScreenState extends State<OrderStatusScreen> {
             if (snapshot.connectionState == ConnectionState.waiting) {
               return _buildLoadingDialog();
             }
-
             if (snapshot.hasError) {
               return _buildErrorDialog(context, snapshot.error.toString());
             }
 
             final orderData = snapshot.data!;
-            final isSuccess = widget.isSuccess && orderData['status'] != 'failed';
-            
-            return isSuccess 
+            final showSuccess = isSuccess && orderData['status'] != 'failed';
+
+            return showSuccess
                 ? _buildSuccessDialog(context, orderData)
                 : _buildFailureDialog(context, orderData);
           },
@@ -115,11 +109,7 @@ class _OrderStatusScreenState extends State<OrderStatusScreen> {
               style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
             ),
             const SizedBox(height: 8),
-            Text(
-              error,
-              textAlign: TextAlign.center,
-              style: const TextStyle(color: Colors.red),
-            ),
+            Text(error, textAlign: TextAlign.center, style: const TextStyle(color: Colors.red)),
             const SizedBox(height: 24),
             ElevatedButton(
               onPressed: () => Navigator.pop(context),
@@ -163,9 +153,9 @@ class _OrderStatusScreenState extends State<OrderStatusScreen> {
               width: double.infinity,
               child: ElevatedButton(
                 onPressed: () => Navigator.pushNamed(
-                  context, 
+                  context,
                   AppRoutes.trackOrder,
-                  arguments: widget.orderId,
+                  arguments: orderId,
                 ),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppColors.primary,
@@ -218,10 +208,7 @@ class _OrderStatusScreenState extends State<OrderStatusScreen> {
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
-                onPressed: () {
-                  // Implement retry logic here
-                  Navigator.pop(context);
-                },
+                onPressed: () => Navigator.pop(context),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppColors.primary,
                   padding: const EdgeInsets.symmetric(vertical: 16),

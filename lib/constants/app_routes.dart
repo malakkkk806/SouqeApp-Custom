@@ -26,6 +26,5 @@ class AppRoutes {
   static const String notifications = '/notifications';
   static const String help = '/help';
   static const String about = '/about';
-  
-  // Add more routes as needed
+  static const myOrders = '/myOrders';
 }
