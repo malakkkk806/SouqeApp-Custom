@@ -1,4 +1,4 @@
-import 'cart_item.dart';
+import "package:souqe/models/cart_item.dart";
 
 class Order {
   final String id;
@@ -38,6 +38,7 @@ class Order {
                 price: item['price'],
                 imageUrl: item['imageUrl'],
                 quantity: item['quantity'],
+                category: item['category'],
                 allergens: List<String>.from(item['allergens']),
               ))
           .toList(),

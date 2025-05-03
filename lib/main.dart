@@ -3,6 +3,8 @@ import 'package:flutter/services.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:provider/provider.dart';
 
+
+
 // import 'firebase_options.dart';
 import 'constants/app_routes.dart';
 import 'constants/colors.dart';
@@ -26,6 +28,7 @@ import 'screens/profile/account_screen.dart';
 
 // Providers
 import 'providers/cart_provider.dart';
+import 'providers/favorites_provider.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -45,6 +48,7 @@ Future<void> main() async {
     MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => CartProvider()),
+        ChangeNotifierProvider(create: (_) => FavoritesProvider()),
       ],
       child: const MyApp(),
     ),

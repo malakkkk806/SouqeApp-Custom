@@ -1,20 +1,23 @@
+
 class CartItem {
   final String productId;
   final String name;
   final double price;
   final String imageUrl;
+  final String category;
   int quantity;
   final List<String> allergens;
-  final bool isSelected; // Add this field
+  final bool isSelected;
 
   CartItem({
     required this.productId,
     required this.name,
     required this.price,
     required this.imageUrl,
-    this.quantity = 1,
+    required this.category,
     required this.allergens,
-    this.isSelected = false, // Initialize with default value
+    this.quantity = 1,
+    this.isSelected = true,
   });
 
   double get totalPrice => price * quantity;
@@ -24,9 +27,10 @@ class CartItem {
         'name': name,
         'price': price,
         'imageUrl': imageUrl,
+        'category': category,
         'quantity': quantity,
         'allergens': allergens,
-        'isSelected': isSelected, // Add to JSON
+        'isSelected': isSelected,
       };
 
   factory CartItem.fromJson(Map<String, dynamic> json) => CartItem(
@@ -34,9 +38,10 @@ class CartItem {
         name: json['name'] as String,
         price: (json['price'] as num).toDouble(),
         imageUrl: json['imageUrl'] as String,
+        category: json['category'] as String,
         quantity: (json['quantity'] as num).toInt(),
         allergens: (json['allergens'] as List<dynamic>).cast<String>(),
-        isSelected: json['isSelected'] as bool? ?? false, // Handle null case
+        isSelected: json['isSelected'] as bool? ?? true,
       );
 
   CartItem copyWith({
@@ -44,18 +49,20 @@ class CartItem {
     String? name,
     double? price,
     String? imageUrl,
+    String? category,
     int? quantity,
     List<String>? allergens,
-    bool? isSelected, // Add to copyWith
+    bool? isSelected,
   }) {
     return CartItem(
       productId: productId ?? this.productId,
       name: name ?? this.name,
       price: price ?? this.price,
       imageUrl: imageUrl ?? this.imageUrl,
+      category: category ?? this.category,
       quantity: quantity ?? this.quantity,
       allergens: allergens ?? List.from(this.allergens),
-      isSelected: isSelected ?? this.isSelected, // Include in copy
+      isSelected: isSelected ?? this.isSelected,
     );
   }
 
@@ -68,4 +75,18 @@ class CartItem {
 
   @override
   int get hashCode => productId.hashCode;
+
+  @override
+  String toString() {
+    return 'CartItem{'
+        'productId: $productId, '
+        'name: $name, '
+        'price: $price, '
+        'imageUrl: $imageUrl, '
+        'category: $category, '
+        'quantity: $quantity, '
+        'allergens: $allergens, '
+        'isSelected: $isSelected'
+        '}';
+  }
 }

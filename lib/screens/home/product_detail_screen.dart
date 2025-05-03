@@ -7,6 +7,8 @@ import 'package:souqe/models/product.dart';
 import 'package:souqe/mock/dummy_products.dart';
 import 'package:souqe/providers/cart_provider.dart';
 import 'package:souqe/models/cart_item.dart';
+import 'package:souqe/providers/favorites_provider.dart';
+import 'package:souqe/models/product.dart';
 
 class ProductDetailScreen extends StatefulWidget {
   final Product product;
@@ -56,6 +58,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
       name: product.name,
       price: product.price,
       imageUrl: product.imageUrl,
+      category: product.categories.join(', '),
       quantity: quantity,
       allergens: product.allergens,
     );
@@ -156,9 +159,16 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
         ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.favorite_border, color: Colors.black),
-            tooltip: 'Add to Favorites',
-            onPressed: () {},
+            icon: Icon(
+              Provider.of<FavoritesProvider>(context).isFavorite(product.id)
+                  ? Icons.favorite
+                  : Icons.favorite_border,
+              color: Colors.red,
+            ),
+            onPressed: () {
+              Provider.of<FavoritesProvider>(context, listen: false)
+                  .toggleFavorite(product);
+            },
           ),
         ],
       ),
@@ -292,7 +302,6 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                             ),
                           ],
                         ),
-
                         const SizedBox(height: 24),
 
                         // Product Details Section

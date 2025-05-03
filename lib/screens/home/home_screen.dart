@@ -2,12 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:souqe/constants/app_images.dart';
 import 'package:souqe/constants/colors.dart';
-import 'package:souqe/widgets/common/bottom_nav_bar.dart';
-import 'package:souqe/screens/home/product_detail_screen.dart';
 import 'package:souqe/models/product.dart';
 import 'package:souqe/providers/cart_provider.dart';
 import 'package:souqe/models/cart_item.dart';
 import 'package:souqe/screens/cart/cart_screen.dart';
+import 'package:souqe/screens/home/product_detail_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -83,7 +82,7 @@ class _HomeScreenState extends State<HomeScreen> {
       case 1:
         return const Center(child: Text("Explore Screen"));
       case 2:
-        return const CartScreen(); // Now using actual CartScreen
+        return const CartScreen();
       case 3:
         return const Center(child: Text("Favourite Screen"));
       case 4:
@@ -162,19 +161,25 @@ class _HomeScreenState extends State<HomeScreen> {
                           color: AppColors.primary,
                         ),
                       ),
-                      IconButton(
+                       IconButton(
                         icon: const Icon(Icons.add_circle_outline,
                             color: AppColors.primary),
                         onPressed: () {
                           final cart = Provider.of<CartProvider>(context, listen: false);
-                          cart.addItem(CartItem(
-                            productId: product.id,
-                            name: product.name,
-                            price: product.price,
-                            imageUrl: product.imageUrl,
-                            allergens: product.allergens,
-                            quantity: 1,
-                          ));
+                          cart.addItem(
+                            CartItem(
+                               productId: product.id,
+                               name: product.name,
+                               price: product.price,
+                               category: product.categories.isNotEmpty 
+                                  ? product.categories.first 
+                                  : 'Uncategorized',
+                               imageUrl: product.imageUrl,
+                               allergens: product.allergens,
+                               quantity: 1,
+                      ),
+                      productId: product.id, // This matches your CartProvider's addItem signature
+                         );
                           
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
@@ -372,9 +377,31 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       backgroundColor: AppColors.background,
       body: _buildTabScreen(),
-      bottomNavigationBar: BottomNavBar(
+      bottomNavigationBar: BottomNavigationBar(
         currentIndex: _currentIndex,
         onTap: (index) => setState(() => _currentIndex = index),
+        items: const [
+          BottomNavigationBarItem(
+            icon: Icon(Icons.store),
+            label: 'Shop',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.explore),
+            label: 'Explore',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.shopping_cart),
+            label: 'Cart',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.favorite),
+            label: 'Favorites',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.person),
+            label: 'Account',
+          ),
+        ],
       ),
     );
   }

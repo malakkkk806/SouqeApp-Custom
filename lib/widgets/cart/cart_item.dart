@@ -4,16 +4,18 @@ import 'package:souqe/models/product.dart';
 
 class CartItem extends StatelessWidget {
   final Product product;
+  final String name;
   final int quantity;
   final VoidCallback onRemove;
   final VoidCallback onAdd;
-
+  final String category; // Add this
   const CartItem({
     super.key,
     required this.product,
     required this.quantity,
     required this.onRemove,
     required this.onAdd,
+    required this.name, required this.category,
   });
 
   @override
