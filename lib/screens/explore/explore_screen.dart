@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:souqe/constants/colors.dart';
+import 'package:souqe/mock/explore_categories.dart';
 import 'package:souqe/models/category.dart';
 import 'package:souqe/widgets/explore/explore_card.dart';
-import 'package:souqe/screens/category_products_screen.dart'; // Import CategoryProductsScreen
+import 'package:souqe/screens/explore/category_products_screen.dart'; // Import CategoryProductsScreen
 
 class ExploreScreen extends StatefulWidget {
   const ExploreScreen({super.key});

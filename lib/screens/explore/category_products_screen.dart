@@ -11,7 +11,7 @@ class CategoryProductsScreen extends StatelessWidget {
   const CategoryProductsScreen({super.key, required this.category});
 
   @override
-  Widget build(BuildContext context) {
+  Future<Widget> build(BuildContext context) async {
     final productProvider = Provider.of<ProductProvider>(context);
     
     // Filter products by category
@@ -22,10 +22,10 @@ class CategoryProductsScreen extends StatelessWidget {
         title: Text(category.title),
         backgroundColor: AppColors.primary,
       ),
-      body: categoryProducts.isEmpty
+      body: await categoryProducts.isEmpty
           ? const Center(child: Text('No products available in this category.'))
           : ListView.builder(
-              itemCount: categoryProducts.length,
+              itemCount: await categoryProducts.length,
               itemBuilder: (ctx, index) {
                 final product = categoryProducts[index];
                 return ListTile(

@@ -1,3 +1,4 @@
+
 class Category {
   final String title;
   final String image;
@@ -8,4 +9,6 @@ class Category {
     required this.image,
     required this.bgColor,
   });
+
+  static Stream<List<Category>> fromJson(Map<String, dynamic> data) {}
 }
