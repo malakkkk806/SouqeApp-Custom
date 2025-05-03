@@ -3,8 +3,6 @@ import 'package:flutter/services.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:provider/provider.dart';
 
-
-
 // import 'firebase_options.dart';
 import 'constants/app_routes.dart';
 import 'constants/colors.dart';

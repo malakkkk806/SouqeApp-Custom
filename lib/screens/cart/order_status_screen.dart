@@ -46,7 +46,7 @@ class _OrderStatusScreenState extends State<OrderStatusScreen> {
       return doc.data()!;
     } catch (e) {
       debugPrint('Error fetching order: $e');
-      throw e;
+      rethrow;
     }
   }
 

@@ -1,15 +1,66 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:souqe/constants/colors.dart';
 import 'package:souqe/constants/app_images.dart';
 import 'package:souqe/constants/app_routes.dart';
+import 'package:souqe/providers/cart_provider.dart';
 
-class CheckoutModal extends StatelessWidget {
-  final double totalAmount; // Add this parameter
+class CheckoutModal extends StatefulWidget {
+  final double totalAmount;
 
   const CheckoutModal({
     super.key,
-    required this.totalAmount, // Make it required
+    required this.totalAmount,
   });
+
+  @override
+  State<CheckoutModal> createState() => _CheckoutModalState();
+}
+
+class _CheckoutModalState extends State<CheckoutModal> {
+  String _selectedDelivery = 'Standard Delivery';
+  String _selectedPayment = 'Mastercard';
+
+  void _selectDeliveryMethod() {
+    showModalBottomSheet(
+      context: context,
+      builder: (_) {
+        return Column(
+          mainAxisSize: MainAxisSize.min,
+          children: ['Standard Delivery', 'Express Delivery'].map((method) {
+            return ListTile(
+              title: Text(method),
+              onTap: () {
+                setState(() => _selectedDelivery = method);
+                Navigator.pop(context);
+              },
+            );
+          }).toList(),
+        );
+      },
+    );
+  }
+
+  void _selectPaymentMethod() {
+    showModalBottomSheet(
+      context: context,
+      builder: (_) {
+        return Column(
+          mainAxisSize: MainAxisSize.min,
+          children: ['Mastercard', 'PayPal', 'Cash on Delivery'].map((method) {
+            return ListTile(
+              title: Text(method),
+              onTap: () {
+                setState(() => _selectedPayment = method);
+                Navigator.pop(context);
+              },
+            );
+          }).toList(),
+        );
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -41,32 +92,25 @@ class CheckoutModal extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 8),
-
-          _buildRow(title: 'Delivery', value: 'Select Method', onTap: () {}),
-          const Divider(height: 28),
-
           _buildRow(
-            title: 'Payment',
-            valueWidget: Image.asset(
-              AppImages.mastercard,
-              height: 20,
-              width: 28,
-            ),
-            onTap: () {},
+            title: 'Delivery',
+            value: _selectedDelivery,
+            onTap: _selectDeliveryMethod,
           ),
           const Divider(height: 28),
-
-          _buildRow(title: 'Promo Code', value: 'Pick discount', onTap: () {}),
+          _buildRow(
+            title: 'Payment',
+            value: _selectedPayment,
+            onTap: _selectPaymentMethod,
+          ),
           const Divider(height: 28),
-
           _buildRow(
             title: 'Total Cost',
-            value: '\$${totalAmount.toStringAsFixed(2)}', // Use the passed totalAmount
+            value: '\$${widget.totalAmount.toStringAsFixed(2)}',
             onTap: () {},
             isBold: true,
           ),
           const SizedBox(height: 20),
-
           Padding(
             padding: const EdgeInsets.only(bottom: 16),
             child: RichText(
@@ -90,17 +134,43 @@ class CheckoutModal extends StatelessWidget {
               ),
             ),
           ),
-
           SizedBox(
             width: double.infinity,
             child: ElevatedButton(
-              onPressed: () {
-                Navigator.pop(context); // Close modal first
-                Navigator.pushNamed(
-                  context,
-                  AppRoutes.orderStatus,
-                  arguments: {'success': true},
-                );
+              onPressed: () async {
+                Navigator.pop(context);
+                final cart = Provider.of<CartProvider>(context, listen: false);
+
+                try {
+                  final orderId = FirebaseFirestore.instance.collection('orders').doc().id;
+                  final orderData = {
+                    'orderId': orderId,
+                    'items': cart.items.values.map((item) => item.toJson()).toList(),
+                    'total': widget.totalAmount,
+                    'deliveryMethod': _selectedDelivery,
+                    'paymentMethod': _selectedPayment,
+                    'status': 'pending',
+                    'timestamp': FieldValue.serverTimestamp(),
+                  };
+
+                  await FirebaseFirestore.instance
+                      .collection('orders')
+                      .doc(orderId)
+                      .set(orderData);
+
+                  cart.clearCart();
+
+                  Navigator.pushNamed(
+                    context,
+                    AppRoutes.orderStatus,
+                    arguments: {'orderId': orderId, 'success': true},
+                  );
+                } catch (e) {
+                  debugPrint('Error placing order: $e');
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Failed to place order. Please try again.')),
+                  );
+                }
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.primary,
