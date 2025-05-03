@@ -26,6 +26,7 @@ import 'screens/profile/account_screen.dart';
 
 // Providers
 import 'providers/cart_provider.dart';
+import 'providers/favorites_provider.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -45,6 +46,7 @@ Future<void> main() async {
     MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => CartProvider()),
+        ChangeNotifierProvider(create: (_) => FavoritesProvider()),
       ],
       child: const MyApp(),
     ),

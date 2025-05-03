@@ -6,7 +6,8 @@ import 'package:souqe/constants/colors.dart';
 import 'package:souqe/models/product.dart';
 import 'package:souqe/mock/dummy_products.dart';
 import 'package:souqe/providers/cart_provider.dart';
-import 'package:souqe/models/cart_item.dart';
+import 'package:souqe/models/cart_item_model.dart';
+import 'package:souqe/providers/favorites_provider.dart';
 
 class ProductDetailScreen extends StatefulWidget {
   final Product product;
@@ -56,6 +57,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
       name: product.name,
       price: product.price,
       imageUrl: product.imageUrl,
+      category: product.categories.join(', '),
       quantity: quantity,
       allergens: product.allergens,
     );
@@ -64,7 +66,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
     debugPrint('Attempting to add: ${cartItem.toString()}');
 
     // Add to cart
-    cart.addItem(cartItem);
+    cart.addItem(cartItem, productId: '');
 
     // Verify addition
     if (!cart.items.containsKey(product.id)) {
@@ -156,9 +158,16 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
         ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.favorite_border, color: Colors.black),
-            tooltip: 'Add to Favorites',
-            onPressed: () {},
+            icon: Icon(
+              Provider.of<FavoritesProvider>(context).isFavorite(product.id)
+                  ? Icons.favorite
+                  : Icons.favorite_border,
+              color: Colors.red,
+            ),
+            onPressed: () {
+              Provider.of<FavoritesProvider>(context, listen: false)
+                  .toggleFavorite(product);
+            },
           ),
         ],
       ),
@@ -292,7 +301,6 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                             ),
                           ],
                         ),
-
                         const SizedBox(height: 24),
 
                         // Product Details Section

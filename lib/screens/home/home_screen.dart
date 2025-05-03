@@ -5,13 +5,15 @@ import 'package:provider/provider.dart';
 import 'package:souqe/constants/app_images.dart';
 import 'package:souqe/constants/colors.dart';
 import 'package:souqe/screens/explore/explore_screen.dart';
+import 'package:souqe/screens/favourite/favourite_screen.dart';
 import 'package:souqe/widgets/common/bottom_nav_bar.dart';
 import 'package:souqe/screens/home/product_detail_screen.dart';
 import 'package:souqe/models/product.dart';
 import 'package:souqe/providers/cart_provider.dart';
-import 'package:souqe/models/cart_item.dart';
+import 'package:souqe/models/cart_item_model.dart';
 import 'package:souqe/screens/cart/cart_screen.dart';
 import 'package:souqe/screens/profile/account_screen.dart';
+import 'package:souqe/models/product.dart';
 
 
 class HomeScreen extends StatefulWidget {
@@ -239,7 +241,7 @@ class _HomeScreenState extends State<HomeScreen> {
         );
       },
       child: Card(
-        elevation: 1,
+        elevation: 2,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(12),
         ),
@@ -351,8 +353,10 @@ class _HomeScreenState extends State<HomeScreen> {
                             price: product.price,
                             imageUrl: product.imageUrl,
                             allergens: product.allergens,
-                            quantity: 1,
-                          ));
+                            quantity: 1, 
+                            category: '',
+                          ), 
+                          productId: '');
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
                               content: Text(
@@ -388,6 +392,70 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
+  Widget _buildCategoryChips() {
+    final categories = [
+      {
+        'title': 'Pulses',
+        'color': AppColors.surface,
+        'icon': AppImages.pulses,
+      },
+      {
+        'title': 'Rice',
+        'color': AppColors.secondary.withOpacity(0.15),
+        'icon': AppImages.rice,
+      },
+      {
+        'title': 'Oils',
+        'color': AppColors.primaryLight.withOpacity(0.1),
+        'icon': AppImages.oil,
+      },
+    ];
+
+    return SizedBox(
+      height: 100,
+      child: ListView.separated(
+        scrollDirection: Axis.horizontal,
+        itemCount: categories.length,
+        separatorBuilder: (_, __) => const SizedBox(width: 34),
+        itemBuilder: (context, index) {
+          final category = categories[index];
+          return Container(
+            width: 160,
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: category['color'] as Color,
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: Row(
+              children: [
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(12),
+                  child: Image.asset(
+                    category['icon'] as String,
+                    width: 50,
+                    height: 50,
+                    fit: BoxFit.cover,
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Text(
+                    category['title'] as String,
+                    style: const TextStyle(
+                      fontFamily: 'Inter',
+                      fontSize: 18,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          );
+        },
+      ),
+    );
+  }
+
   Widget _buildTabScreen() {
     switch (_currentIndex) {
       case 0:
@@ -397,7 +465,7 @@ class _HomeScreenState extends State<HomeScreen> {
       case 2:
         return const CartScreen();
       case 3:
-        //return const FavouriteScreen();
+        return const FavoritesScreen();
       case 4:
         return AccountScreen(userAddress: _currentAddress);
       default:
@@ -410,9 +478,10 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       backgroundColor: AppColors.background,
       body: _buildTabScreen(),
-      bottomNavigationBar: BottomNavBar(
+      bottomNavigationBar: BottomNavigationBar(
         currentIndex: _currentIndex,
-        onTap: (index) => setState(() => _currentIndex = index),
+        onTap: (index) => setState(() => _currentIndex = index), 
+        items: [],
       ),
     );
   }
