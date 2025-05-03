@@ -14,7 +14,7 @@ final List<Category> exploreCategories = [
   ),
   Category(
     title: 'Meat & Fish',
-    image: 'assets/images/meat.png',
+    image: 'assets/images/beef.png',
     bgColor: const Color(0xFFFFEBEB),
   ),
   Category(

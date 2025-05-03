@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import '../../mock/explore_categories.dart';
-import '../../constants/colors.dart';
-import '../../widgets/explore/explore_card.dart';
+import 'package:souqe/models/category.dart';
+import 'package:souqe/widgets/explore/explore_card.dart';
+import 'package:souqe/screens/category_products_screen.dart'; // Import CategoryProductsScreen
 
 class ExploreScreen extends StatefulWidget {
   const ExploreScreen({super.key});
@@ -11,7 +11,6 @@ class ExploreScreen extends StatefulWidget {
 }
 
 class _ExploreScreenState extends State<ExploreScreen> {
-  
 
   @override
   Widget build(BuildContext context) {
@@ -62,7 +61,17 @@ class _ExploreScreenState extends State<ExploreScreen> {
                   itemBuilder: (context, index) {
                     return ExploreCard(
                       category: exploreCategories[index],
-                      onTap: () {}, // Added required onTap parameter
+                      onTap: () {
+                        // Navigate to CategoryProductsScreen on tap
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => CategoryProductsScreen(
+                              category: exploreCategories[index],
+                            ),
+                          ),
+                        );
+                      },
                     );
                   },
                 ),
@@ -71,7 +80,6 @@ class _ExploreScreenState extends State<ExploreScreen> {
           ],
         ),
       ),
-    
     );
   }
 }
