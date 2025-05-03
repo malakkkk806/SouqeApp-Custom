@@ -4,7 +4,12 @@ import 'package:souqe/constants/app_images.dart';
 import 'package:souqe/constants/app_routes.dart';
 
 class CheckoutModal extends StatelessWidget {
-  const CheckoutModal({super.key});
+  final double totalAmount; // Add this parameter
+
+  const CheckoutModal({
+    super.key,
+    required this.totalAmount, // Make it required
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -56,7 +61,7 @@ class CheckoutModal extends StatelessWidget {
 
           _buildRow(
             title: 'Total Cost',
-            value: '\$13.97',
+            value: '\$${totalAmount.toStringAsFixed(2)}', // Use the passed totalAmount
             onTap: () {},
             isBold: true,
           ),
@@ -94,10 +99,9 @@ class CheckoutModal extends StatelessWidget {
                 Navigator.pushNamed(
                   context,
                   AppRoutes.orderStatus,
-                  arguments: {'success': true}, // or false if failed
+                  arguments: {'success': true},
                 );
               },
-
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.primary,
                 shape: RoundedRectangleBorder(
