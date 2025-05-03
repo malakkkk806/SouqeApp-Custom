@@ -3,7 +3,6 @@ import 'package:provider/provider.dart';
 import 'package:souqe/providers/cart_provider.dart';
 import 'package:souqe/constants/colors.dart';
 import 'package:souqe/models/cart_item_model.dart';
-import 'package:souqe/widgets/cart/cart_item.dart';
 
 class CartScreen extends StatefulWidget {
   const CartScreen({super.key});

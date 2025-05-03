@@ -7,7 +7,6 @@ import 'package:souqe/models/product.dart';
 import 'package:souqe/providers/cart_provider.dart';
 import 'package:souqe/providers/product_provider.dart';
 import 'package:souqe/models/cart_item_model.dart';
-import 'package:souqe/widgets/cart/cart_item.dart';
 import 'package:souqe/providers/favorites_provider.dart';
 
 class ProductDetailScreen extends StatefulWidget {
@@ -49,37 +48,17 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
       final cart = Provider.of<CartProvider>(context, listen: false);
       final product = widget.product;
 
-      if (product.id.isEmpty) throw Exception('Product ID is empty');
-      if (quantity <= 0) throw Exception('Quantity must be at least 1');
-      if (product.price <= 0) throw Exception('Invalid product price');
-
       final cartItem = CartItem(
         productId: product.id,
         name: product.name,
         price: product.price,
         imageUrl: product.imageUrl,
+        category: product.category,
         quantity: quantity,
         allergens: product.allergens,
       );
 
-      final cartItem = CartItem(
-        productId: product.id,
-        name: product.name,
-        price: product.price,
-        imageUrl: product.imageUrl,
-        category: product.categories.join(', '),
-        quantity: quantity,
-        allergens: product.allergens,
-      );
-
-      cart.addItem(cartItem);
-
-      if (!cart.items.containsKey(product.id)) {
-        throw Exception('Item not found in cart after addition');
-      }
-
-      // Add to cart
-      cart.addItem(cartItem, productId: '');
+      cart.addItem(cartItem, productId: cartItem.productId);
 
       setState(() => isAddedToCart = true);
 
@@ -145,10 +124,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
   @override
   Widget build(BuildContext context) {
     final product = widget.product;
-    final productProvider = Provider.of<ProductProvider>(
-      context,
-      listen: false,
-    );
+    final productProvider = Provider.of<ProductProvider>(context, listen: false);
 
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -180,7 +156,6 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
         children: [
           Column(
             children: [
-              // Product Image
               Container(
                 height: 140,
                 width: double.infinity,
@@ -193,14 +168,10 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                   ),
                 ),
               ),
-
               if (product.allergens.isNotEmpty)
                 Container(
                   margin: const EdgeInsets.symmetric(vertical: 12),
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 12,
-                    vertical: 6,
-                  ),
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                   decoration: BoxDecoration(
                     color: Colors.red.shade100,
                     borderRadius: BorderRadius.circular(8),
@@ -215,15 +186,10 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                     ),
                   ),
                 ),
-
               const SizedBox(height: 16),
-
               Expanded(
                 child: Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 16,
-                    vertical: 12,
-                  ),
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                   child: SingleChildScrollView(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -239,9 +205,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                             ),
                           ),
                         ),
-
                         const SizedBox(height: 8),
-
                         Text(
                           product.description,
                           style: const TextStyle(
@@ -250,9 +214,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                             color: AppColors.textMedium,
                           ),
                         ),
-
                         const SizedBox(height: 16),
-
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
@@ -300,7 +262,6 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                           ],
                         ),
                         const SizedBox(height: 24),
-
                         const Text(
                           'Product Detail',
                           style: TextStyle(
@@ -310,17 +271,15 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                           ),
                         ),
                         const SizedBox(height: 8),
-                        const Text(
-                          'Apples are nutritious. Apples may be good for weight loss. Apples may be good for your heart. As part of a healthful and varied diet.',
-                          style: TextStyle(
+                        Text(
+                          product.description,
+                          style: const TextStyle(
                             fontSize: 14,
                             color: AppColors.textMedium,
                             fontFamily: 'Inter',
                           ),
                         ),
-
                         const SizedBox(height: 24),
-
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
@@ -333,27 +292,19 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                               ),
                             ),
                             Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 8,
-                                vertical: 4,
-                              ),
+                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                               decoration: BoxDecoration(
                                 color: AppColors.surface,
                                 borderRadius: BorderRadius.circular(8),
                               ),
                               child: const Text(
                                 '100gr',
-                                style: TextStyle(
-                                  fontSize: 14,
-                                  fontFamily: 'Inter',
-                                ),
+                                style: TextStyle(fontSize: 14, fontFamily: 'Inter'),
                               ),
                             ),
                           ],
                         ),
-
                         const SizedBox(height: 24),
-
                         const Text(
                           'Review',
                           style: TextStyle(
@@ -368,23 +319,19 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                             5,
                             (index) => Icon(
                               Icons.star,
-                              color:
-                                  index < product.rating.floor()
-                                      ? Colors.orange
-                                      : Colors.grey.shade300,
+                              color: index < product.rating.floor()
+                                  ? Colors.orange
+                                  : Colors.grey.shade300,
                               size: 20,
                             ),
                           ),
                         ),
-
                         const SizedBox(height: 32),
-
                         SizedBox(
                           width: double.infinity,
                           child: ElevatedButton(
                             onPressed: () {
-                              if (product.allergens.isNotEmpty &&
-                                  !hasSeenWarning) {
+                              if (product.allergens.isNotEmpty && !hasSeenWarning) {
                                 _showAllergenWarning();
                               } else {
                                 _addToCart();
@@ -392,18 +339,14 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                             },
                             style: ElevatedButton.styleFrom(
                               backgroundColor:
-                                  isAddedToCart
-                                      ? Colors.green
-                                      : AppColors.primary,
+                                  isAddedToCart ? Colors.green : AppColors.primary,
                               padding: const EdgeInsets.symmetric(vertical: 16),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(12),
                               ),
                             ),
                             child: Text(
-                              isAddedToCart
-                                  ? '✓ Added to Cart'
-                                  : 'Add To Basket',
+                              isAddedToCart ? '✓ Added to Cart' : 'Add To Basket',
                               style: const TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.bold,
@@ -421,7 +364,6 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
               ),
             ],
           ),
-
           if (showSuggestion && product.suggestedProductId != null)
             Positioned(
               bottom: 20,
@@ -439,14 +381,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder:
-                              (_) => ChangeNotifierProvider.value(
-                                value: Provider.of<CartProvider>(
-                                  context,
-                                  listen: false,
-                                ),
-                                child: ProductDetailScreen(product: suggested),
-                              ),
+                          builder: (_) => ProductDetailScreen(product: suggested),
                         ),
                       );
                     }
@@ -454,29 +389,18 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                   child: Container(
                     padding: const EdgeInsets.all(12),
                     width: 220,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
                     child: Row(
                       children: [
-                        const Icon(
-                          Icons.info_outline,
-                          color: AppColors.primary,
-                        ),
+                        const Icon(Icons.info_outline, color: AppColors.primary),
                         const SizedBox(width: 8),
                         Expanded(
                           child: Text(
                             'You may also like: ${productProvider.getProductByName(product.suggestedProductId!)?.name ?? ''}',
-                            style: const TextStyle(
-                              fontSize: 13,
-                              fontFamily: 'Inter',
-                            ),
+                            style: const TextStyle(fontSize: 13, fontFamily: 'Inter'),
                           ),
                         ),
                         GestureDetector(
-                          onTap: () {
-                            setState(() => showSuggestion = false);
-                          },
+                          onTap: () => setState(() => showSuggestion = false),
                           child: const Padding(
                             padding: EdgeInsets.only(left: 6),
                             child: Icon(Icons.close, size: 16),

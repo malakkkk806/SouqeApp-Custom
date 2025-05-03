@@ -7,15 +7,12 @@ import 'package:souqe/constants/colors.dart';
 import 'package:souqe/screens/explore/explore_screen.dart';
 import 'package:souqe/screens/profile/account_screen.dart';
 import 'package:souqe/screens/favourite/favourite_screen.dart';
-import 'package:souqe/widgets/common/bottom_nav_bar.dart';
 import 'package:souqe/screens/home/product_detail_screen.dart';
 import 'package:souqe/models/product.dart';
 import 'package:souqe/providers/cart_provider.dart';
 import 'package:souqe/models/cart_item_model.dart';
 import 'package:souqe/screens/cart/cart_screen.dart';
 import 'package:souqe/utils/product_upload.dart';
-import 'package:souqe/screens/profile/account_screen.dart';
-import 'package:souqe/models/product.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
