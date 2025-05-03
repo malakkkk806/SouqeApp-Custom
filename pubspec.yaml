@@ -80,6 +80,10 @@ flutter:
     - assets/fonts/
     - assets/icon/icon.png
     - assets/icon/account.png
+    - assets/images/beverages.png
+    - assets/images/milk.png
+    - assets/images/bakery.png
+    - assets/images/fruits.png
   fonts:
     - family: Montserrat
       fonts:
