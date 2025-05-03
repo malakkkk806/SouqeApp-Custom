@@ -29,7 +29,6 @@ class _HomeScreenState extends State<HomeScreen> {
   String _currentAddress = 'Fetching location...';
 
   final Set<String> _favoriteProductIds = {};
-  final String _currentAddress = 'Fetching location...';
 
 
   final List<Product> products = [
