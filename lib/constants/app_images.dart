@@ -21,5 +21,7 @@ class AppImages {
   static const String deliveryBike = 'assets/images/delivery_bike.png';
   static const String userProfile = 'assets/images/delivery_bike.png';
   static const String defaultProfile = 'assets/images/user_avatar.png';
+  static const String account = 'assets/icon/account.png';
+
   // Removed duplicate entries and cleaned up naming
 }

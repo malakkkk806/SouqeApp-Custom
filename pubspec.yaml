@@ -76,7 +76,7 @@ flutter:
     - assets/images/delivery_bike.png
     - assets/fonts/
     - assets/icon/icon.png
-    - assets/egyptian_grocery_products.json
+    - assets/icon/account.png
   fonts:
     - family: Montserrat
       fonts:
