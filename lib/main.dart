@@ -102,7 +102,7 @@ class MyApp extends StatelessWidget {
         AppRoutes.favorite: (context) => const FavoritesScreen(),
         AppRoutes.orderStatus: (context) => const OrderStatusScreen(),
         AppRoutes.myOrders: (context) => const MyOrdersScreen(),
-        
+        AppRoutes.selectOrder: (context) => const SelectOrderScreen(),
       },
     );
   }

@@ -27,6 +27,6 @@ class AppRoutes {
   static const String help = '/help';
   static const String about = '/about';
   static const myOrders = '/myOrders';
-  static const String select = '/selectOrder';
+  static const String selectOrder = '/selectOrder';
 
 }
