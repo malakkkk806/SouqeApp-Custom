@@ -20,24 +20,47 @@ class ProductDetailScreen extends StatefulWidget {
 class _ProductDetailScreenState extends State<ProductDetailScreen> {
   int quantity = 1;
   bool hasSeenWarning = false;
+  bool showSuggestion = false;
   bool isAddedToCart = false;
 
   void _showAllergenWarning() {
-    AwesomeDialog(
-      context: context,
-      dialogType: DialogType.warning,
-      animType: AnimType.rightSlide,
-      title: 'Allergen Warning',
-      desc:
-          'This product contains the following allergens:\n\n'
-          '${widget.product.allergens.map((e) => '• $e').join('\n')}',
-      btnOkOnPress: () {
-        setState(() {
-          hasSeenWarning = true;
-        });
-      },
-    ).show();
-  }
+  AwesomeDialog(
+    context: context,
+    dialogType: DialogType.warning,
+    animType: AnimType.rightSlide,
+    titleTextStyle: const TextStyle(
+      fontFamily: 'Montserrat',
+      fontWeight: FontWeight.bold,
+      fontSize: 20,
+      color: AppColors.primary,
+    ),
+    descTextStyle: const TextStyle(
+      fontFamily: 'Inter',
+      fontSize: 14,
+      color: AppColors.textMedium,
+    ),
+    btnOkColor: AppColors.primary,
+    btnOkText: 'Continue',
+    buttonsTextStyle: const TextStyle(
+      fontFamily: 'Inter',
+      fontWeight: FontWeight.bold,
+      color: Colors.white,
+    ),
+    dialogBackgroundColor: AppColors.surface,
+    title: 'Allergen Warning',
+    desc:
+        'This product contains the following allergens:\n\n'
+        '${widget.product.allergens.map((e) => '• $e').join('\n')}',
+    btnOkOnPress: () {
+      setState(() {
+        hasSeenWarning = true;
+        if (widget.product.suggestedProductId != null) {
+          showSuggestion = true;
+        }
+      });
+    },
+  ).show();
+}
 
   Future<void> _addToCart() async {
     try {
@@ -74,7 +97,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
           duration: const Duration(seconds: 2),
           behavior: SnackBarBehavior.floating,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-          backgroundColor: Colors.green,
+          backgroundColor: AppColors.primary,
           action: SnackBarAction(
             label: 'VIEW CART',
             textColor: Colors.white,
@@ -86,7 +109,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Failed to add item: $e'),
-          backgroundColor: Colors.red,
+          backgroundColor: AppColors.primary,
         ),
       );
     }
@@ -147,7 +170,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                 style: TextStyle(
                   fontSize: 12,
                   fontFamily: 'Inter',
-                  color: Colors.red,
+                  color: AppColors.primary,
                   fontWeight: FontWeight.w600,
                 ),
               ),
@@ -280,7 +303,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                         },
                         style: ElevatedButton.styleFrom(
                           backgroundColor:
-                              isAddedToCart ? Colors.green : AppColors.primary,
+                              isAddedToCart ? AppColors.primary : AppColors.primary,
                           padding: const EdgeInsets.symmetric(vertical: 16),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12),
