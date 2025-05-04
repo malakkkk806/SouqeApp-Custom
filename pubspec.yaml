@@ -106,6 +106,21 @@ flutter:
     - assets/images/shampoo.png
     - assets/images/shrimp.png
     - assets/images/toothpaste.png
+    - assets/images/basmati_rice.png
+    - assets/images/blueberry_muffin.png
+    - assets/images/butter_croissant.png
+    - assets/images/health_care.png
+    - assets/images/child_care.png
+    - assets/images/french_baguette.png
+    - assets/images/frozen_foods.png
+    - assets/images/green_peas.png
+    - assets/images/household.png
+    - assets/images/pantry.png
+    - assets/images/snacks.png
+    - assets/images/spaghetti_pasta.png
+    - assets/images/wheat_bread.png
+    - assets/images/spices.png
+    - assets/images/spinach.png
 
   fonts:
     - family: Montserrat
