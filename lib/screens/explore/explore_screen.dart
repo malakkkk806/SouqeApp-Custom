@@ -48,7 +48,7 @@ class ExploreScreen extends StatelessWidget {
                     MaterialPageRoute(
                       builder: (context) => CategoryProductsScreen(
                         category: category,
-                        products: allProducts, // ✅ Pass the list here
+                        products: allProducts,
                       ),
                     ),
                   );

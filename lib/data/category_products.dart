@@ -59,7 +59,7 @@ class FruitsAndVegetables {
         name: "Spinach",
         description: "Fresh organic spinach leaves",
         price: 2.0,
-        imageUrl: "assets/images/spimach.png",
+        imageUrl: "assets/images/spinach.png",
         category: "Fruits & Vegetables",
         stockQuantity: 60,
         isAvailable: true,
@@ -652,7 +652,7 @@ class PetSupplies {
         reviewCount: 100,
         allergens: [],
         relatedProducts: ["Dog Treats", "Chew Toys"],
-        suggestedProductId: null, relatedProduct: [], categoryId: '14'
+        suggestedProductId: null, relatedProduct: [], categoryId: '13'
       )
     ];
   }

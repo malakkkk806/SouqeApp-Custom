@@ -12,7 +12,6 @@ import '/screens/explore/explore_screen.dart';
 import '/screens/cart/cart_screen.dart';
 import '/screens/favourite/favourite_screen.dart';
 import '/screens/profile/account_screen.dart';
-import '/widgets/common/bottom_nav_bar.dart';
 
 class CategoryProductsScreen extends StatefulWidget {
   final Category category;
