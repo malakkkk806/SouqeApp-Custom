@@ -120,6 +120,7 @@ flutter:
     - assets/images/spaghetti_pasta.png
     - assets/images/wheat_bread.png
     - assets/images/spices.png
+    - assets/images/spinach.png
 
   fonts:
     - family: Montserrat
