@@ -7,7 +7,7 @@ class Product {
   final double price;
   final String imageUrl;
   final String category;
-  final String categoryId; // ✅ Add this
+  final String categoryId;
   final int stockQuantity;
   final bool isAvailable;
   final double rating;
@@ -23,7 +23,7 @@ class Product {
     required this.price,
     required this.imageUrl,
     required this.category,
-    required this.categoryId, // ✅ Add this
+    required this.categoryId,
     required this.stockQuantity,
     this.isAvailable = true,
     this.rating = 0.0,
@@ -43,7 +43,7 @@ class Product {
       price: (data['price'] ?? 0).toDouble(),
       imageUrl: data['imageUrl'] ?? '',
       category: data['category'] ?? '',
-      categoryId: data['categoryId'] ?? '', // ✅ Get it from Firestore
+      categoryId: data['categoryId'] ?? '', 
       stockQuantity: data['stockQuantity'] ?? 0,
       isAvailable: data['isAvailable'] ?? true,
       rating: (data['rating'] ?? 0).toDouble(),
@@ -62,7 +62,7 @@ class Product {
       'price': price,
       'imageUrl': imageUrl,
       'category': category,
-      'categoryId': categoryId, // ✅ Include in Firestore data
+      'categoryId': categoryId,
       'stockQuantity': stockQuantity,
       'isAvailable': isAvailable,
       'rating': rating,
@@ -82,7 +82,7 @@ class Product {
       price: map['price'],
       imageUrl: map['imageUrl'],
       category: map['category'],
-      categoryId: map['categoryId'], // ✅ Required
+      categoryId: map['categoryId'],
       stockQuantity: map['stockQuantity'],
       isAvailable: map['isAvailable'],
       rating: map['rating'],
