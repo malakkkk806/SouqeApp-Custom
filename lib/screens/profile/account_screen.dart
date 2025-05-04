@@ -161,25 +161,8 @@ class AccountScreen extends StatelessWidget {
                 leading: const Icon(Icons.delivery_dining, color: AppColors.primary),
                 title: const Text('Track Order'),
                 trailing: const Icon(Icons.chevron_right),
-                onTap: () async {
-                  final uid = FirebaseAuth.instance.currentUser?.uid;
-                  if (uid == null) return;
-
-                  final orders = await FirebaseFirestore.instance
-                      .collection('orders')
-                      .where('userID', isEqualTo: uid)
-                      .orderBy('timestamp', descending: true)
-                      .limit(1)
-                      .get();
-
-                  if (orders.docs.isNotEmpty) {
-                    final orderId = orders.docs.first.id;
-                    Navigator.pushNamed(context, AppRoutes.trackOrder, arguments: orderId);
-                  } else {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text("No orders available to track.")),
-                    );
-                  }
+                onTap: () {
+                  Navigator.pushNamed(context, '/selectOrder');
                 },
               ),
 
@@ -254,20 +237,6 @@ class AccountScreen extends StatelessWidget {
           ),
         ),
       ],
-    );
-  }
-
-  Widget _buildOptionTile(
-    BuildContext context, {
-    required String title,
-    required IconData icon,
-    required String route,
-  }) {
-    return ListTile(
-      leading: Icon(icon, color: AppColors.primary),
-      title: Text(title),
-      trailing: const Icon(Icons.chevron_right),
-      onTap: () => Navigator.pushNamed(context, route),
     );
   }
 
