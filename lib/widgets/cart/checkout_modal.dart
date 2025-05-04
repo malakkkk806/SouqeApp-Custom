@@ -150,11 +150,7 @@ class _CheckoutModalState extends State<CheckoutModal> {
               'timestamp': FieldValue.serverTimestamp(),
             };
 
-            await FirebaseFirestore.instance
-                .collection('orders')
-                .doc(orderId)
-                .set(orderData);
-
+            await FirebaseFirestore.instance.collection('orders').doc(orderId).set(orderData);
             cart.clearCart();
 
             showDialog(
@@ -167,7 +163,7 @@ class _CheckoutModalState extends State<CheckoutModal> {
                   TextButton(
                     onPressed: () {
                       Navigator.pop(context); // Close dialog
-                      Navigator.pop(context); // Close checkout modal
+                      Navigator.pop(context); // Close modal
                       Navigator.pushNamedAndRemoveUntil(
                         context,
                         AppRoutes.home,
@@ -179,12 +175,14 @@ class _CheckoutModalState extends State<CheckoutModal> {
                   ElevatedButton(
                     onPressed: () {
                       Navigator.pop(context); // Close dialog
-                      Navigator.pop(context); // Close checkout modal
-                      Navigator.pushNamed(
-                        context,
-                        AppRoutes.trackOrder,
-                        arguments: orderId,
-                      );
+                      Navigator.pop(context); // Close modal
+                      Future.delayed(const Duration(milliseconds: 100), () {
+                        Navigator.pushNamed(
+                          context,
+                          AppRoutes.trackOrder,
+                          arguments: orderId,
+                        );
+                      });
                     },
                     child: const Text('Track Order'),
                   ),

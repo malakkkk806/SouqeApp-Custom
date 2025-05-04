@@ -16,13 +16,29 @@ class TrackOrderScreen extends StatefulWidget {
 class _TrackOrderScreenState extends State<TrackOrderScreen> {
   GoogleMapController? _mapController;
   LatLng? _driverPosition;
+  late final String orderId;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final args = ModalRoute.of(context)?.settings.arguments;
+    if (args == null || args is! String) {
+      Navigator.pop(context);
+      return;
+    }
+    orderId = args;
+    _startUpdatingLocation(orderId);
+  }
 
   void _startUpdatingLocation(String orderId) async {
     final permission = await Geolocator.requestPermission();
-    if (permission == LocationPermission.denied) return;
+    if (permission == LocationPermission.denied || permission == LocationPermission.deniedForever) return;
 
     Geolocator.getPositionStream(
-      locationSettings: const LocationSettings(accuracy: LocationAccuracy.high, distanceFilter: 10),
+      locationSettings: const LocationSettings(
+        accuracy: LocationAccuracy.high,
+        distanceFilter: 10,
+      ),
     ).listen((pos) {
       FirebaseFirestore.instance.collection('orders').doc(orderId).update({
         'location': {'lat': pos.latitude, 'lng': pos.longitude}
@@ -32,9 +48,6 @@ class _TrackOrderScreenState extends State<TrackOrderScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final orderId = ModalRoute.of(context)!.settings.arguments as String;
-    _startUpdatingLocation(orderId);
-
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -47,7 +60,12 @@ class _TrackOrderScreenState extends State<TrackOrderScreen> {
         ),
         title: const Text(
           'Track Order',
-          style: TextStyle(fontFamily: 'Montserrat', fontSize: 18, fontWeight: FontWeight.w600, color: Colors.black),
+          style: TextStyle(
+            fontFamily: 'Montserrat',
+            fontSize: 18,
+            fontWeight: FontWeight.w600,
+            color: Colors.black,
+          ),
         ),
       ),
       body: StreamBuilder<DocumentSnapshot>(
@@ -74,22 +92,9 @@ class _TrackOrderScreenState extends State<TrackOrderScreen> {
       bottomNavigationBar: BottomNavBar(
         currentIndex: 2,
         onTap: (index) {
-          switch (index) {
-            case 0:
-              Navigator.pushReplacementNamed(context, '/home');
-              break;
-            case 1:
-              Navigator.pushReplacementNamed(context, '/explore');
-              break;
-            case 2:
-              Navigator.pushReplacementNamed(context, '/cart');
-              break;
-            case 3:
-              Navigator.pushReplacementNamed(context, '/favorite');
-              break;
-            case 4:
-              Navigator.pushReplacementNamed(context, '/account');
-              break;
+          final routes = ['/home', '/explore', '/cart', '/favorite', '/account'];
+          if (index >= 0 && index < routes.length) {
+            Navigator.pushReplacementNamed(context, routes[index]);
           }
         },
       ),
@@ -119,7 +124,7 @@ class _TrackOrderScreenState extends State<TrackOrderScreen> {
                     markerId: const MarkerId('driver'),
                     position: _driverPosition!,
                     infoWindow: const InfoWindow(title: 'Driver Location'),
-                  )
+                  ),
                 },
               ),
             )
@@ -151,7 +156,7 @@ class _TrackOrderScreenState extends State<TrackOrderScreen> {
           const SizedBox(height: 24),
           const Text('Order Summary', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
           const SizedBox(height: 8),
-          ...items.map((item) => _buildItemRow(item)).toList(),
+          ...items.map(_buildItemRow).toList(),
           const Divider(),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
