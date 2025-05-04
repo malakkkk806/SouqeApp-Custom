@@ -18,7 +18,6 @@ class OrderStatusScreen extends StatelessWidget {
     );
   }
 
-  // ✅ Success as Dialog
   Widget _buildSuccessDialog(BuildContext context) {
     return Dialog(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
@@ -112,7 +111,6 @@ class OrderStatusScreen extends StatelessWidget {
     );
   }
 
-  // ❌ Failure as Dialog
   Widget _buildFailureDialog(BuildContext context) {
     return Dialog(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
