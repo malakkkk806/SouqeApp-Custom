@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:souqe/constants/colors.dart';
 import 'package:souqe/widgets/common/bottom_nav_bar.dart';
 import 'package:souqe/constants/app_routes.dart';
 
