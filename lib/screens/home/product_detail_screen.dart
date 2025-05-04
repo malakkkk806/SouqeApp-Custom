@@ -5,7 +5,6 @@ import 'package:souqe/constants/app_routes.dart';
 import 'package:souqe/constants/colors.dart';
 import 'package:souqe/models/product.dart';
 import 'package:souqe/providers/cart_provider.dart';
-import 'package:souqe/providers/product_provider.dart';
 import 'package:souqe/models/cart_item_model.dart';
 import 'package:souqe/providers/favorites_provider.dart';
 
@@ -166,7 +165,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                 borderRadius: BorderRadius.circular(8),
               ),
               child: const Text(
-                'Contains allergens',
+                'Contains allergy',
                 style: TextStyle(
                   fontSize: 12,
                   fontFamily: 'Inter',
