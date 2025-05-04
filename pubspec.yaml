@@ -87,21 +87,21 @@ flutter:
     - assets/images/fruits.png
     - assets/images/carrots.png
     - assets/images/shrimp.png
-    - assests/images/bread.png
-    - assets/images/bar.png 
-    - assests/images/detergent.png 
-    - assests/images/Chips.png
+    - assets/images/bread.png
+    - assets/images/chocolate_bar.png 
+    - assets/images/detergent.png 
+    - assets/images/crispy_chips.png
     - assets/images/diapers.png
-    - assets/images/cheese.png
-    - assets/images/pizza.png
-    - assets/images/yogurt.png
+    - assets/images/feta_cheese.png
+    - assets/images/frozen_pizza.png
+    - assets/images/greek_yogurt.png
     - assets/images/ketchup.png
     - assets/images/dogs.png
     - assets/images/carrots.png
     - assets/images/tea.png
     - assets/images/juice.png
     - assets/images/pasta.png
-    - assets/images/fillet.png
+    - assets/images/salmon_fillet.png
     - assets/images/salt.png
     - assets/images/shampoo.png
     - assets/images/shrimp.png
