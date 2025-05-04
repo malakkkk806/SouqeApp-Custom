@@ -16,7 +16,7 @@ final List<Category> exploreCategories = [
   ),
   Category(
     title: 'Frozen Foods',
-    image: 'assets/images/frozen_food.png', 
+    image: 'assets/images/frozen_foods.png', 
     bgColor: const Color(0xFFD1E8F6),
     categoryId: '4',
   ),
@@ -46,7 +46,7 @@ final List<Category> exploreCategories = [
   ),
   Category(
     title: 'Baby & Child Care',
-    image: 'assets/images/baby.png', 
+    image: 'assets/images/child_care.png', 
     bgColor: const Color(0xFFB2EBF2),
     categoryId: '9',
   ),
@@ -70,7 +70,7 @@ final List<Category> exploreCategories = [
   ),
   Category(
     title: 'Pet Supplies',
-    image: 'assets/images/Pet.png',
+    image: 'assets/images/pet_supplies.png',
     bgColor: const Color(0xFFE5F4FF),
     categoryId: '13', 
   ),
