@@ -8,12 +8,6 @@ import 'package:souqe/providers/cart_provider.dart';
 import 'package:souqe/providers/product_provider.dart';
 import 'package:souqe/models/cart_item_model.dart';
 import 'package:souqe/providers/favorites_provider.dart';
-import 'package:souqe/widgets/common/bottom_nav_bar.dart';
-import 'package:souqe/screens/home/home_screen.dart';
-import 'package:souqe/screens/explore/explore_screen.dart';
-import 'package:souqe/screens/cart/cart_screen.dart';
-import 'package:souqe/screens/favourite/favourite_screen.dart';
-import 'package:souqe/screens/profile/account_screen.dart';
 
 class ProductDetailScreen extends StatefulWidget {
   final Product product;
@@ -26,9 +20,7 @@ class ProductDetailScreen extends StatefulWidget {
 class _ProductDetailScreenState extends State<ProductDetailScreen> {
   int quantity = 1;
   bool hasSeenWarning = false;
-  bool showSuggestion = false;
   bool isAddedToCart = false;
-  final int _currentIndex = 0; // Track the current tab index for BottomNavBar
 
   void _showAllergenWarning() {
     AwesomeDialog(
@@ -42,9 +34,6 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
       btnOkOnPress: () {
         setState(() {
           hasSeenWarning = true;
-          if (widget.product.suggestedProductId != null) {
-            showSuggestion = true;
-          }
         });
       },
     ).show();
@@ -66,7 +55,6 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
       );
 
       cart.addItem(cartItem, productId: cartItem.productId);
-
       setState(() => isAddedToCart = true);
 
       ScaffoldMessenger.of(context).showSnackBar(
@@ -85,9 +73,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
           ),
           duration: const Duration(seconds: 2),
           behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(10),
-          ),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
           backgroundColor: Colors.green,
           action: SnackBarAction(
             label: 'VIEW CART',
@@ -96,59 +82,19 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
           ),
         ),
       );
-    } catch (e, stackTrace) {
-      debugPrint('Add to cart error: $e');
-      debugPrint('Stack trace: $stackTrace');
-
+    } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Row(
-            children: [
-              const Icon(Icons.error_outline, color: Colors.white),
-              const SizedBox(width: 8),
-              Expanded(
-                child: Text(
-                  'Failed to add: ${e.toString().replaceFirst('Exception: ', '')}',
-                  style: const TextStyle(fontSize: 16),
-                ),
-              ),
-            ],
-          ),
-          duration: const Duration(seconds: 3),
-          behavior: SnackBarBehavior.floating,
+          content: Text('Failed to add item: $e'),
           backgroundColor: Colors.red,
-          action: SnackBarAction(
-            label: 'RETRY',
-            textColor: Colors.white,
-            onPressed: _addToCart,
-          ),
         ),
       );
-      setState(() => isAddedToCart = false);
-    }
-  }
-
-  Widget _buildTabScreen(int index) {
-    switch (_currentIndex) {
-      case 0:
-        return const HomeScreen();
-      case 1:
-        return const ExploreScreen();
-      case 2:
-        return const CartScreen();
-      case 3:
-        return const FavoritesScreen();
-      case 4:
-        return AccountScreen(userAddress: ''); // Pass actual address if needed
-      default:
-        return const HomeScreen();
     }
   }
 
   @override
   Widget build(BuildContext context) {
     final product = widget.product;
-    final productProvider = Provider.of<ProductProvider>(context, listen: false);
 
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -174,233 +120,190 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
           ),
         ],
       ),
-      body: Stack(
+      body: Column(
         children: [
-          Column(
-            children: [
-              Container(
-                height: 140,
-                width: double.infinity,
-                margin: const EdgeInsets.symmetric(horizontal: 16),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(16),
-                  image: DecorationImage(
-                    image: AssetImage(product.imageUrl),
-                    fit: BoxFit.contain,
-                  ),
+          Container(
+            height: 140,
+            width: double.infinity,
+            margin: const EdgeInsets.symmetric(horizontal: 16),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(16),
+              image: DecorationImage(
+                image: AssetImage(product.imageUrl),
+                fit: BoxFit.contain,
+              ),
+            ),
+          ),
+          if (product.allergens.isNotEmpty)
+            Container(
+              margin: const EdgeInsets.symmetric(vertical: 12),
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+              decoration: BoxDecoration(
+                color: Colors.red.shade100,
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: const Text(
+                'Contains allergens',
+                style: TextStyle(
+                  fontSize: 12,
+                  fontFamily: 'Inter',
+                  color: Colors.red,
+                  fontWeight: FontWeight.w600,
                 ),
               ),
-              if (product.allergens.isNotEmpty)
-                Container(
-                  margin: const EdgeInsets.symmetric(vertical: 12),
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                  decoration: BoxDecoration(
-                    color: Colors.red.shade100,
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: const Text(
-                    'Contains allergens',
-                    style: TextStyle(
-                      fontSize: 12,
-                      fontFamily: 'Inter',
-                      color: Colors.red,
-                      fontWeight: FontWeight.w600,
+            ),
+          const SizedBox(height: 16),
+          Expanded(
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              child: SingleChildScrollView(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Center(
+                      child: Text(
+                        product.name,
+                        style: const TextStyle(
+                          fontSize: 25,
+                          fontWeight: FontWeight.bold,
+                          fontFamily: 'Montserrat',
+                          color: AppColors.primary,
+                        ),
+                      ),
                     ),
-                  ),
-                ),
-              const SizedBox(height: 16),
-              Expanded(
-                child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                  child: SingleChildScrollView(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                    const SizedBox(height: 8),
+                    Text(
+                      product.description,
+                      style: const TextStyle(
+                        fontSize: 14,
+                        fontFamily: 'Inter',
+                        color: AppColors.textMedium,
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Center(
-                          child: Text(
-                            product.name,
-                            style: const TextStyle(
-                              fontSize: 25,
-                              fontWeight: FontWeight.bold,
-                              fontFamily: 'Montserrat',
-                              color: AppColors.primary,
-                            ),
+                        Container(
+                          decoration: BoxDecoration(
+                            border: Border.all(color: AppColors.textLight),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Row(
+                            children: [
+                              IconButton(
+                                icon: const Icon(Icons.remove),
+                                onPressed: () {
+                                  if (quantity > 1) {
+                                    setState(() => quantity--);
+                                  }
+                                },
+                              ),
+                              Text(
+                                '$quantity',
+                                style: const TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w600,
+                                  fontFamily: 'Inter',
+                                ),
+                              ),
+                              IconButton(
+                                icon: const Icon(Icons.add),
+                                onPressed: () {
+                                  setState(() => quantity++);
+                                },
+                              ),
+                            ],
                           ),
                         ),
-                        const SizedBox(height: 8),
                         Text(
-                          product.description,
+                          '\$${(product.price * quantity).toStringAsFixed(2)}',
                           style: const TextStyle(
-                            fontSize: 14,
-                            fontFamily: 'Inter',
-                            color: AppColors.textMedium,
+                            fontSize: 22,
+                            fontWeight: FontWeight.bold,
+                            color: AppColors.primaryLight,
+                            fontFamily: 'Montserrat',
                           ),
                         ),
-                        const SizedBox(height: 16),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Container(
-                              decoration: BoxDecoration(
-                                border: Border.all(color: AppColors.textLight),
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                              child: Row(
-                                children: [
-                                  IconButton(
-                                    icon: const Icon(Icons.remove),
-                                    onPressed: () {
-                                      if (quantity > 1) {
-                                        setState(() => quantity--);
-                                      }
-                                    },
-                                  ),
-                                  Text(
-                                    '$quantity',
-                                    style: const TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.w600,
-                                      fontFamily: 'Inter',
-                                    ),
-                                  ),
-                                  IconButton(
-                                    icon: const Icon(Icons.add),
-                                    onPressed: () {
-                                      setState(() => quantity++);
-                                    },
-                                  ),
-                                ],
-                              ),
-                            ),
-                            Text(
-                              '\$${(product.price * quantity).toStringAsFixed(2)}',
-                              style: const TextStyle(
-                                fontSize: 22,
-                                fontWeight: FontWeight.bold,
-                                color: AppColors.primaryLight,
-                                fontFamily: 'Montserrat',
-                              ),
-                            ),
-                          ],
+                      ],
+                    ),
+                    const SizedBox(height: 24),
+                    const Text(
+                      'Product Detail',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        fontFamily: 'Inter',
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      product.description,
+                      style: const TextStyle(
+                        fontSize: 14,
+                        color: AppColors.textMedium,
+                        fontFamily: 'Inter',
+                      ),
+                    ),
+                    const SizedBox(height: 24),
+                    const Text(
+                      'Review',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
+                        fontFamily: 'Inter',
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Row(
+                      children: List.generate(
+                        5,
+                        (index) => Icon(
+                          Icons.star,
+                          color: index < product.rating.floor()
+                              ? Colors.orange
+                              : Colors.grey.shade300,
+                          size: 20,
                         ),
-                        const SizedBox(height: 24),
-                        const Text(
-                          'Product Detail',
-                          style: TextStyle(
+                      ),
+                    ),
+                    const SizedBox(height: 32),
+                    SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton(
+                        onPressed: () {
+                          if (product.allergens.isNotEmpty && !hasSeenWarning) {
+                            _showAllergenWarning();
+                          } else {
+                            _addToCart();
+                          }
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor:
+                              isAddedToCart ? Colors.green : AppColors.primary,
+                          padding: const EdgeInsets.symmetric(vertical: 16),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                        child: Text(
+                          isAddedToCart ? '✓ Added to Cart' : 'Add To Basket',
+                          style: const TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
                             fontFamily: 'Inter',
+                            color: Colors.white,
                           ),
                         ),
-                        const SizedBox(height: 8),
-                        Text(
-                          product.description,
-                          style: const TextStyle(
-                            fontSize: 14,
-                            color: AppColors.textMedium,
-                            fontFamily: 'Inter',
-                          ),
-                        ),
-                        const SizedBox(height: 24),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            const Text(
-                              'Nutritions',
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w500,
-                                fontFamily: 'Inter',
-                              ),
-                            ),
-                            Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                              decoration: BoxDecoration(
-                                color: AppColors.surface,
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              child: const Text(
-                                '100gr',
-                                style: TextStyle(fontSize: 14, fontFamily: 'Inter'),
-                              ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 24),
-                        const Text(
-                          'Review',
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w500,
-                            fontFamily: 'Inter',
-                          ),
-                        ),
-                        const SizedBox(height: 4),
-                        Row(
-                          children: List.generate(
-                            5,
-                            (index) => Icon(
-                              Icons.star,
-                              color: index < product.rating.floor()
-                                  ? Colors.orange
-                                  : Colors.grey.shade300,
-                              size: 20,
-                            ),
-                          ),
-                        ),
-                        const SizedBox(height: 32),
-                        SizedBox(
-                          width: double.infinity,
-                          child: ElevatedButton(
-                            onPressed: () {
-                              if (product.allergens.isNotEmpty && !hasSeenWarning) {
-                                _showAllergenWarning();
-                              } else {
-                                _addToCart();
-                              }
-                            },
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor:
-                                  isAddedToCart ? Colors.green : AppColors.primary,
-                              padding: const EdgeInsets.symmetric(vertical: 16),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                            ),
-                            child: Text(
-                              isAddedToCart ? '✓ Added to Cart' : 'Add To Basket',
-                              style: const TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                                fontFamily: 'Inter',
-                                color: Colors.white,
-                              ),
-                            ),
-                          ),
-                        ),
-                        const SizedBox(height: 16),
-                      ],
+                      ),
                     ),
-                  ),
+                    const SizedBox(height: 16),
+                  ],
                 ),
               ),
-            ],
+            ),
           ),
         ],
-      ),
-      bottomNavigationBar: BottomNavBar(
-        currentIndex: _currentIndex,
-        onTap: (index) {
-          if (index != _currentIndex) {
-            Navigator.pushAndRemoveUntil(
-              context,
-              MaterialPageRoute(
-                builder: (context) => _buildTabScreen(index),
-              ),
-              (route) => false,
-            );
-          }
-        },
       ),
     );
   }
