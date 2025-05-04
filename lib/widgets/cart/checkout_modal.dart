@@ -8,10 +8,12 @@ import 'package:souqe/providers/cart_provider.dart';
 
 class CheckoutModal extends StatefulWidget {
   final double totalAmount;
+  final Function(bool)? onOrderResult; // ✅ NEW
 
   const CheckoutModal({
     super.key,
     required this.totalAmount,
+    this.onOrderResult, // ✅ NEW
   });
 
   @override
@@ -21,7 +23,7 @@ class CheckoutModal extends StatefulWidget {
 class _CheckoutModalState extends State<CheckoutModal> {
   String _selectedDelivery = 'Standard Delivery';
   String _selectedPayment = 'Mastercard';
-  String _userAddress = '123 Main Street, Springfield'; // TODO: Replace with actual user address
+  String _userAddress = '123 Main Street, Springfield'; // Replace with actual address if needed
 
   void _selectDeliveryMethod() {
     showModalBottomSheet(
@@ -153,47 +155,21 @@ class _CheckoutModalState extends State<CheckoutModal> {
             await FirebaseFirestore.instance.collection('orders').doc(orderId).set(orderData);
             cart.clearCart();
 
-            showDialog(
-              context: context,
-              barrierDismissible: false,
-              builder: (_) => AlertDialog(
-                title: const Text('Order Placed'),
-                content: const Text('Your order has been successfully placed.'),
-                actions: [
-                  TextButton(
-                    onPressed: () {
-                      Navigator.pop(context); // Close dialog
-                      Navigator.pop(context); // Close modal
-                      Navigator.pushNamedAndRemoveUntil(
-                        context,
-                        AppRoutes.home,
-                        (route) => false,
-                      );
-                    },
-                    child: const Text('Back to Home'),
-                  ),
-                  ElevatedButton(
-                    onPressed: () {
-                      Navigator.pop(context); // Close dialog
-                      Navigator.pop(context); // Close modal
-                      Future.delayed(const Duration(milliseconds: 100), () {
-                        Navigator.pushNamed(
-                          context,
-                          AppRoutes.trackOrder,
-                          arguments: orderId,
-                        );
-                      });
-                    },
-                    child: const Text('Track Order'),
-                  ),
-                ],
-              ),
-            );
+            // ✅ Notify parent screen about success
+            if (widget.onOrderResult != null) {
+              widget.onOrderResult!(true);
+            }
+
           } catch (e) {
             debugPrint('❌ Firestore Error: $e');
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(content: Text('Failed to place order. Please try again.')),
             );
+
+            // ❌ Notify parent screen about failure
+            if (widget.onOrderResult != null) {
+              widget.onOrderResult!(false);
+            }
           }
         },
         style: ElevatedButton.styleFrom(

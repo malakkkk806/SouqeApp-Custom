@@ -1,9 +1,10 @@
- import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:souqe/providers/cart_provider.dart';
 import 'package:souqe/constants/colors.dart';
 import 'package:souqe/models/cart_item_model.dart';
 import 'package:souqe/widgets/cart/checkout_modal.dart';
+import 'package:souqe/screens/cart/order_status_screen.dart';
 
 class CartScreen extends StatefulWidget {
   const CartScreen({super.key});
@@ -13,6 +14,15 @@ class CartScreen extends StatefulWidget {
 }
 
 class _CartScreenState extends State<CartScreen> {
+  void _showOrderStatus(bool isSuccess) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => OrderStatusScreen(isSuccess: isSuccess),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final cart = Provider.of<CartProvider>(context);
@@ -36,11 +46,7 @@ class _CartScreenState extends State<CartScreen> {
         automaticallyImplyLeading: false,
         bottom: const PreferredSize(
           preferredSize: Size.fromHeight(1),
-          child: Divider(
-            height: 1,
-            color: Color(0xFFE0E0E0),
-            thickness: 1,
-          ),
+          child: Divider(height: 1, color: Color(0xFFE0E0E0), thickness: 1),
         ),
         actions: [
           if (cart.isNotEmpty)
@@ -50,7 +56,6 @@ class _CartScreenState extends State<CartScreen> {
             ),
         ],
       ),
-      
       body: Column(
         children: [
           Expanded(
@@ -76,10 +81,7 @@ class _CartScreenState extends State<CartScreen> {
                     padding: const EdgeInsets.all(16),
                     itemCount: items.length,
                     separatorBuilder: (_, __) => const Divider(height: 40, color: Color(0xFFE0E0E0)),
-                    itemBuilder: (ctx, index) {
-                      final item = items[index];
-                      return _buildCartItem(item, cart);
-                    },
+                    itemBuilder: (ctx, index) => _buildCartItem(items[index], cart),
                   ),
           ),
           if (cart.isNotEmpty) _buildCheckoutSection(cart),
@@ -178,12 +180,7 @@ class _CartScreenState extends State<CartScreen> {
         width: 100,
         height: 100,
         fit: BoxFit.contain,
-        errorBuilder: (_, __, ___) => Container(
-          width: 100,
-          height: 100,
-          color: Colors.grey[200],
-          child: const Icon(Icons.broken_image, color: Colors.grey),
-        ),
+        errorBuilder: (_, __, ___) => _imageErrorWidget(),
       );
     } else {
       return Image.asset(
@@ -191,14 +188,18 @@ class _CartScreenState extends State<CartScreen> {
         width: 100,
         height: 100,
         fit: BoxFit.contain,
-        errorBuilder: (_, __, ___) => Container(
-          width: 100,
-          height: 100,
-          color: Colors.grey[200],
-          child: const Icon(Icons.image, color: Colors.grey),
-        ),
+        errorBuilder: (_, __, ___) => _imageErrorWidget(),
       );
     }
+  }
+
+  Widget _imageErrorWidget() {
+    return Container(
+      width: 100,
+      height: 100,
+      color: Colors.grey[200],
+      child: const Icon(Icons.broken_image, color: Colors.grey),
+    );
   }
 
   Widget _quantityButton(String label, VoidCallback onTap) {
@@ -235,15 +236,19 @@ class _CartScreenState extends State<CartScreen> {
             context: context,
             isScrollControlled: true,
             backgroundColor: Colors.transparent,
-            builder: (_) => CheckoutModal(totalAmount: cart.totalAmount),
+            builder: (_) => CheckoutModal(
+              totalAmount: cart.totalAmount,
+              onOrderResult: (bool isSuccess) {
+                Navigator.pop(context); // Close modal
+                _showOrderStatus(isSuccess); // Show order result
+              },
+            ),
           );
         },
         style: ElevatedButton.styleFrom(
           backgroundColor: AppColors.primary,
           padding: const EdgeInsets.symmetric(vertical: 16),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
-          ),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -289,7 +294,7 @@ class _CartScreenState extends State<CartScreen> {
               Provider.of<CartProvider>(context, listen: false).clearCart();
               Navigator.pop(ctx);
             },
-            child: const Text('CLEAR', style: TextStyle(color: Colors.red)),
+            child: const Text('CLEAR', style: TextStyle(color: AppColors.primary)),
           ),
         ],
       ),
