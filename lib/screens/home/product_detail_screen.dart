@@ -5,9 +5,9 @@ import 'package:souqe/constants/app_routes.dart';
 import 'package:souqe/constants/colors.dart';
 import 'package:souqe/models/product.dart';
 import 'package:souqe/providers/cart_provider.dart';
-import 'package:souqe/providers/product_provider.dart';
 import 'package:souqe/models/cart_item_model.dart';
 import 'package:souqe/providers/favorites_provider.dart';
+import 'package:souqe/providers/product_provider.dart';
 
 class ProductDetailScreen extends StatefulWidget {
   final Product product;
@@ -89,6 +89,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
       
       setState(() => isAddedToCart = true);
 
+      // ignore: use_build_context_synchronously
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Row(
@@ -115,6 +116,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
         ),
       );
     } catch (e) {
+      // ignore: use_build_context_synchronously
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Error: ${e.toString()}'),
@@ -255,6 +257,37 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
       ),
       body: Column(
         children: [
+          Container(
+            height: 140,
+            width: double.infinity,
+            margin: const EdgeInsets.symmetric(horizontal: 16),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(16),
+              image: DecorationImage(
+                image: AssetImage(product.imageUrl),
+                fit: BoxFit.contain,
+              ),
+            ),
+          ),
+          if (product.allergens.isNotEmpty)
+            Container(
+              margin: const EdgeInsets.symmetric(vertical: 12),
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+              decoration: BoxDecoration(
+                color: Colors.red.shade100,
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: const Text(
+                'Contains allergy',
+                style: TextStyle(
+                  fontSize: 12,
+                  fontFamily: 'Inter',
+                  color: AppColors.primary,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+          const SizedBox(height: 16),
           Expanded(
             child: SingleChildScrollView(
               padding: const EdgeInsets.all(16),

@@ -52,7 +52,7 @@ class Product {
       price: (data['price'] ?? 0).toDouble(),
       imageUrl: data['imageUrl'] ?? '',
       category: data['category'] ?? '',
-      categoryId: data['categoryId'] ?? '',
+      categoryId: data['categoryId'] ?? '', 
       stockQuantity: data['stockQuantity'] ?? 0,
       isAvailable: data['isAvailable'] ?? true,
       rating: (data['rating'] ?? 0).toDouble(),
