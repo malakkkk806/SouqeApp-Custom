@@ -7,12 +7,8 @@ import '/providers/cart_provider.dart';
 import '/providers/favorites_provider.dart';
 import '/constants/colors.dart';
 import '/screens/home/product_detail_screen.dart';
-import '/screens/home/home_screen.dart';
-import '/screens/explore/explore_screen.dart';
 import '/screens/cart/cart_screen.dart';
 import '/screens/favourite/favourite_screen.dart';
-import '/screens/profile/account_screen.dart';
-import '/widgets/common/bottom_nav_bar.dart';
 
 class CategoryProductsScreen extends StatefulWidget {
   final Category category;
