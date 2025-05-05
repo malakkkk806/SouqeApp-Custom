@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/foundation.dart';
 
 class PhoneAuthService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
@@ -66,12 +67,28 @@ class PhoneAuthService {
 
   Future<void> _saveUserToFirestore(User user, String phone) async {
     try {
-      await _firestore.collection('users').doc(user.uid).set({
-        'phone': phone,
-        'createdAt': FieldValue.serverTimestamp(),
-        'updatedAt': FieldValue.serverTimestamp(),
-      }, SetOptions(merge: true));
+      // First check if user document exists
+      final userDoc = await _firestore.collection('users').doc(user.uid).get();
+      
+      if (!userDoc.exists) {
+        // Create new user document with all required fields
+        await _firestore.collection('users').doc(user.uid).set({
+          'phone': phone,
+          'email': user.email ?? '',
+          'name': user.displayName ?? 'User ${user.uid.substring(0, 6)}',
+          'address': '',
+          'createdAt': FieldValue.serverTimestamp(),
+          'updatedAt': FieldValue.serverTimestamp(),
+        });
+      } else {
+        // Update existing user document
+        await _firestore.collection('users').doc(user.uid).update({
+          'phone': phone,
+          'updatedAt': FieldValue.serverTimestamp(),
+        });
+      }
     } catch (e) {
+      debugPrint('Error saving user to Firestore: $e');
       throw Exception('Failed to save user data: $e');
     }
   }

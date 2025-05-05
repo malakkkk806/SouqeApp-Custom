@@ -161,11 +161,26 @@ class _CheckoutModalState extends State<CheckoutModal> {
           .doc(user.uid)
           .get();
 
+      // If user document doesn't exist, create it with basic info
       if (!userDoc.exists) {
-        throw Exception('User data not found');
+        debugPrint('⚠️ User document not found, creating new document');
+        await FirebaseFirestore.instance.collection('users').doc(user.uid).set({
+          'phone': user.phoneNumber ?? '',
+          'email': user.email ?? '',
+          'name': user.displayName ?? 'User ${user.uid.substring(0, 6)}',
+          'address': '',
+          'createdAt': FieldValue.serverTimestamp(),
+          'updatedAt': FieldValue.serverTimestamp(),
+        });
       }
 
-      final userData = userDoc.data()!;
+      final userData = userDoc.exists ? userDoc.data()! : {
+        'phone': user.phoneNumber ?? '',
+        'email': user.email ?? '',
+        'name': user.displayName ?? 'User ${user.uid.substring(0, 6)}',
+        'address': '',
+      };
+      
       debugPrint('📋 User data: $userData');
 
       debugPrint('🛒 Starting order creation...');
@@ -175,9 +190,9 @@ class _CheckoutModalState extends State<CheckoutModal> {
       final orderData = {
         'orderID': orderId,
         'userID': user.uid,
-        'userName': userData['name'] ?? user.displayName,
-        'userEmail': userData['email'] ?? user.email,
-        'userPhone': userData['phone'] ?? user.phoneNumber,
+        'userName': userData['name'] ?? user.displayName ?? 'User ${user.uid.substring(0, 6)}',
+        'userEmail': userData['email'] ?? user.email ?? '',
+        'userPhone': userData['phone'] ?? user.phoneNumber ?? '',
         'address': _userAddress.isNotEmpty ? _userAddress : (userData['address'] ?? ''),
         'items': cart.items.values.map((item) => item.toJson()).toList(),
         'total': widget.totalAmount,
