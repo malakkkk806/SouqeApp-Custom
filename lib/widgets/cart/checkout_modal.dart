@@ -138,7 +138,10 @@ class _CheckoutModalState extends State<CheckoutModal> {
           }
 
           try {
+            debugPrint('🛒 Starting order creation...');
             final orderId = FirebaseFirestore.instance.collection('orders').doc().id;
+            debugPrint('📝 Generated order ID: $orderId');
+            
             final orderData = {
               'orderID': orderId,
               'userID': user.uid,
@@ -150,18 +153,23 @@ class _CheckoutModalState extends State<CheckoutModal> {
               'status': 'pending',
               'timestamp': FieldValue.serverTimestamp(),
             };
+            debugPrint('📦 Order data prepared: $orderData');
 
             await FirebaseFirestore.instance.collection('orders').doc(orderId).set(orderData);
+            debugPrint('✅ Order created successfully');
+            
             cart.clearCart();
+            debugPrint('🧹 Cart cleared');
 
             if (widget.onOrderResult != null) {
               widget.onOrderResult!(true, orderId);
+              debugPrint('🔄 Order result callback triggered');
             }
 
           } catch (e) {
             debugPrint('❌ Firestore Error: $e');
             ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('Failed to place order. Please try again.')),
+              SnackBar(content: Text('Failed to place order: $e')),
             );
 
             if (widget.onOrderResult != null) {
