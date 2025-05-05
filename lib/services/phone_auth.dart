@@ -8,6 +8,7 @@ class PhoneAuthService {
 
   Future<void> verifyPhoneNumber({
     required String phoneNumber,
+    required String userName, // New
     required Function(String verificationId) codeSent,
     required Function(AuthCredential credential) verificationCompleted,
     required Function(String error) onError,
@@ -21,7 +22,7 @@ class PhoneAuthService {
             final UserCredential userCredential = 
                 await _auth.signInWithCredential(credential);
             if (userCredential.user != null) {
-              await _saveUserToFirestore(userCredential.user!, phoneNumber);
+              await _saveUserToFirestore(userCredential.user!, phoneNumber, userName);
             }
             verificationCompleted(credential);
           } catch (e) {
@@ -45,45 +46,44 @@ class PhoneAuthService {
     required String verificationId,
     required String smsCode,
     required String phoneNumber,
+    required String userName, // New
   }) async {
     try {
       final credential = PhoneAuthProvider.credential(
         verificationId: verificationId,
         smsCode: smsCode,
       );
-      
+
       final UserCredential userCredential = 
           await _auth.signInWithCredential(credential);
-      
+
       if (userCredential.user != null) {
-        await _saveUserToFirestore(userCredential.user!, phoneNumber);
+        await _saveUserToFirestore(userCredential.user!, phoneNumber, userName);
       }
-      
+
       return userCredential;
     } catch (e) {
       throw Exception('OTP sign-in failed: $e');
     }
   }
 
-  Future<void> _saveUserToFirestore(User user, String phone) async {
+  Future<void> _saveUserToFirestore(User user, String phone, String name) async {
     try {
-      // First check if user document exists
       final userDoc = await _firestore.collection('users').doc(user.uid).get();
-      
+
       if (!userDoc.exists) {
-        // Create new user document with all required fields
         await _firestore.collection('users').doc(user.uid).set({
           'phone': phone,
           'email': user.email ?? '',
-          'name': user.displayName ?? 'User ${user.uid.substring(0, 6)}',
+          'name': name,
           'address': '',
           'createdAt': FieldValue.serverTimestamp(),
           'updatedAt': FieldValue.serverTimestamp(),
         });
       } else {
-        // Update existing user document
         await _firestore.collection('users').doc(user.uid).update({
           'phone': phone,
+          'name': name, // Optionally overwrite if needed
           'updatedAt': FieldValue.serverTimestamp(),
         });
       }

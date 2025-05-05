@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:souqe/constants/app_routes.dart';
 import 'package:souqe/constants/colors.dart';
 import 'package:souqe/constants/app_images.dart';
@@ -17,8 +16,8 @@ class SignInScreen extends StatefulWidget {
 
 class _SignInScreenState extends State<SignInScreen> {
   final TextEditingController _phoneController = TextEditingController();
+  final TextEditingController _nameController = TextEditingController();
   final PhoneAuthService _authService = PhoneAuthService();
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   String countryCode = '+20';
   bool _isLoading = false;
@@ -45,26 +44,19 @@ class _SignInScreenState extends State<SignInScreen> {
     );
   }
 
-  Future<void> _saveUserToFirestore(User user, String phone) async {
-    try {
-      await _firestore.collection('users').doc(user.uid).set({
-        'phone': phone,
-        'createdAt': FieldValue.serverTimestamp(),
-        'updatedAt': FieldValue.serverTimestamp(),
-      }, SetOptions(merge: true));
-    } catch (e) {
-      debugPrint('Error saving user to Firestore: $e');
-      throw Exception('Failed to save user data');
-    }
-  }
-
   void _startPhoneVerification() async {
     final rawInput = _phoneController.text.trim();
     final sanitized = rawInput.startsWith('0') ? rawInput.substring(1) : rawInput;
     final fullPhone = '$countryCode$sanitized';
+    final name = _nameController.text.trim();
 
     if (sanitized.isEmpty || sanitized.length < 8) {
       _showSnackBar("Enter a valid phone number");
+      return;
+    }
+
+    if (name.isEmpty) {
+      _showSnackBar("Enter your name");
       return;
     }
 
@@ -73,6 +65,7 @@ class _SignInScreenState extends State<SignInScreen> {
     try {
       await _authService.verifyPhoneNumber(
         phoneNumber: fullPhone,
+        userName: name,
         codeSent: (verificationId) {
           setState(() => _isLoading = false);
           Navigator.pushNamed(
@@ -81,15 +74,15 @@ class _SignInScreenState extends State<SignInScreen> {
             arguments: {
               'verificationId': verificationId,
               'phone': fullPhone,
+              'name': name,
             },
           );
         },
         verificationCompleted: (AuthCredential credential) async {
           try {
-            final UserCredential userCredential = 
+            final UserCredential userCredential =
                 await FirebaseAuth.instance.signInWithCredential(credential);
             if (userCredential.user != null) {
-              await _saveUserToFirestore(userCredential.user!, fullPhone);
               Navigator.pushReplacementNamed(context, AppRoutes.home);
             }
           } catch (e) {
@@ -110,6 +103,7 @@ class _SignInScreenState extends State<SignInScreen> {
   @override
   void dispose() {
     _phoneController.dispose();
+    _nameController.dispose();
     super.dispose();
   }
 
@@ -161,6 +155,18 @@ class _SignInScreenState extends State<SignInScreen> {
                           ),
                         ),
                         const SizedBox(height: 24),
+
+                        TextField(
+                          controller: _nameController,
+                          textCapitalization: TextCapitalization.words,
+                          decoration: const InputDecoration(
+                            labelText: 'Full Name',
+                            border: OutlineInputBorder(),
+                            prefixIcon: Icon(Icons.person),
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+
                         Row(
                           children: [
                             Container(
