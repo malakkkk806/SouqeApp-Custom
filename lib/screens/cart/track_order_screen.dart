@@ -16,21 +16,16 @@ class TrackOrderScreen extends StatefulWidget {
 class _TrackOrderScreenState extends State<TrackOrderScreen> {
   GoogleMapController? _mapController;
   LatLng? _driverPosition;
-  late final String orderId;
+  late String orderId;
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    final args = ModalRoute.of(context)?.settings.arguments;
-    if (args == null || args is! String) {
-      Navigator.pop(context);
-      return;
-    }
-    orderId = args;
-    _startUpdatingLocation(orderId);
+    orderId = ModalRoute.of(context)!.settings.arguments as String;
+    _startUpdatingLocation();
   }
 
-  void _startUpdatingLocation(String orderId) async {
+  void _startUpdatingLocation() async {
     final permission = await Geolocator.requestPermission();
     if (permission == LocationPermission.denied || permission == LocationPermission.deniedForever) return;
 
