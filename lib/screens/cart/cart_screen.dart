@@ -14,11 +14,14 @@ class CartScreen extends StatefulWidget {
 }
 
 class _CartScreenState extends State<CartScreen> {
-  void _showOrderStatus(bool isSuccess) {
+  void _showOrderStatus(bool isSuccess, String orderId) {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (_) => OrderStatusScreen(isSuccess: isSuccess),
+        builder: (_) => OrderStatusScreen(
+          isSuccess: isSuccess,
+          orderId: orderId,
+        ),
       ),
     );
   }
@@ -238,9 +241,9 @@ class _CartScreenState extends State<CartScreen> {
             backgroundColor: Colors.transparent,
             builder: (_) => CheckoutModal(
               totalAmount: cart.totalAmount,
-              onOrderResult: (bool isSuccess) {
+              onOrderResult: (bool isSuccess, String orderId) {
                 Navigator.pop(context); // Close modal
-                _showOrderStatus(isSuccess); // Show order result
+                _showOrderStatus(isSuccess, orderId); // Show order result
               },
             ),
           );

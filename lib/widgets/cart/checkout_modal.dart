@@ -7,7 +7,7 @@ import 'package:souqe/providers/cart_provider.dart';
 
 class CheckoutModal extends StatefulWidget {
   final double totalAmount;
-  final Function(bool)? onOrderResult;
+  final Function(bool, String)? onOrderResult;
 
   const CheckoutModal({
     super.key,
@@ -155,7 +155,7 @@ class _CheckoutModalState extends State<CheckoutModal> {
             cart.clearCart();
 
             if (widget.onOrderResult != null) {
-              widget.onOrderResult!(true);
+              widget.onOrderResult!(true, orderId);
             }
 
           } catch (e) {
@@ -165,7 +165,7 @@ class _CheckoutModalState extends State<CheckoutModal> {
             );
 
             if (widget.onOrderResult != null) {
-              widget.onOrderResult!(false);
+              widget.onOrderResult!(false, '');
             }
           }
         },

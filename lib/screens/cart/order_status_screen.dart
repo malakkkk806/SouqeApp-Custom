@@ -5,8 +5,13 @@ import 'package:souqe/constants/app_routes.dart';
 
 class OrderStatusScreen extends StatelessWidget {
   final bool isSuccess;
+  final String orderId;
 
-  const OrderStatusScreen({super.key, required this.isSuccess});
+  const OrderStatusScreen({
+    super.key, 
+    required this.isSuccess,
+    required this.orderId,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -66,7 +71,11 @@ class OrderStatusScreen extends StatelessWidget {
               width: double.infinity,
               child: ElevatedButton(
                 onPressed: () {
-                  Navigator.pushNamed(context, AppRoutes.trackOrder);
+                  Navigator.pushNamed(
+                    context, 
+                    AppRoutes.trackOrder,
+                    arguments: orderId,
+                  );
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppColors.primary,
