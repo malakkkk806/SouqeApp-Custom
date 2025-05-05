@@ -22,14 +22,12 @@ import 'screens/cart/track_order_screen.dart';
 import 'screens/explore/explore_screen.dart';
 import 'screens/profile/account_screen.dart';
 import 'screens/profile/my_orders_screen.dart';
-import 'widgets/common/main_app_screen.dart';
 import 'screens/profile/select_order_screen.dart';
 
 // Providers
 import 'providers/cart_provider.dart';
 import 'providers/product_provider.dart';
 import 'providers/favorites_provider.dart';
-import 'providers/tab_index_provider.dart'; // ✅ NEW LINE
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -48,9 +46,7 @@ Future<void> main() async {
   runApp(
     MultiProvider(
       providers: [
-        ChangeNotifierProvider(create: (_) => AuthProvider()),
         ChangeNotifierProvider(create: (_) => CartProvider()),
-        ChangeNotifierProvider(create: (_) => TabIndexProvider()),
         ChangeNotifierProvider(create: (_) => ProductProvider()),
         ChangeNotifierProvider(create: (_) => FavoritesProvider()),
       ],
@@ -91,7 +87,6 @@ class MyApp extends StatelessWidget {
         AppRoutes.signin: (context) => const SignInScreen(),
         AppRoutes.signup: (context) => const SignUpScreen(),
         AppRoutes.login: (context) => const LogInScreen(),
-        AppRoutes.home: (context) => const MainAppScreen(),
         AppRoutes.forgotPassword: (context) => const ForgotPasswordScreen(),
         AppRoutes.medicalHistory: (context) => const MedicalHistoryScreen(),
         AppRoutes.cart: (context) => const CartScreen(),
