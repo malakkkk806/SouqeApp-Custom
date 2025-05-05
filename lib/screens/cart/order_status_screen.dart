@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:souqe/constants/colors.dart';
 import 'package:souqe/constants/app_images.dart';
 import 'package:souqe/constants/app_routes.dart';
+import 'package:souqe/screens/cart/track_order_screen.dart';
 
 class OrderStatusScreen extends StatelessWidget {
   final bool isSuccess;
@@ -71,10 +72,12 @@ class OrderStatusScreen extends StatelessWidget {
               width: double.infinity,
               child: ElevatedButton(
                 onPressed: () {
-                  Navigator.pushNamed(
-                    context, 
-                    AppRoutes.trackOrder,
-                    arguments: orderId,
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => TrackOrderScreen(),
+                      settings: RouteSettings(arguments: orderId),
+                    ),
                   );
                 },
                 style: ElevatedButton.styleFrom(
