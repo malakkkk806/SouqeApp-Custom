@@ -80,7 +80,6 @@ class AccountScreen extends StatelessWidget {
           final userData = snapshot.data ?? {};
           final userName = userData['name'] ?? user.displayName ?? user.email?.split('@')[0] ?? 'Guest User';
           final userEmail = userData['email'] ?? user.email ?? 'No email';
-          final userPhone = userData['phone']?.toString() ?? user.phoneNumber ?? 'No phone number';
           final userAddress = userData['address'] ?? 'No address set';
 
           return ListView(
@@ -125,12 +124,6 @@ class AccountScreen extends StatelessWidget {
                         icon: Icons.email,
                         label: 'Email',
                         value: userEmail,
-                      ),
-                      const SizedBox(height: 12),
-                      _buildDetailRow(
-                        icon: Icons.phone,
-                        label: 'Phone',
-                        value: userPhone,
                       ),
                       const SizedBox(height: 12),
                       _buildDetailRow(

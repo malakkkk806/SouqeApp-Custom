@@ -13,7 +13,6 @@ class TrackOrderScreen extends StatefulWidget {
 }
 
 class _TrackOrderScreenState extends State<TrackOrderScreen> {
-  GoogleMapController? _mapController;
   LatLng? _driverPosition;
   late String orderId;
 
@@ -102,7 +101,6 @@ class _TrackOrderScreenState extends State<TrackOrderScreen> {
             SizedBox(
               height: 200,
               child: GoogleMap(
-                onMapCreated: (controller) => _mapController = controller,
                 initialCameraPosition: CameraPosition(target: _driverPosition!, zoom: 15),
                 markers: {
                   Marker(
