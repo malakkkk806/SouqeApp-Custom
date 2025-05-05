@@ -1,16 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/tab_index_provider.dart';
-import '../widgets/bottom_nav_bar.dart';
-import '../utils/app_colors.dart';
+import '../constants/colors.dart';
 import 'home/home_screen.dart';
 import 'explore/explore_screen.dart';
 import 'cart/cart_screen.dart';
-import 'favorites/favorites_screen.dart';
-import 'account/account_screen.dart';
+import 'favourite/favourite_screen.dart';
+import 'profile/account_screen.dart';
 
 class MainAppScreen extends StatelessWidget {
-  const MainAppScreen({Key? key}) : super(key: key);
+  const MainAppScreen({super.key});
 
   Widget _buildTabScreen(int index) {
     switch (index) {
@@ -36,7 +35,7 @@ class MainAppScreen extends StatelessWidget {
         return Scaffold(
           backgroundColor: AppColors.background,
           body: _buildTabScreen(tabProvider.currentIndex),
-          bottomNavigationBar: const BottomNavBar(),
+          bottomNavigationBar: const BottomAppBar(),
         );
       },
     );
