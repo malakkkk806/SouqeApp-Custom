@@ -162,7 +162,7 @@ class AccountScreen extends StatelessWidget {
                 title: const Text('Track Order'),
                 trailing: const Icon(Icons.chevron_right),
                 onTap: () {
-                  Navigator.pushNamed(context, '/selectOrder');
+                  Navigator.pushNamed(context, AppRoutes.selectOrder);
                 },
               ),
 

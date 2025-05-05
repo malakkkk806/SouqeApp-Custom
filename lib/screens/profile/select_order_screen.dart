@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:intl/intl.dart';
 import 'package:souqe/constants/app_routes.dart';
+import 'package:souqe/screens/cart/track_order_screen.dart';
 
 class SelectOrderScreen extends StatelessWidget {
   const SelectOrderScreen({super.key});
@@ -53,10 +54,12 @@ class SelectOrderScreen extends StatelessWidget {
                 subtitle: Text('Date: $dateStr'),
                 trailing: Text('\$${total.toStringAsFixed(2)}'),
                 onTap: () {
-                  Navigator.pushNamed(
+                  Navigator.push(
                     context,
-                    AppRoutes.trackOrder,
-                    arguments: order.id,
+                    MaterialPageRoute(
+                      builder: (context) => const TrackOrderScreen(),
+                      settings: RouteSettings(arguments: order.id),
+                    ),
                   );
                 },
               );
