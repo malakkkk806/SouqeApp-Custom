@@ -34,7 +34,7 @@ final List<Category> exploreCategories = [
   ),
   Category(
     title: 'Health & Personal Care',
-    image: 'assets/images/health_care.png', 
+    image: 'assets/images/care.png', 
     bgColor: const Color(0xFFEDC7D7),
     categoryId: '7',
   ),
