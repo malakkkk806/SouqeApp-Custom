@@ -15,6 +15,8 @@ import 'package:souqe/screens/home/all_products_screen.dart';
 import 'package:souqe/models/product.dart';
 import 'package:souqe/providers/favorites_provider.dart';
 import 'package:souqe/utils/product_upload.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -195,6 +197,14 @@ class _HomeScreenState extends State<HomeScreen> {
       _currentAddress =
           '${place.locality}, ${place.administrativeArea}, ${place.country}';
     });
+
+    final user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      await FirebaseFirestore.instance.collection('users').doc(user.uid).update({
+        'address': _currentAddress,
+        'updatedAt': FieldValue.serverTimestamp(),
+      });
+    }
   }
 
   Widget _buildShopContent() {
