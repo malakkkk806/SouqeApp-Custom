@@ -23,6 +23,7 @@ import 'screens/explore/explore_screen.dart';
 import 'screens/profile/account_screen.dart';
 import 'screens/profile/my_orders_screen.dart';
 import 'screens/profile/select_order_screen.dart';
+import 'widgets/common/main_app_screen.dart';
 
 // Providers
 import 'providers/cart_provider.dart';
