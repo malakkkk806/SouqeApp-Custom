@@ -3,17 +3,16 @@ import 'package:provider/provider.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:souqe/constants/colors.dart';
-import 'package:souqe/constants/app_routes.dart';
 import 'package:souqe/providers/cart_provider.dart';
 
 class CheckoutModal extends StatefulWidget {
   final double totalAmount;
-  final Function(bool)? onOrderResult; // ✅ NEW
+  final Function(bool)? onOrderResult;
 
   const CheckoutModal({
     super.key,
     required this.totalAmount,
-    this.onOrderResult, // ✅ NEW
+    this.onOrderResult,
   });
 
   @override
@@ -155,7 +154,6 @@ class _CheckoutModalState extends State<CheckoutModal> {
             await FirebaseFirestore.instance.collection('orders').doc(orderId).set(orderData);
             cart.clearCart();
 
-            // ✅ Notify parent screen about success
             if (widget.onOrderResult != null) {
               widget.onOrderResult!(true);
             }
@@ -166,7 +164,6 @@ class _CheckoutModalState extends State<CheckoutModal> {
               const SnackBar(content: Text('Failed to place order. Please try again.')),
             );
 
-            // ❌ Notify parent screen about failure
             if (widget.onOrderResult != null) {
               widget.onOrderResult!(false);
             }
