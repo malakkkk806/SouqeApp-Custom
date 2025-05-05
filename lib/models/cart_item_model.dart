@@ -1,4 +1,4 @@
-import 'package:flutter/foundation.dart'; // Required for listEquals
+import 'package:flutter/foundation.dart'; 
 class CartItem {
   final String productId;
   final String name;

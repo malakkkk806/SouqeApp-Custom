@@ -28,6 +28,4 @@ class AppRoutes {
   static const String about = '/about';
   static const String myOrders = '/myOrders';
   static const String selectOrder = '/selectOrder';
-
-
 }

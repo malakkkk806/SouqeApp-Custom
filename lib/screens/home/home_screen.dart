@@ -14,7 +14,6 @@ import 'package:souqe/screens/home/product_detail_screen.dart';
 import 'package:souqe/screens/home/all_products_screen.dart';
 import 'package:souqe/models/product.dart';
 import 'package:souqe/providers/favorites_provider.dart';
-import 'package:souqe/utils/product_upload.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
@@ -157,7 +156,6 @@ class _HomeScreenState extends State<HomeScreen> {
   void initState() {
     super.initState();
     _fetchLocation();
-    uploadInitialProducts();
   }
 
   Future<void> _fetchLocation() async {
