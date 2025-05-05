@@ -78,12 +78,10 @@ class AccountScreen extends StatelessWidget {
           }
 
           final userData = snapshot.data ?? {};
-          final userName = userData['name'] ?? user.displayName ?? 'Guest User';
+          final userName = userData['name'] ?? user.displayName ?? user.email?.split('@')[0] ?? 'Guest User';
           final userEmail = userData['email'] ?? user.email ?? 'No email';
-          final userPhone = userData['phone']?.toString() ?? 'No phone number';
-          final userAddress = this.userAddress.isNotEmpty
-              ? this.userAddress
-              : userData['address'] ?? 'No address set';
+          final userPhone = userData['phone']?.toString() ?? user.phoneNumber ?? 'No phone number';
+          final userAddress = userData['address'] ?? 'No address set';
 
           return ListView(
             padding: const EdgeInsets.all(20),
@@ -178,7 +176,7 @@ class AccountScreen extends StatelessWidget {
                   await FirebaseAuth.instance.signOut();
                   Navigator.pushNamedAndRemoveUntil(
                     context,
-                    AppRoutes.login,
+                    AppRoutes.intro,
                     (route) => false,
                   );
                 },
