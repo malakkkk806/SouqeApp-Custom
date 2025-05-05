@@ -131,11 +131,14 @@ class _CheckoutModalState extends State<CheckoutModal> {
           final user = FirebaseAuth.instance.currentUser;
 
           if (user == null) {
+            debugPrint('❌ User not logged in');
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(content: Text('User not logged in.')),
             );
             return;
           }
+
+          debugPrint('👤 Current user ID: ${user.uid}');
 
           try {
             debugPrint('🛒 Starting order creation...');
@@ -155,8 +158,16 @@ class _CheckoutModalState extends State<CheckoutModal> {
             };
             debugPrint('📦 Order data prepared: $orderData');
 
-            await FirebaseFirestore.instance.collection('orders').doc(orderId).set(orderData);
-            debugPrint('✅ Order created successfully');
+            // Try to create the order
+            try {
+              await FirebaseFirestore.instance.collection('orders').doc(orderId).set(orderData);
+              debugPrint('✅ Order created successfully');
+            } catch (firestoreError) {
+              debugPrint('❌ Firestore Error Details:');
+              debugPrint('Error Type: ${firestoreError.runtimeType}');
+              debugPrint('Error Message: $firestoreError');
+              rethrow; // Re-throw to be caught by outer catch block
+            }
             
             cart.clearCart();
             debugPrint('🧹 Cart cleared');
@@ -167,9 +178,19 @@ class _CheckoutModalState extends State<CheckoutModal> {
             }
 
           } catch (e) {
-            debugPrint('❌ Firestore Error: $e');
+            debugPrint('❌ Error in order creation process:');
+            debugPrint('Error Type: ${e.runtimeType}');
+            debugPrint('Error Message: $e');
+            if (e is FirebaseException) {
+              debugPrint('Firebase Error Code: ${e.code}');
+              debugPrint('Firebase Error Message: ${e.message}');
+            }
+            
             ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text('Failed to place order: $e')),
+              SnackBar(
+                content: Text('Failed to place order: ${e.toString()}'),
+                duration: const Duration(seconds: 5),
+              ),
             );
 
             if (widget.onOrderResult != null) {
