@@ -10,21 +10,38 @@ class SelectOrderScreen extends StatelessWidget {
 
   Future<List<QueryDocumentSnapshot>> _getUserOrders() async {
     final uid = FirebaseAuth.instance.currentUser?.uid;
-    if (uid == null) return [];
+    if (uid == null) {
+      debugPrint('❌ No user ID found - user not logged in');
+      return [];
+    }
 
-    final snapshot = await FirebaseFirestore.instance
-        .collection('orders')
-        .where('userID', isEqualTo: uid)
-        .orderBy('timestamp', descending: true)
-        .get();
+    debugPrint('👤 Fetching orders for user: $uid');
+    try {
+      final snapshot = await FirebaseFirestore.instance
+          .collection('orders')
+          .where('userID', isEqualTo: uid)
+          .orderBy('timestamp', descending: true)
+          .get();
 
-    return snapshot.docs;
+      debugPrint('📦 Found ${snapshot.docs.length} orders');
+      for (var doc in snapshot.docs) {
+        debugPrint('Order ID: ${doc.id}, Data: ${doc.data()}');
+      }
+      return snapshot.docs;
+    } catch (e) {
+      debugPrint('❌ Error fetching orders: $e');
+      rethrow;
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("Select Order to Track")),
+      appBar: AppBar(
+        title: const Text("Select Order to Track"),
+        backgroundColor: AppColors.primary,
+        foregroundColor: Colors.white,
+      ),
       body: FutureBuilder<List<QueryDocumentSnapshot>>(
         future: _getUserOrders(),
         builder: (context, snapshot) {
@@ -32,13 +49,53 @@ class SelectOrderScreen extends StatelessWidget {
             return const Center(child: CircularProgressIndicator());
           }
 
+          if (snapshot.hasError) {
+            debugPrint('❌ Error in FutureBuilder: ${snapshot.error}');
+            return Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Icon(Icons.error_outline, color: Colors.red, size: 48),
+                  const SizedBox(height: 16),
+                  Text(
+                    'Error loading orders: ${snapshot.error}',
+                    style: const TextStyle(color: AppColors.darkRed),
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 16),
+                  ElevatedButton(
+                    onPressed: () {
+                      Navigator.pushReplacementNamed(context, AppRoutes.selectOrder);
+                    },
+                    child: const Text('Retry'),
+                  ),
+                ],
+              ),
+            );
+          }
+
           if (!snapshot.hasData || snapshot.data!.isEmpty) {
-            return const Center(child: Text("No orders to track."));
+            debugPrint('ℹ️ No orders found for user');
+            return const Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.shopping_cart_outlined, size: 48, color: Colors.grey),
+                  SizedBox(height: 16),
+                  Text(
+                    "No orders to track.",
+                    style: TextStyle(fontSize: 16, color: Colors.grey),
+                  ),
+                ],
+              ),
+            );
           }
 
           final orders = snapshot.data!;
+          debugPrint('✅ Building list with ${orders.length} orders');
 
           return ListView.separated(
+            padding: const EdgeInsets.all(16),
             itemCount: orders.length,
             separatorBuilder: (_, __) => const Divider(),
             itemBuilder: (context, index) {
