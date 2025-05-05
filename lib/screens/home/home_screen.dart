@@ -490,7 +490,7 @@ class _HomeScreenState extends State<HomeScreen> {
       case 3:
         return const FavoritesScreen();
       case 4:
-        return AccountScreen(userAddress: _currentAddress);
+        return AccountScreen();
       default:
         return _buildShopContent();
     }

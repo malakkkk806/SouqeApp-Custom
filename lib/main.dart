@@ -97,7 +97,7 @@ class MyApp extends StatelessWidget {
         AppRoutes.resetPassword: (context) => const ResetPasswordScreen(),
         AppRoutes.explore: (context) => const ExploreScreen(),
         AppRoutes.trackOrder: (context) => const TrackOrderScreen(),
-        AppRoutes.account: (context) => const AccountScreen(userAddress: ''),
+        AppRoutes.account: (context) => const AccountScreen(),
         AppRoutes.favorite: (context) => const FavoritesScreen(),
         AppRoutes.myOrders: (context) => const MyOrdersScreen(),
         AppRoutes.selectOrder: (context) => const SelectOrderScreen(),

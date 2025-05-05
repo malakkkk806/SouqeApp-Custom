@@ -26,7 +26,7 @@ class _MainAppScreenState extends State<MainAppScreen> {
     ExploreScreen(),
     CartScreen(),
     FavoritesScreen(),
-    AccountScreen(userAddress: ''),
+    AccountScreen(),
   ];
 
   @override

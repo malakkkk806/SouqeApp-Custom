@@ -6,9 +6,8 @@ import 'package:souqe/constants/colors.dart';
 import 'package:souqe/constants/app_routes.dart';
 
 class AccountScreen extends StatelessWidget {
-  final String userAddress;
 
-  const AccountScreen({super.key, required this.userAddress});
+  const AccountScreen({super.key});
 
   Future<Map<String, dynamic>> fetchUserData(String uid) async {
     try {
