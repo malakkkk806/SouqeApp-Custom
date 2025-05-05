@@ -4,7 +4,6 @@ import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:intl/intl.dart';
 import 'package:souqe/constants/colors.dart';
-import 'package:souqe/widgets/common/bottom_nav_bar.dart';
 
 class TrackOrderScreen extends StatefulWidget {
   const TrackOrderScreen({super.key});
@@ -82,15 +81,6 @@ class _TrackOrderScreenState extends State<TrackOrderScreen> {
           }
 
           return _buildTrackingContent(status, items, total, timestamp);
-        },
-      ),
-      bottomNavigationBar: BottomNavBar(
-        currentIndex: 2,
-        onTap: (index) {
-          final routes = ['/home', '/explore', '/cart', '/favorite', '/account'];
-          if (index >= 0 && index < routes.length) {
-            Navigator.pushReplacementNamed(context, routes[index]);
-          }
         },
       ),
     );
