@@ -134,28 +134,6 @@ class AccountScreen extends StatelessWidget {
                   ),
                 ),
               ),
-              const SizedBox(height: 30),
-
-              _buildSectionHeader('Orders'),
-
-              ListTile(
-                leading: const Icon(Icons.shopping_bag_outlined, color: AppColors.primary),
-                title: const Text('My Orders'),
-                trailing: const Icon(Icons.chevron_right),
-                onTap: () {
-                  Navigator.pushNamed(context, AppRoutes.myOrders);
-                },
-              ),
-
-              ListTile(
-                leading: const Icon(Icons.delivery_dining, color: AppColors.primary),
-                title: const Text('Track Order'),
-                trailing: const Icon(Icons.chevron_right),
-                onTap: () {
-                  Navigator.pushNamed(context, AppRoutes.selectOrder);
-                },
-              ),
-
               const Divider(height: 40),
 
               ListTile(
@@ -176,20 +154,6 @@ class AccountScreen extends StatelessWidget {
             ],
           );
         },
-      ),
-    );
-  }
-
-  Widget _buildSectionHeader(String title) {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
-      child: Text(
-        title,
-        style: const TextStyle(
-          fontSize: 16,
-          fontWeight: FontWeight.bold,
-          color: AppColors.primary,
-        ),
       ),
     );
   }
