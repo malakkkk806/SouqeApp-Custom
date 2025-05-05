@@ -176,7 +176,7 @@ class AccountScreen extends StatelessWidget {
                   await FirebaseAuth.instance.signOut();
                   Navigator.pushNamedAndRemoveUntil(
                     context,
-                    AppRoutes.intro,
+                    AppRoutes.signin,
                     (route) => false,
                   );
                 },
