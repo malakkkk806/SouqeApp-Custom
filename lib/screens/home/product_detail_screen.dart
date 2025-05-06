@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:awesome_dialog/awesome_dialog.dart';
-import 'package:souqe/constants/app_routes.dart';
+import 'package:souqe/providers/tab_index_provider.dart';
 import 'package:souqe/constants/colors.dart';
 import 'package:souqe/models/product.dart';
 import 'package:souqe/providers/cart_provider.dart';
@@ -91,7 +91,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
           action: SnackBarAction(
             label: 'VIEW CART',
             textColor: Colors.white,
-            onPressed: () => Navigator.pushNamed(context, AppRoutes.cart),
+            onPressed: () => Provider.of<TabIndexProvider>(context, listen: false).setIndex(2),
           ),
         ),
       );
@@ -113,12 +113,25 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
     favoritesProvider.toggleFavorite(widget.product);
     if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(wasFavorite ? 'Removed from favorites' : 'Added to favorites'),
-        backgroundColor: AppColors.primary,
-        duration: const Duration(seconds: 1),
-      ),
-    );
+                        SnackBar(
+                          content: Text(wasFavorite ? 'Removed from favorites' : 'Added to favorites',
+                            style: const TextStyle(fontSize: 13),
+                          ),
+                          behavior: SnackBarBehavior.floating,
+                          backgroundColor: AppColors.primary.withAlpha((0.9 * 255).round()),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          duration: const Duration(seconds: 2),
+                          action: SnackBarAction(
+                            label: 'VIEW FAVORITES',
+                            textColor: Colors.white,
+                            onPressed: () {
+                               Provider.of<TabIndexProvider>(context, listen: false).setIndex(3);
+                            },
+                          ),
+                        ),
+                      );
   }
 
   Widget _buildNutritionInfo() {
@@ -157,7 +170,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
           IconButton(
             icon: Icon(
               favoritesProvider.isFavorite(widget.product.id) ? Icons.favorite : Icons.favorite_border,
-              color: Colors.red,
+              color: AppColors.primary,
             ),
             onPressed: _toggleFavorite,
           ),
@@ -277,7 +290,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                         }
                       },
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: isAddedToCart ? Colors.green : AppColors.primary,
+                        backgroundColor: isAddedToCart ? AppColors.primaryLight : AppColors.primary,
                         padding: const EdgeInsets.symmetric(vertical: 16),
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                       ),

@@ -6,6 +6,7 @@ import 'package:souqe/constants/app_images.dart';
 import 'package:souqe/constants/colors.dart';
 import 'package:souqe/models/cart_item_model.dart';
 import 'package:souqe/providers/cart_provider.dart';
+import 'package:souqe/providers/tab_index_provider.dart';
 import 'package:souqe/screens/explore/explore_screen.dart';
 import 'package:souqe/screens/cart/cart_screen.dart';
 import 'package:souqe/screens/profile/account_screen.dart';
@@ -16,6 +17,7 @@ import 'package:souqe/models/product.dart';
 import 'package:souqe/providers/favorites_provider.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -377,7 +379,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             label: 'VIEW FAVORITES',
                             textColor: Colors.white,
                             onPressed: () {
-                              setState(() => _currentIndex = 3);
+                               Provider.of<TabIndexProvider>(context, listen: false).setIndex(3);
                             },
                           ),
                         ),
@@ -458,7 +460,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                 label: 'VIEW CART',
                                 textColor: Colors.white,
                                 onPressed: () {
-                                  setState(() => _currentIndex = 2);
+                                   Provider.of<TabIndexProvider>(context, listen: false).setIndex(2);
                                 },
                               ),
                               duration: const Duration(seconds: 2),
