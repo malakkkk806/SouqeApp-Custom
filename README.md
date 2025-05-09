@@ -71,7 +71,16 @@ service cloud.firestore {
 ```
 
 ## 📷 Screenshots
+### 🏠 Home Screen
+![Home](Screenshots/homeScreen.png)
 
+### 🗺️ Order Tracking
+![Track](Screenshots/trackOrder.png)
+
+- more screenshots in folder  `Screenshots`
+
+### Recorded Video
+![Video](appScreenRecorded.mp4)
 
 ## 👩‍💻 Author
 
