@@ -31,6 +31,7 @@ import 'widgets/common/main_app_screen.dart';
 import 'providers/cart_provider.dart';
 import 'providers/product_provider.dart';
 import 'providers/favorites_provider.dart';
+import 'providers/tab_index_provider.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
