@@ -137,25 +137,6 @@ class AccountScreen extends StatelessWidget {
               const Divider(height: 40),
 
               ListTile(
-<<<<<<< Updated upstream
-  leading: const Icon(Icons.logout, color: AppColors.darkRed),
-  title: const Text(
-    'Logout',
-    style: TextStyle(color: AppColors.darkRed),
-  ),
-  onTap: () async {
-    // Step 1: Sign out from Firebase
-    await FirebaseAuth.instance.signOut();
-
-    // Step 2: Navigate to SignIn screen and remove previous routes
-    Navigator.pushNamedAndRemoveUntil(
-      context,
-      AppRoutes.signin,
-      (Route<dynamic> route) => false,
-    );
-  },
-),
-=======
                 leading: const Icon(Icons.logout, color: AppColors.darkRed),
                 title: const Text(
                   'Logout',
@@ -173,7 +154,6 @@ class AccountScreen extends StatelessWidget {
                   );
                 },
               ),
->>>>>>> Stashed changes
 
             ],
           );

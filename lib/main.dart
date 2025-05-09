@@ -19,13 +19,7 @@ import 'screens/favourite/favourite_screen.dart';
 import 'screens/cart/track_order_screen.dart';
 import 'screens/explore/explore_screen.dart';
 import 'screens/profile/account_screen.dart';
-<<<<<<< Updated upstream
-import 'screens/profile/my_orders_screen.dart';
 import 'widgets/common/main_app_screen.dart';
-import 'screens/profile/select_order_screen.dart';
-=======
-import 'widgets/common/main_app_screen.dart';
->>>>>>> Stashed changes
 
 // Providers
 import 'providers/cart_provider.dart';
