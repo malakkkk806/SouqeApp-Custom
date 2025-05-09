@@ -80,7 +80,8 @@ service cloud.firestore {
 ### Recorded Video
 [🎬 Watch Demo Video](https://github.com/NourhanFarag/SouqeApp/blob/main/appScreenRecorded.mp4)
 
-## 👩‍💻 Author
-
-- Nourhan Farag
-- Email: nourhanfarag2002@gmail.com
+## 👩‍💻 Team 
+-Malak Mounir Abdellatef 
+-Nourhan Farag Mohamed 
+-Farida Waheed Abdelbary 
+-Nour Hesham Elsayed 
