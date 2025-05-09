@@ -71,11 +71,9 @@ service cloud.firestore {
 ```
 
 ## 📷 Screenshots
-### 🏠 Home Screen
-![Home](Screenshots/homeScreen.png)
+### 🏠 Home Screen & 🗺️ Order Tracking
 
-### 🗺️ Order Tracking
-![Track](Screenshots/trackOrder.png)
+<img src="Screenshots/homeScreen.png" width="200"/> <img src="Screenshots/trackOrder.png" width="200"/>
 
 - more screenshots in folder  `Screenshots`
 
