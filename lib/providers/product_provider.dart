@@ -5,12 +5,10 @@ import '../services/product_service.dart';
 class ProductProvider with ChangeNotifier {
   final ProductService _productService = ProductService();
   List<Product> _products = [];
-  List<Product> _featuredProducts = [];
   bool _isLoading = false;
   String? _error;
 
   List<Product> get products => _products;
-  List<Product> get featuredProducts => _featuredProducts;
   bool get isLoading => _isLoading;
   String? get error => _error;
 
@@ -33,34 +31,6 @@ class ProductProvider with ChangeNotifier {
       notifyListeners();
     } finally {
       _setLoading(false);
-    }
-  }
-
-  // Load featured products
-  Future<void> loadFeaturedProducts() async {
-    _setLoading(true);
-    try {
-      _featuredProducts = await _productService.getFeaturedProducts();
-      notifyListeners();
-    } catch (e) {
-      _error = e.toString();
-      notifyListeners();
-    } finally {
-      _setLoading(false);
-    }
-  }
-
-  // Search products
-  Future<List<Product>> searchProducts(String query) async {
-    _setLoading(true);
-    try {
-      final results = await _productService.searchProducts(query);
-      _setLoading(false);
-      return results;
-    } catch (e) {
-      _error = e.toString();
-      _setLoading(false);
-      return [];
     }
   }
 

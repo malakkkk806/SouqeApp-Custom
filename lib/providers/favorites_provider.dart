@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:souqe/models/product.dart'; // Adjust path as needed
+import 'package:souqe/models/product.dart';
 
 class FavoritesProvider with ChangeNotifier {
   final List<Product> _favoriteProducts = [];

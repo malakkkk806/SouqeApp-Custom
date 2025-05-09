@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import '../../mock/explore_categories.dart';
 import '../../widgets/explore/explore_card.dart';
 import '../../constants/colors.dart';
-import '../../data/category_products.dart'; // ← Contains allProducts
+import '../../data/category_products.dart';
 import 'category_products_screen.dart';
 
 class ExploreScreen extends StatelessWidget {

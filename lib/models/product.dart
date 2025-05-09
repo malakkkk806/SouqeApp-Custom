@@ -16,7 +16,6 @@ class Product {
   final List<String> relatedProducts;
   final String? suggestedProductId;
 
-  // ✅ Nutritional info fields
   final int? calories;
   final double? protein;
   final double? carbs;

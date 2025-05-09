@@ -20,7 +20,6 @@ class CartItem {
     this.quantity = 1,
   });
 
-  // Calculates total price for this cart item
   double get totalPrice => price * quantity;
 
   // Converts object to JSON for storage

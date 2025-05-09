@@ -18,8 +18,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
-  final _phoneController = TextEditingController();
-  final _addressController = TextEditingController();
   final AuthService _authService = AuthService();
 
   bool _obscurePassword = true;
@@ -31,8 +29,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
     _emailController.dispose();
     _passwordController.dispose();
     _confirmPasswordController.dispose();
-    _phoneController.dispose();
-    _addressController.dispose();
     super.dispose();
   }
 
@@ -66,8 +62,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
           await FirebaseFirestore.instance.collection('users').doc(user.uid).set({
             'name': _nameController.text.trim(),
             'email': _emailController.text.trim(),
-            'phone': _phoneController.text.trim(),
-            'address': _addressController.text.trim(),
             'createdAt': FieldValue.serverTimestamp(),
             'updatedAt': FieldValue.serverTimestamp(),
           });
@@ -235,30 +229,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                 }
                                 return null;
                               },
-                            ),
-                            const SizedBox(height: 16),
-                            TextFormField(
-                              controller: _phoneController,
-                              keyboardType: TextInputType.phone,
-                              decoration: const InputDecoration(
-                                labelText: 'Phone Number',
-                                prefixIcon: Icon(Icons.phone),
-                                border: OutlineInputBorder(),
-                              ),
-                              validator: (value) =>
-                                  value == null || value.isEmpty ? 'Enter your phone number' : null,
-                            ),
-                            const SizedBox(height: 16),
-                            TextFormField(
-                              controller: _addressController,
-                              maxLines: 2,
-                              decoration: const InputDecoration(
-                                labelText: 'Address',
-                                prefixIcon: Icon(Icons.location_on),
-                                border: OutlineInputBorder(),
-                              ),
-                              validator: (value) =>
-                                  value == null || value.isEmpty ? 'Enter your address' : null,
                             ),
                             const SizedBox(height: 24),
                             SizedBox(

@@ -3,7 +3,6 @@ import 'package:flutter/services.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:provider/provider.dart';
 
-// import 'firebase_options.dart';
 import 'constants/app_routes.dart';
 import 'constants/colors.dart';
 
@@ -14,22 +13,24 @@ import 'screens/auth/login_screen.dart';
 import 'screens/auth/signin_screen.dart';
 import 'screens/auth/signup_screen.dart';
 import 'screens/auth/forgot_password_screen.dart';
-import 'screens/auth/reset_password_screen.dart';
 import 'screens/medical/medical_history_screen.dart';
 import 'screens/cart/cart_screen.dart';
 import 'screens/favourite/favourite_screen.dart';
 import 'screens/cart/track_order_screen.dart';
 import 'screens/explore/explore_screen.dart';
 import 'screens/profile/account_screen.dart';
+<<<<<<< Updated upstream
 import 'screens/profile/my_orders_screen.dart';
 import 'widgets/common/main_app_screen.dart';
 import 'screens/profile/select_order_screen.dart';
+=======
+import 'widgets/common/main_app_screen.dart';
+>>>>>>> Stashed changes
 
 // Providers
 import 'providers/cart_provider.dart';
 import 'providers/product_provider.dart';
 import 'providers/favorites_provider.dart';
-import 'providers/tab_index_provider.dart'; // ✅ NEW LINE
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -51,7 +52,7 @@ Future<void> main() async {
         ChangeNotifierProvider(create: (_) => CartProvider()),
         ChangeNotifierProvider(create: (_) => ProductProvider()),
         ChangeNotifierProvider(create: (_) => FavoritesProvider()),
-        ChangeNotifierProvider(create: (_) => TabIndexProvider()), // ✅ NEW LINE
+        ChangeNotifierProvider(create: (_) => TabIndexProvider()),
       ],
       child: const MyApp(),
     ),
@@ -94,13 +95,10 @@ class MyApp extends StatelessWidget {
         AppRoutes.forgotPassword: (context) => const ForgotPasswordScreen(),
         AppRoutes.medicalHistory: (context) => const MedicalHistoryScreen(),
         AppRoutes.cart: (context) => const CartScreen(),
-        AppRoutes.resetPassword: (context) => const ResetPasswordScreen(),
         AppRoutes.explore: (context) => const ExploreScreen(),
         AppRoutes.trackOrder: (context) => const TrackOrderScreen(),
         AppRoutes.account: (context) => const AccountScreen(),
         AppRoutes.favorite: (context) => const FavoritesScreen(),
-        AppRoutes.myOrders: (context) => const MyOrdersScreen(),
-        AppRoutes.selectOrder: (context) => const SelectOrderScreen(),
       },
     );
   }

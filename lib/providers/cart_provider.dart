@@ -13,21 +13,19 @@ class CartProvider with ChangeNotifier {
   bool get isEmpty => _items.isEmpty;
   bool get isNotEmpty => _items.isNotEmpty;
 
-  // Core Operations
   void addItem(CartItem item, {required String productId}) {
     try {
       // Validate input
       if (item.quantity <= 0) throw ArgumentError('Quantity must be positive');
       if (item.productId.isEmpty) throw ArgumentError('Product ID cannot be empty');
 
-      // Ensure isSelected is properly initialized
       final itemToAdd = item.copyWith(isSelected: item.isSelected);
 
       _items.update(
         item.productId,
         (existing) => existing.copyWith(
           quantity: existing.quantity + item.quantity,
-          isSelected: existing.isSelected, // Preserve selection state
+          isSelected: existing.isSelected,
         ),
         ifAbsent: () => itemToAdd,
       );
@@ -62,7 +60,7 @@ class CartProvider with ChangeNotifier {
       productId,
       (existing) => existing.copyWith(
         quantity: existing.quantity + 1,
-        isSelected: existing.isSelected, // Preserve selection state
+        isSelected: existing.isSelected,
       ),
     );
     notifyListeners();
@@ -78,7 +76,7 @@ class CartProvider with ChangeNotifier {
         productId,
         (existing) => existing.copyWith(
           quantity: existing.quantity - 1,
-          isSelected: existing.isSelected, // Preserve selection state
+          isSelected: existing.isSelected,
         ),
       );
     } else {
@@ -98,67 +96,12 @@ class CartProvider with ChangeNotifier {
         productId,
         (existing) => existing.copyWith(
           quantity: newQuantity,
-          isSelected: existing.isSelected, // Preserve selection state
-        ),
+          isSelected: existing.isSelected,
+        ),   
       );
       notifyListeners();
     }
     debugPrint('Set quantity for $productId to $newQuantity');
-  }
-
-  // Selection Operations
-  void toggleSelection(String productId) {
-    if (_items.containsKey(productId)) {
-      final current = _items[productId]!;
-      _items[productId] = current.copyWith(isSelected: !current.isSelected);
-      notifyListeners();
-      debugPrint('Toggled selection for: $productId');
-    }
-  }
-
-  void selectAll() {
-    bool allSelected = _items.values.every((item) => item.isSelected);
-    
-    for (var item in _items.values) {
-      _items[item.productId] = item.copyWith(isSelected: !allSelected);
-    }
-    notifyListeners();
-    debugPrint(allSelected ? 'Deselected all items' : 'Selected all items');
-  }
-
-  void clearSelection() {
-    bool hasSelected = _items.values.any((item) => item.isSelected);
-    
-    if (hasSelected) {
-      for (var item in _items.values) {
-        _items[item.productId] = item.copyWith(isSelected: false);
-      }
-      notifyListeners();
-      debugPrint('Cleared all selections');
-    }
-  }
-
-  // Utility Getters
-  Map<String, CartItem> get selectedItems {
-    return Map.from(_items)..removeWhere((_, item) => !item.isSelected);
-  }
-
-  int get selectedItemCount => selectedItems.length;
-
-  double get selectedItemsAmount {
-    return selectedItems.values.fold(0, (sum, item) => sum + item.totalPrice);
-  }
-
-  // Helper Methods
-  bool containsItem(String productId) => _items.containsKey(productId);
-
-  int getQuantity(String productId) => _items[productId]?.quantity ?? 0;
-
-  bool isSelected(String productId) => _items[productId]?.isSelected ?? false;
-
-  bool get allItemsSelected {
-    if (_items.isEmpty) return false;
-    return _items.values.every((item) => item.isSelected);
   }
 
   @override

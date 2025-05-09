@@ -18,10 +18,6 @@ class AppColors {
   static const Color warning = Color(0xFFFFA000);
   static const Color error = Color(0xFFD32F2F);
 
-  // Social Media Colors
-  static const Color facebook = Color(0xFF4267B2);
-  static const Color google = Color(0xFFDB4437);
-
   // Background & Surface
   static const Color background = Color(0xFFFAFAFA);
   static const Color surface = Colors.white;
@@ -36,13 +32,4 @@ class AppColors {
   static final Color black40 = Colors.black.withAlpha((0.4 * 255).round());
   static final Color white90 = Colors.white.withAlpha((0.9 * 255).round());
   static const Color lightGrey = Color(0xFFF5F5F5); 
-  
-  // Example Explore Colors
-  static const Color exploreGreen = Color(0xFFE7F6EC);
-  static const Color exploreYellow = Color(0xFFFFF3E7);
-  static const Color explorePink = Color(0xFFFDEAEA);
-  static const Color explorePurple = Color(0xFFF4EDFF);
-  static const Color exploreCream = Color(0xFFFFF9E5);
-  static const Color exploreBlue = Color(0xFFE7F4FA);
-
 }

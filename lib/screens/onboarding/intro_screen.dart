@@ -28,7 +28,7 @@ class IntroScreen extends StatelessWidget {
       body: SafeArea(
         child: Column(
           children: [
-            const Spacer(flex: 2), // Top spacer to push content down
+            const Spacer(flex: 2),
 
             SizedBox(height: size.height * 0.1),
             Padding(
@@ -54,8 +54,7 @@ class IntroScreen extends StatelessWidget {
               ),
             ),
             
-
-            const Spacer(flex: 3), // Bottom spacer
+            const Spacer(flex: 3),
 
             // Get Started Button
             Padding(

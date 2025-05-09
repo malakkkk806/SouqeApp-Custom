@@ -14,7 +14,6 @@ class AppRoutes {
   static const String orderConfirmation = '/order-confirmation';
   static const String profile = '/profile';
   static const String medicalHistory = '/medical-history';
-  static const String resetPassword = '/reset-password';
   static const String favorite = '/favorite';
   static const String account = '/account';
   static const String orderStatus = '/order-status';
@@ -26,6 +25,4 @@ class AppRoutes {
   static const String notifications = '/notifications';
   static const String help = '/help';
   static const String about = '/about';
-  static const String myOrders = '/myOrders';
-  static const String selectOrder = '/selectOrder';
 }

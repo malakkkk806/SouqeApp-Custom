@@ -83,7 +83,7 @@ class PhoneAuthService {
       } else {
         await _firestore.collection('users').doc(user.uid).update({
           'phone': phone,
-          'name': name, // Optionally overwrite if needed
+          'name': name,
           'updatedAt': FieldValue.serverTimestamp(),
         });
       }

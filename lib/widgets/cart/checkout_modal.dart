@@ -22,7 +22,7 @@ class CheckoutModal extends StatefulWidget {
 class _CheckoutModalState extends State<CheckoutModal> {
   String _selectedDelivery = 'Standard Delivery';
   String _selectedPayment = 'Mastercard';
-  String _userAddress = '123 Main Street, Springfield'; // Replace with actual address if needed
+  final String _userAddress = '123 Main Street, Springfield';
 
   void _selectDeliveryMethod() {
     showModalBottomSheet(
@@ -145,7 +145,7 @@ class _CheckoutModalState extends State<CheckoutModal> {
     final user = FirebaseAuth.instance.currentUser;
 
     if (user == null) {
-      debugPrint('❌ User not logged in');
+      debugPrint('User not logged in');
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Please log in to place an order')),
       );
